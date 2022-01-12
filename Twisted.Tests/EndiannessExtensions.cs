@@ -20,6 +20,20 @@ public static class EndiannessExtensions
         return endianness == Endianness;
     }
 
+    public static T Peek<T>(this BinaryReader reader, Func<BinaryReader, T> func)
+    {
+        if (reader is null)
+            throw new ArgumentNullException(nameof(reader));
+
+        var position = reader.BaseStream.Position;
+
+        var value = func(reader);
+
+        reader.BaseStream.Position = position;
+
+        return value;
+    }
+
     public static T ReadEnum<T>(this BinaryReader reader, Endianness endianness) where T : Enum, IConvertible
     {
         if (reader is null)
