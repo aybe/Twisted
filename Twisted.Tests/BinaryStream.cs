@@ -333,27 +333,12 @@ public partial class BinaryStream
         StreamWriter.WriteEnum(value, endianness);
     }
 
-    public void WriteInt16(short value)
+    public void Write(short value)
     {
-        WriteInt16(value, Endianness ?? EndiannessExtensions.Endianness);
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
     }
 
-    public void WriteInt16(short value, Endianness endianness)
-    {
-        if (StreamWriter is null)
-        {
-            throw new InvalidOperationException(TheStreamIsNotWritable);
-        }
-
-        StreamWriter.Write(value, endianness);
-    }
-
-    public void WriteInt32(int value)
-    {
-        WriteInt32(value, Endianness ?? EndiannessExtensions.Endianness);
-    }
-
-    public void WriteInt32(int value, Endianness endianness)
+    public void Write(short value, Endianness endianness)
     {
         if (StreamWriter is null)
         {
@@ -363,27 +348,12 @@ public partial class BinaryStream
         StreamWriter.Write(value, endianness);
     }
 
-    public void WriteInt64(long value)
+    public void Write(int value)
     {
-        WriteInt64(value, Endianness ?? EndiannessExtensions.Endianness);
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
     }
 
-    public void WriteInt64(long value, Endianness endianness)
-    {
-        if (StreamWriter is null)
-        {
-            throw new InvalidOperationException(TheStreamIsNotWritable);
-        }
-
-        StreamWriter.Write(value, endianness);
-    }
-
-    public void WriteUInt16(ushort value)
-    {
-        WriteUInt16(value, Endianness ?? EndiannessExtensions.Endianness);
-    }
-
-    public void WriteUInt16(ushort value, Endianness endianness)
+    public void Write(int value, Endianness endianness)
     {
         if (StreamWriter is null)
         {
@@ -393,12 +363,12 @@ public partial class BinaryStream
         StreamWriter.Write(value, endianness);
     }
 
-    public void WriteUInt32(uint value)
+    public void Write(long value)
     {
-        WriteUInt32(value, Endianness ?? EndiannessExtensions.Endianness);
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
     }
 
-    public void WriteUInt32(uint value, Endianness endianness)
+    public void Write(long value, Endianness endianness)
     {
         if (StreamWriter is null)
         {
@@ -408,12 +378,42 @@ public partial class BinaryStream
         StreamWriter.Write(value, endianness);
     }
 
-    public void WriteUInt64(ulong value)
+    public void Write(ushort value)
     {
-        WriteUInt64(value, Endianness ?? EndiannessExtensions.Endianness);
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
     }
 
-    public void WriteUInt64(ulong value, Endianness endianness)
+    public void Write(ushort value, Endianness endianness)
+    {
+        if (StreamWriter is null)
+        {
+            throw new InvalidOperationException(TheStreamIsNotWritable);
+        }
+
+        StreamWriter.Write(value, endianness);
+    }
+
+    public void Write(uint value)
+    {
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
+    }
+
+    public void Write(uint value, Endianness endianness)
+    {
+        if (StreamWriter is null)
+        {
+            throw new InvalidOperationException(TheStreamIsNotWritable);
+        }
+
+        StreamWriter.Write(value, endianness);
+    }
+
+    public void Write(ulong value)
+    {
+        Write(value, Endianness ?? EndiannessExtensions.Endianness);
+    }
+
+    public void Write(ulong value, Endianness endianness)
     {
         if (StreamWriter is null)
         {
