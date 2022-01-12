@@ -7,7 +7,7 @@ public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEq
     public readonly long Position;
     public readonly long Length;
 
-    public BinaryStreamRegion(long position, long length)
+    internal BinaryStreamRegion(long position, long length)
     {
         Position = position;
         Length   = length;
