@@ -133,17 +133,20 @@ public sealed class DPCNode00FFXXXX : DPCNode
                         reader.ReadBytes(8);
                     }
 
-                    var n1 = bytes.ReadInt16(24, Endianness.LE);
-                    var n2 = bytes.ReadInt16(26, Endianness.LE);
-                    var n3 = bytes.ReadInt16(28, Endianness.LE);
-                    var n4 = bytes.ReadInt16(30, Endianness.LE);
-                    var n5 = bytes.ReadInt16(32, Endianness.LE);
-                    var n6 = bytes.ReadInt16(34, Endianness.LE);
-
-                    foreach (var index in new[] { n1, n2, n3, n4, n5, n6 })
+                    if (false) // BUG reads out of bounds
                     {
-                        reader.Position = Normals + index * 8;
-                        reader.ReadBytes(8);
+                        var n1 = bytes.ReadInt16(24, Endianness.LE);
+                        var n2 = bytes.ReadInt16(26, Endianness.LE);
+                        var n3 = bytes.ReadInt16(28, Endianness.LE);
+                        var n4 = bytes.ReadInt16(30, Endianness.LE);
+                        var n5 = bytes.ReadInt16(32, Endianness.LE);
+                        var n6 = bytes.ReadInt16(34, Endianness.LE);
+
+                        foreach (var index in new[] { n1, n2, n3, n4, n5, n6 })
+                        {
+                            reader.Position = Normals + index * 8;
+                            reader.ReadBytes(8);
+                        }
                     }
 
                     reader.Position = position;

@@ -83,6 +83,11 @@ public partial class BinaryStream : Stream
     {
         var position = Position;
 
+        if (position >= Length)
+        {
+            throw new EndOfStreamException();
+        }
+
         var read = Stream.Read(buffer, offset, count);
 
         RegionsReading.Add(new BinaryStreamRegion(position, read));
