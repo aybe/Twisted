@@ -328,4 +328,124 @@ public static class EndiannessExtensions
     {
         return endianness.IsIdentical() ? value : BinaryPrimitives.ReverseEndianness(value);
     }
+
+    public static short ReadInt16(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(short))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadInt16BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadInt16LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
+
+    public static int ReadInt32(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(int))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadInt32BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadInt32LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
+
+    public static long ReadInt64(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(long))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadInt64BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadInt64LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
+
+    public static ushort ReadUInt16(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(ushort))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadUInt16BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadUInt16LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
+
+    public static uint ReadUInt32(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(uint))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadUInt32BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadUInt32LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
+
+    public static ulong ReadUInt64(this byte[] bytes, int index, Endianness endianness)
+    {
+        if (bytes is null)
+            throw new ArgumentNullException(nameof(bytes));
+
+        if (index < 0 || index > bytes.Length - sizeof(ulong))
+            throw new ArgumentOutOfRangeException(nameof(index), index, null);
+
+        var slice = bytes[index..];
+
+        var value = endianness switch
+        {
+            Endianness.BE => BinaryPrimitives.ReadUInt64BigEndian(slice),
+            Endianness.LE => BinaryPrimitives.ReadUInt64LittleEndian(slice),
+            _             => throw new ArgumentOutOfRangeException(nameof(endianness), endianness, null)
+        };
+
+        return value;
+    }
 }
