@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Twisted.Tests.PC;
 
@@ -15,6 +16,16 @@ internal sealed class DPCNodeReader
     {
         get => Reader.BaseStream.Position;
         set => Reader.BaseStream.Position = value;
+    }
+
+    public T Peek<T>(Func<BinaryReader, T> func)
+    {
+        if (func is null)
+            throw new ArgumentNullException(nameof(func));
+
+        var peek = Reader.Peek(func);
+
+        return peek;
     }
 
     public int ReadAddress()
