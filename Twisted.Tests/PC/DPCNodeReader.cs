@@ -4,15 +4,12 @@ namespace Twisted.Tests.PC;
 
 internal sealed class DPCNodeReader
 {
-    public DPCNodeReader(BinaryReader reader, int baseAddress)
+    public DPCNodeReader(BinaryReader reader)
     {
         Reader      = reader;
-        BaseAddress = baseAddress;
     }
 
     public BinaryReader Reader { get; }
-
-    public int BaseAddress { get; }
 
     public long Position
     {
@@ -22,7 +19,7 @@ internal sealed class DPCNodeReader
 
     public int ReadAddress()
     {
-        return Reader.ReadInt32(Endianness.LE) - BaseAddress;
+        return Reader.ReadInt32(Endianness.LE) - unchecked((int)0x800188B8);
     }
 
     public int[] ReadAddresses(int count)
@@ -45,5 +42,10 @@ internal sealed class DPCNodeReader
     public byte[] ReadBytes(int count)
     {
         return Reader.ReadBytes(count);
+    }
+
+    public int ReadInt32(Endianness endianness)
+    {
+        return Reader.ReadInt32(endianness);
     }
 }
