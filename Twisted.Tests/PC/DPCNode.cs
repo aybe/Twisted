@@ -45,4 +45,9 @@ public abstract class DPCNode
             return root;
         }
     }
+
+    public override string ToString()
+    {
+        return $"{GetType().Name[nameof(DPCNode).Length..]} @ {Position}";
+    }
 }
