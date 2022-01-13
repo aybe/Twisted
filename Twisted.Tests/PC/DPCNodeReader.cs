@@ -6,7 +6,7 @@ internal sealed class DPCNodeReader
 {
     public DPCNodeReader(BinaryReader reader)
     {
-        Reader      = reader;
+        Reader = reader;
     }
 
     public BinaryReader Reader { get; }
