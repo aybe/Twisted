@@ -21,7 +21,7 @@ public sealed class DPCNode01070100 : DPCNode
 
         children = Array.Empty<int>();
 
-        // children = addresses; // BUG TODO this may not be regular nodes
+        children = addresses; // BUG TODO this may not be regular nodes
     }
 
     public int A { get; }
