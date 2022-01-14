@@ -13,8 +13,6 @@ public sealed class DPCNode03090000 : DPCNode
         var b3 = reader.ReadByte();
         var b4 = reader.ReadByte();
 
-        // addresses = reader.ReadAddresses(b4);
-        addresses = Array.Empty<int>();
         Assert.AreEqual(0, b1, Position.ToString());
 
         Assert.IsTrue(b2 is 1 or 2, Position.ToString());
@@ -22,5 +20,11 @@ public sealed class DPCNode03090000 : DPCNode
         Assert.AreEqual(0, b3, Position.ToString());
 
         Assert.IsTrue(b4 is 1 or 2 or 3, Position.ToString());
+
+        var i1 = reader.ReadInt32(Endianness.LE);
+
+        Assert.AreEqual(0, i1, Position.ToString());
+
+        addresses = reader.ReadAddresses(b4);
     }
 }
