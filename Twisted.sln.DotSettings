@@ -3,5 +3,8 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=DPC/@EntryIndexedValue">DPC</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=FF/@EntryIndexedValue">FF</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XXXX/@EntryIndexedValue">XXXX</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XXXXX/@EntryIndexedValue">XXXXX</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=XXXXXXXX/@EntryIndexedValue">XXXXXXXX</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=endianness/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=XXXX/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=XXXX/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=XXXXX/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
