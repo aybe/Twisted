@@ -29,6 +29,8 @@ public sealed class DPCNode0107XXXX : DPCNode
 
     public override string ToString()
     {
-        return $"{base.ToString()}, {nameof(A)}: {A}, {nameof(B)}: {B}, {nameof(C)}: {C}, {nameof(D)}: {D}";
+        return ToStringVerbose
+            ? $"{base.ToString()}, {nameof(A)}: {A}, {nameof(B)}: {B}, {nameof(C)}: {C}, {nameof(D)}: {D}"
+            : base.ToString();
     }
 }

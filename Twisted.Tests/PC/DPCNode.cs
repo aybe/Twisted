@@ -10,6 +10,8 @@ public abstract class DPCNode
         Position = reader.Position;
     }
 
+    public static bool ToStringVerbose { get; set; }
+
     public DPCNode? Parent { get; set; }
 
     public List<DPCNode> Children { get; } = new();

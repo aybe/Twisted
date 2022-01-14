@@ -327,6 +327,8 @@ public sealed class DPCNode00FFXXXX : DPCNode
 
     public override string ToString()
     {
-        return $"{base.ToString()}, {nameof(Vertices)}: {Vertices}, {nameof(Normals)}: {Normals}, {nameof(Polygons)}: {Polygons}";
+        return ToStringVerbose
+            ? $"{base.ToString()}, {nameof(Vertices)}: {Vertices}, {nameof(Normals)}: {Normals}, {nameof(Polygons)}: {Polygons}"
+            : base.ToString();
     }
 }
