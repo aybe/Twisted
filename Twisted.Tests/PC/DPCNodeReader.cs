@@ -31,14 +31,20 @@ internal sealed class DPCNodeReader
 
     public int ReadAddress(bool validate = true)
     {
-        var address = Reader.ReadInt32(Endianness.LE) - unchecked((int)0x800188B8);
+        const int baseAddress = unchecked((int)0x800188B8);
+
+        var address1 = Reader.ReadInt32(Endianness.LE);
+        var address2 = address1 - baseAddress;
 
         if (validate)
         {
-            Assert.IsTrue(address >= 0 && address < Reader.BaseStream.Length, $"Invalid address @ {Position - sizeof(int)}.");
-        } 
+            Assert.IsTrue(
+                address2 >= 0 && address2 < Reader.BaseStream.Length,
+                $"Invalid address @ {Position - sizeof(int)}: 0x{address2:X8}."
+            );
+        }
 
-        return address;
+        return address2;
     }
 
     public int[] ReadAddresses(int count, bool validate = true)

@@ -65,6 +65,7 @@ public sealed class DPCNode00FFXXXX : DPCNode
                     reader.Position = position;
                     continue;
                 }
+                case 0x00010704:
                 case 0x00010705:
                 {
                     var bytes = reader.ReadBytes(28); // TODO maybe
@@ -282,6 +283,25 @@ public sealed class DPCNode00FFXXXX : DPCNode
                     var position = reader.Position;
 
                     foreach (var index in new[] { v1, v2, v3, v4 })
+                    {
+                        reader.Position = Vertices + index * 8;
+                        reader.ReadBytes(8);
+                    }
+
+                    reader.Position = position;
+                    continue;
+                }
+                case 0x83010D09:
+                {
+                    var bytes = reader.ReadBytes(52); // TODO maybe
+
+                    var v1 = bytes.ReadInt16(4, Endianness.LE);
+                    var v2 = bytes.ReadInt16(6, Endianness.LE);
+                    var v3 = bytes.ReadInt16(8, Endianness.LE);
+
+                    var position = reader.Position;
+
+                    foreach (var index in new[] { v1, v2, v3 })
                     {
                         reader.Position = Vertices + index * 8;
                         reader.ReadBytes(8);

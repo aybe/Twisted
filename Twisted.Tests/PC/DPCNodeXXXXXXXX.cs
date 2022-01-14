@@ -1,16 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Twisted.Tests.PC;
+﻿namespace Twisted.Tests.PC;
 
 public sealed class DPCNodeXXXXXXXX : DPCNode
 {
     internal DPCNodeXXXXXXXX(DPCNodeReader reader, out int[] children) : base(reader)
     {
-        var bytes = reader.ReadBytes(8);
+        var bytes = reader.ReadBytes(4);
 
-        var i1 = bytes.ReadInt32(4, Endianness.LE);
-
-        // Assert.AreEqual(0, i1, Position.ToString());
+        var b1 = reader.ReadByte();
+        var b2 = reader.ReadByte();
+        var b3 = reader.ReadByte();
+        var b4 = reader.ReadByte();
 
         var addresses = reader.ReadAddresses(1);
 
