@@ -11,7 +11,7 @@ public sealed class DPCNode00FFXXXX : DPCNode
 
         reader.Position += 4;
 
-        var addresses = reader.ReadAddresses(3);
+        var addresses = reader.ReadAddresses(3, false);
 
         children = Array.Empty<int>();
 

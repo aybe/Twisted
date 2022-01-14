@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Twisted.Tests.PC;
 
@@ -28,18 +29,25 @@ internal sealed class DPCNodeReader
         return peek;
     }
 
-    public int ReadAddress()
+    public int ReadAddress(bool validate = true)
     {
-        return Reader.ReadInt32(Endianness.LE) - unchecked((int)0x800188B8);
+        var address = Reader.ReadInt32(Endianness.LE) - unchecked((int)0x800188B8);
+
+        if (validate)
+        {
+            Assert.IsTrue(address >= 0 && address < Reader.BaseStream.Length, $"Invalid address @ {Position - sizeof(int)}.");
+        } 
+
+        return address;
     }
 
-    public int[] ReadAddresses(int count)
+    public int[] ReadAddresses(int count, bool validate = true)
     {
         var addresses = new int[count];
 
         for (var i = 0; i < count; i++)
         {
-            addresses[i] = ReadAddress();
+            addresses[i] = ReadAddress(validate);
         }
 
         return addresses;
