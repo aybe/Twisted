@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Twisted.Tests.PC;
 
@@ -53,6 +55,49 @@ public abstract class DPCNode
     public override string ToString()
     {
         return $"{GetType().Name[nameof(DPCNode).Length..]}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Depth)}: {Depth}";
+    }
+
+    public int Traverse(Action<DPCNode> action)
+    {
+        if (action is null)
+            throw new ArgumentNullException(nameof(action));
+
+        return Traverse(s =>
+        {
+            action(s);
+            return true;
+        });
+    }
+
+    public int Traverse(Func<DPCNode, bool> func)
+    {
+        if (func is null)
+            throw new ArgumentNullException(nameof(func));
+
+        var count = 0;
+
+        var stack = new Stack<DPCNode>();
+
+        stack.Push(this);
+
+        while (stack.Any())
+        {
+            var node = stack.Pop();
+
+            count++;
+
+            if (func(node) is false)
+            {
+                break;
+            }
+
+            foreach (var item in node.Children.AsEnumerable().Reverse())
+            {
+                stack.Push(item);
+            }
+        }
+
+        return count;
     }
 
     private protected void SetLength(DPCNodeReader reader)
