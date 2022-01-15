@@ -17,6 +17,8 @@ public sealed class DPCNode0107XXXX : DPCNode
         var b4 = reader.ReadByte();
 
         children = reader.ReadAddresses(b1);
+
+        SetLength(reader);
     }
 
     public int A { get; }

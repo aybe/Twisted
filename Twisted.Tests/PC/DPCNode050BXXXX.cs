@@ -42,6 +42,10 @@ public sealed class DPCNode050BXXXX : DPCNode
         Assert.AreEqual(1, b3, nameof(b3));
         // Assert.AreEqual(1, b4, nameof(b4));
 
-        children = reader.ReadAddresses(b3);
+        var addresses = reader.ReadAddresses(b3);
+
+        SetLength(reader);
+
+        children = addresses;
     }
 }

@@ -13,6 +13,8 @@ public sealed class DPCNodeXXXXXXXX : DPCNode
 
         var addresses = reader.ReadAddresses(1);
 
+        SetLength(reader);
+
         children = addresses;
     }
 }

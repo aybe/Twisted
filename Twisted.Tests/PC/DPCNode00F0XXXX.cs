@@ -8,6 +8,8 @@ public sealed class DPCNode00F0XXXX : DPCNode
     {
         var bytes = reader.ReadBytes(16);
 
+        SetLength(reader);
+
         children = Array.Empty<int>();
     }
 }

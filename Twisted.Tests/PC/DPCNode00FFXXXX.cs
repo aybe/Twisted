@@ -13,6 +13,8 @@ public sealed class DPCNode00FFXXXX : DPCNode
 
         var addresses = reader.ReadAddresses(3, false);
 
+        SetLength(reader);
+
         children = Array.Empty<int>();
 
         // TODO vertices, normals, polygons ???

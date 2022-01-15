@@ -4,7 +4,7 @@ namespace Twisted.Tests.PC;
 
 public sealed class DPCNode03090000 : DPCNode
 {
-    internal DPCNode03090000(DPCNodeReader reader, out int[] addresses) : base(reader)
+    internal DPCNode03090000(DPCNodeReader reader, out int[] children) : base(reader)
     {
         var bytes = reader.ReadBytes(8);
 
@@ -25,6 +25,10 @@ public sealed class DPCNode03090000 : DPCNode
 
         Assert.AreEqual(0, i1, Position.ToString());
 
-        addresses = reader.ReadAddresses(b4);
+        var addresses = reader.ReadAddresses(b4);
+
+        SetLength(reader);
+
+        children = addresses;
     }
 }

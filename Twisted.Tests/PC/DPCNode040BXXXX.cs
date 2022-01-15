@@ -29,7 +29,11 @@ public sealed class DPCNode040BXXXX : DPCNode
 
         // Assert.AreEqual(0, b4, Position.ToString());
 
-        children = reader.ReadAddresses(b3);
+        var addresses = reader.ReadAddresses(b3);
+
+        SetLength(reader);
+
+        children = addresses;
     }
 
     public int A { get; }

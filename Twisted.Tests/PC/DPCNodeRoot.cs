@@ -10,6 +10,10 @@ public sealed class DPCNodeRoot : DPCNode
 
         var count = reader.ReadInt32(Endianness.LE);
 
-        children = reader.ReadAddresses(count);
+        var addresses = reader.ReadAddresses(count);
+
+        SetLength(reader);
+
+        children = addresses;
     }
 }

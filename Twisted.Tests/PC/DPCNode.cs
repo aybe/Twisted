@@ -48,8 +48,15 @@ public abstract class DPCNode
         }
     }
 
+    public long Length { get; private set; }
+
     public override string ToString()
     {
-        return $"{GetType().Name[nameof(DPCNode).Length..]} @ {Position}";
+        return $"{GetType().Name[nameof(DPCNode).Length..]}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
+    }
+
+    private protected void SetLength(DPCNodeReader reader)
+    {
+        Length = reader.Position - Position;
     }
 }

@@ -27,6 +27,8 @@ public sealed class DPCNode020XXXXX : DPCNode
 
         var addresses = reader.ReadAddresses(b1);
 
+        SetLength(reader);
+
         children = addresses;
     }
 
