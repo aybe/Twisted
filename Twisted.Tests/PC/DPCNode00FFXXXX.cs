@@ -31,6 +31,8 @@ public sealed class DPCNode00FFXXXX : DPCNode
         Assert.AreEqual((byte)0, b3);
         Assert.AreEqual((byte)0, b4);
 
+        var data = reader.ReadBytes(88); // TODO there should be some transform here
+
         // try read polygons
 
         var address = addresses[2];
