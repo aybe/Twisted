@@ -14,6 +14,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twisted.Tests.PS.V1", "Twis
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twisted.Tests.PS.V2", "Twisted.Tests.PS.V2\Twisted.Tests.PS.V2.csproj", "{FB162B5A-F90B-48F9-A2D8-72813785F080}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Version 1", "Version 1", "{387FEFFC-6C80-42EA-8B35-DE0761A93AFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Version 2", "Version 2", "{66B6A056-67BB-4371-8844-507A32B3DE11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Version 3", "Version 3", "{93DE5361-F4F6-490E-91D2-7ABF7D30C994}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +41,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D3F792C0-B130-4604-8765-4001D39F2554} = {387FEFFC-6C80-42EA-8B35-DE0761A93AFF}
+		{DDB147BE-F61C-4F36-BD56-4E231BEBDCE6} = {66B6A056-67BB-4371-8844-507A32B3DE11}
+		{FB162B5A-F90B-48F9-A2D8-72813785F080} = {93DE5361-F4F6-490E-91D2-7ABF7D30C994}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28C9312E-0355-4B29-B7D7-12DB0F479629}
