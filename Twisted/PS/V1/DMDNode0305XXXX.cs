@@ -1,6 +1,6 @@
 ﻿using Twisted.Extensions;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 public sealed class DMDNode0305XXXX : DMDNode
 {

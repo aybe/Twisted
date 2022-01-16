@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using JetBrains.Annotations;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 public static class Tree
 {

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Twisted.Extensions;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Twisted.Extensions;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 [NoReorder]
 public sealed class DMDNode02XXXXXX : DMDNode

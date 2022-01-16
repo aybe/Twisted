@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Twisted.PC;
 using Twisted.PS;
+using Twisted.PS.V1;
 
 namespace Twisted.Tests;
 

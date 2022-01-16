@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 public static class DMDNodeReader
 {

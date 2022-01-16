@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 [DebuggerDisplay("0x{Value.ToString(\"X8\"),nq}")]
 public struct DMDPointer : IEquatable<DMDPointer>

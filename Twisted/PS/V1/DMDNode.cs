@@ -3,7 +3,7 @@ using System.Text;
 using JetBrains.Annotations;
 using Twisted.Extensions;
 
-namespace Twisted.PS;
+namespace Twisted.PS.V1;
 
 public abstract class DMDNode
 {
