@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twisted.Tests.PS.V1", "Twisted.Tests.PS.V1\Twisted.Tests.PS.V1.csproj", "{DDB147BE-F61C-4F36-BD56-4E231BEBDCE6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twisted.Tests.PS.V2", "Twisted.Tests.PS.V2\Twisted.Tests.PS.V2.csproj", "{FB162B5A-F90B-48F9-A2D8-72813785F080}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{DDB147BE-F61C-4F36-BD56-4E231BEBDCE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDB147BE-F61C-4F36-BD56-4E231BEBDCE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDB147BE-F61C-4F36-BD56-4E231BEBDCE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB162B5A-F90B-48F9-A2D8-72813785F080}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB162B5A-F90B-48F9-A2D8-72813785F080}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB162B5A-F90B-48F9-A2D8-72813785F080}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB162B5A-F90B-48F9-A2D8-72813785F080}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
