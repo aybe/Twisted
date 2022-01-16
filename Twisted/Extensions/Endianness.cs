@@ -6,5 +6,7 @@ namespace Twisted.Extensions;
 public enum Endianness
 {
     BE,
-    LE
+    LE,
+    BigEndian = BE,
+    LittleEndian = LE,
 }
