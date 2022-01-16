@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Twisted\Twisted.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Generated.g.cs</LastGenOutput>
