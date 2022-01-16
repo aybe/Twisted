@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Twisted.Tests.PC;
+﻿using System.Text;
 
-namespace Twisted.Tests;
+namespace Twisted.PC;
 
 public static class DPCNodeExtensions
 {

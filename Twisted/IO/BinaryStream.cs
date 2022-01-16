@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
+using Twisted.Extensions;
 
-namespace Twisted.Tests;
+namespace Twisted.IO;
 
 public partial class BinaryStream : Stream
 {

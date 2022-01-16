@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 
-namespace Twisted.Tests.PC;
+namespace Twisted.PC;
 
 public sealed class DPCNode0B060000 : DPCNode
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Twisted.Tests;
+﻿namespace Twisted.Extensions;
 
 public static partial class ConvertExtensions
 {

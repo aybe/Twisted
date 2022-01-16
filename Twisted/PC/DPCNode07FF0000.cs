@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Twisted.Tests.PC;
+﻿namespace Twisted.PC;
 
 public sealed class DPCNode07FF0000 : DPCNode
 {

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Twisted.Tests;
+namespace Twisted.Extensions;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum Endianness

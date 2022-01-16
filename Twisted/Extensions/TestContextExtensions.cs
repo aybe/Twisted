@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Twisted.Tests;
+namespace Twisted.Extensions;
 
 public static class TestContextExtensions
 {

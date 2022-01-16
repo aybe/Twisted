@@ -1,4 +1,4 @@
-﻿namespace Twisted.Tests;
+﻿namespace Twisted.IO;
 
 public enum BinaryStreamRegionKind
 {

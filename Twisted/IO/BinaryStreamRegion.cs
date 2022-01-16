@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Twisted.Tests;
+﻿namespace Twisted.IO;
 
 public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEquatable<BinaryStreamRegion>
 {
