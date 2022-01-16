@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Twisted.Extensions;
 using Twisted.Tests.PS.V1.Extensions;
 
 namespace Twisted.Tests.PS.V1.Graphics;

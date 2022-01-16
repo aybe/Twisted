@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 using Twisted.Tests.PS.V1.Extensions;
 using Twisted.Tests.PS.V1.Graphics;
 using NotNull = JetBrains.Annotations.NotNullAttribute;

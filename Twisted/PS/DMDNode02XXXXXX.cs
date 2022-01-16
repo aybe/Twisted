@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using JetBrains.Annotations;
-using Twisted.Tests.PS.V1.Extensions;
+using Twisted.Extensions;
 
-namespace Twisted.Tests.PS.V1.PSX;
+namespace Twisted.PS;
 
 [NoReorder]
 public sealed class DMDNode02XXXXXX : DMDNode

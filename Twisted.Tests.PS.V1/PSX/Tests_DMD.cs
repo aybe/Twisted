@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Twisted.PS;
 using NotNull = JetBrains.Annotations.NotNullAttribute;
 
 namespace Twisted.Tests.PS.V1.PSX;

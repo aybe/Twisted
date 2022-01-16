@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Twisted.Tests.PS.V1.PSX;
+namespace Twisted.PS;
 
 public sealed class DMDNodeROOT : DMDNode
 {

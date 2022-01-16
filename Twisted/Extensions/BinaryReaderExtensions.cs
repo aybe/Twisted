@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 
-namespace Twisted.Tests.PS.V1.Extensions;
+namespace Twisted.Extensions;
 
 public static class BinaryReaderExtensions
 {

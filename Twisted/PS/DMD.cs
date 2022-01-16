@@ -1,14 +1,10 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Twisted.Tests.PS.V1.Extensions;
-using NotNull = JetBrains.Annotations.NotNullAttribute;
+using Twisted.Extensions;
 
-namespace Twisted.Tests.PS.V1.PSX;
+namespace Twisted.PS;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]

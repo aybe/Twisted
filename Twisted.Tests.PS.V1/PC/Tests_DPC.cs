@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 using Twisted.Tests.PS.V1.Extensions;
 using NotNull = JetBrains.Annotations.NotNullAttribute;
 

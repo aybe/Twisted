@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Twisted.Tests.PS.V1.Extensions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 
-namespace Twisted.Tests.PS.V1.PSX;
+namespace Twisted.PS;
 
 public sealed class DMDNode0107XXXX : DMDNode
 {

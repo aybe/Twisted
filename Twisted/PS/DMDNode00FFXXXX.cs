@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Twisted.Tests.PS.V1.PSX;
+﻿namespace Twisted.PS;
 
 public sealed class DMDNode00FFXXXX : DMDNode
 {

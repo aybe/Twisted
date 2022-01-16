@@ -1,4 +1,4 @@
-﻿namespace Twisted.Tests.PS.V1.Extensions;
+﻿namespace Twisted.Extensions;
 
 public static class Int32Extensions
 {
@@ -11,6 +11,5 @@ public static class Int32Extensions
         byte3 =   (byte)(value & 0xFF);
         value >>= 8;
         byte4 =   (byte)(value & 0xFF);
-        value >>= 8;
     }
 }
