@@ -13,8 +13,6 @@ public sealed class DPCNode00FFXXXX : DPCNode
 
         var addresses = reader.ReadAddresses(3, false);
 
-        SetLength(reader);
-
         children = Array.Empty<int>();
 
         // TODO vertices, normals, polygons ???
@@ -29,11 +27,19 @@ public sealed class DPCNode00FFXXXX : DPCNode
         var b4 = reader.ReadByte();
 
         Assert.AreNotEqual((byte)0, b1);
+
+        if (b1 != 0)
+        {
+            // Assert.Fail($"Maybe polygons @ {ToString()}");
+        }
+
         Assert.AreEqual((byte)0, b2);
         Assert.AreEqual((byte)0, b3);
         Assert.AreEqual((byte)0, b4);
 
-        var data = reader.ReadBytes(88); // TODO there should be some transform here
+        var data = reader.ReadBytes(88); // BUG this does cross over some data
+
+        SetLength(reader);
 
         // try read polygons
 
