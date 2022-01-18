@@ -1,5 +1,6 @@
 ﻿namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 public sealed class DMDNode08FFXXXX : DMDNode
 {
     public DMDNode08FFXXXX(DMD dmd, DMDNode parent) : base(dmd, parent)

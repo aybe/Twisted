@@ -4,6 +4,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 public abstract class DMDNode
 {
     // NOTE a cache could be interesting but what about parents ??

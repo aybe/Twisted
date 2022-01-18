@@ -3,6 +3,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 public sealed class DMDNode0107XXXX : DMDNode
 {
     public DMDNode0107XXXX(DMD dmd, DMDNode parent) : base(dmd, parent)

@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 public static class Tree
 {
     public static void TraversePreOrder<T>(

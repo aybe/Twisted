@@ -4,6 +4,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 [NoReorder]
 public sealed class DMDNode02XXXXXX : DMDNode
 {

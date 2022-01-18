@@ -10,7 +10,7 @@ public static class DMDTester
     {
         if (false)
         {
-            var v1 = new DMD(stream);
+            // var v1 = new DMD(stream);
         }
         else
         {

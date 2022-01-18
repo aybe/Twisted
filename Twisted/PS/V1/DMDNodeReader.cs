@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Twisted.PS.V1;
 
+[Obsolete(null, true)]
 public static class DMDNodeReader
 {
     [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
