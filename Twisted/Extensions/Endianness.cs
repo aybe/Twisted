@@ -7,6 +7,6 @@ public enum Endianness
 {
     BE,
     LE,
-    BigEndian = BE,
-    LittleEndian = LE,
+    BigEndian    = BE,
+    LittleEndian = LE
 }
