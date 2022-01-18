@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using JetBrains.Annotations;
 using Twisted.Extensions;
 
@@ -172,32 +171,5 @@ public abstract class DMDNode : TreeNode<DMDNode>
         };
 
         return node;
-    }
-
-    [PublicAPI]
-    public string PrintTree()
-    {
-        var stack = new Stack<(DMDNode, int)>();
-
-        stack.Push((this, 0));
-
-        var builder = new StringBuilder();
-
-        while (stack.Any())
-        {
-            var (item, depth) = stack.Pop();
-
-            builder.AppendLine($"{new string('\t', depth)}{item}");
-
-            for (var i = item.Count - 1; i >= 0; i--)
-            {
-                var child = item[i];
-                stack.Push((child, depth + 1));
-            }
-        }
-
-        var tree = builder.ToString();
-
-        return tree;
     }
 }
