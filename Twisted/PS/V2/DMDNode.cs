@@ -7,7 +7,7 @@ namespace Twisted.PS.V2;
 
 public abstract class DMDNode : IReadOnlyList<DMDNode>
 {
-    protected DMDNode([CanBeNull] DMDNode parent, BinaryReader reader, ushort? type = null)
+    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? type = null)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -24,8 +24,7 @@ public abstract class DMDNode : IReadOnlyList<DMDNode>
     public long Position { get; }
 
     [PublicAPI]
-    [CanBeNull]
-    public DMDNode Parent { get; }
+    public DMDNode? Parent { get; }
 
     private IList<DMDNode> Children { get; } = new List<DMDNode>();
 
@@ -91,7 +90,7 @@ public abstract class DMDNode : IReadOnlyList<DMDNode>
         }
     }
 
-    private static DMDNode ReadNode([CanBeNull] DMDNode parent, BinaryReader reader)
+    private static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));

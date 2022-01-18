@@ -5,7 +5,7 @@ namespace Twisted.PS.V2;
 
 public sealed class DMDNode0B06 : DMDNode
 {
-    public DMDNode0B06([CanBeNull] DMDNode parent, BinaryReader reader)
+    public DMDNode0B06(DMDNode? parent, BinaryReader reader)
         : base(parent, reader)
     {
         if (reader == null)

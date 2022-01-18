@@ -9,7 +9,7 @@ public abstract class DMDNode
 {
     // NOTE a cache could be interesting but what about parents ??
 
-    protected DMDNode(DMD dmd, [CanBeNull] DMDNode parent)
+    protected DMDNode(DMD dmd, DMDNode? parent)
     {
         if (dmd == null)
             throw new ArgumentNullException(nameof(dmd));
@@ -57,8 +57,7 @@ public abstract class DMDNode
         }
     }
 
-    [CanBeNull]
-    public DMDNode Parent { get; }
+    public DMDNode? Parent { get; }
 
     public List<DMDNode> Children { get; } = new();
 

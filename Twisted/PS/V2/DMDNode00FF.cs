@@ -12,7 +12,7 @@ public sealed class DMDNode00FF : DMDNode
     public readonly uint                    PolygonsOffset;
     public readonly IReadOnlyList<IPolygon> Polygons;
 
-    public DMDNode00FF([CanBeNull] DMDNode parent, BinaryReader reader)
+    public DMDNode00FF(DMDNode? parent, BinaryReader reader)
         : base(parent, reader)
     {
         if (reader == null)
