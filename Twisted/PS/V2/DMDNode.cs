@@ -4,7 +4,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.V2;
 
-public abstract class DMDNode : TreeNode<DMDNode>
+public abstract class DMDNode : TreeNode
 {
     protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? type = null) : base(parent)
     {

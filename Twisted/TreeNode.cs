@@ -3,17 +3,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Twisted;
 
-public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
+public abstract class TreeNode : IList<TreeNode>
 {
-    private T? _parent;
+    private TreeNode? _parent;
 
-    protected TreeNode(T? parent = null)
+    protected TreeNode(TreeNode? parent = null)
     {
-        parent?.Add((T)this);
+        parent?.Add(this);
         _parent = parent;
     }
 
-    private List<T> Children { get; } = new();
+    private List<TreeNode> Children { get; } = new();
 
     public int Depth
     {
@@ -30,10 +30,10 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         }
     }
 
-    [SuppressMessage("ReSharper", "ConvertToAutoPropertyWithPrivateSetter")]
-    public T? Parent => _parent;
+    [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
+    public TreeNode? Parent => _parent;
 
-    public T Root
+    public TreeNode Root
     {
         get
         {
@@ -44,23 +44,23 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
                 root = root.Parent;
             }
 
-            return (T)root;
+            return root;
         }
     }
 
     public int Count => Children.Count;
 
-    public bool IsReadOnly => ((ICollection<T>)Children).IsReadOnly;
+    public bool IsReadOnly => ((ICollection<TreeNode>)Children).IsReadOnly;
 
-    public T this[int index]
+    public TreeNode this[int index]
     {
         get => Children[index];
         set => throw new NotSupportedException();
     }
 
-    public void Add(T item)
+    public void Add(TreeNode item)
     {
-        if (item is null)
+        if (item == null)
             throw new ArgumentNullException(nameof(item));
 
         Insert(Count, item);
@@ -76,19 +76,19 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         Children.Clear();
     }
 
-    public bool Contains(T item)
+    public bool Contains(TreeNode item)
     {
         var contains = Children.Contains(item);
 
         return contains;
     }
 
-    public void CopyTo(T[] array, int arrayIndex)
+    public void CopyTo(TreeNode[] array, int arrayIndex)
     {
         Children.CopyTo(array, arrayIndex);
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<TreeNode> GetEnumerator()
     {
         return Children.GetEnumerator();
     }
@@ -98,7 +98,7 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         return ((IEnumerable)Children).GetEnumerator();
     }
 
-    public int IndexOf(T item)
+    public int IndexOf(TreeNode item)
     {
         if (item == null)
             throw new ArgumentNullException(nameof(item));
@@ -108,11 +108,8 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         return indexOf;
     }
 
-    public void Insert(int index, T item)
+    public void Insert(int index, TreeNode item)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item));
-
         ref var parent = ref item._parent;
 
         if (parent == this)
@@ -121,12 +118,12 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         if (parent != null)
             throw new ArgumentOutOfRangeException(nameof(item), "Item is already a child of another node.");
 
-        parent = (T)this;
+        parent = this;
 
         Children.Insert(index, item);
     }
 
-    public bool Remove(T item)
+    public bool Remove(TreeNode item)
     {
         if (item == null)
             throw new ArgumentNullException(nameof(item));
@@ -151,75 +148,5 @@ public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
         child._parent = null;
 
         Children.RemoveAt(index);
-    }
-
-    public void TraverseBFS(Action<T> visitor)
-    {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
-
-        TraverseBFS(s =>
-        {
-            visitor(s);
-            return true;
-        });
-    }
-
-    public void TraverseBFS(Func<T, bool> visitor)
-    {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
-
-        var queue = new Queue<T>();
-
-        queue.Enqueue((T)this);
-
-        while (queue.Any())
-        {
-            var dequeue = queue.Dequeue();
-
-            if (!visitor(dequeue))
-                break;
-
-            foreach (var item in dequeue)
-            {
-                queue.Enqueue(item);
-            }
-        }
-    }
-
-    public void TraverseDFS(Action<T> visitor)
-    {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
-
-        TraverseDFS(s =>
-        {
-            visitor(s);
-            return true;
-        });
-    }
-
-    public void TraverseDFS(Func<T, bool> visitor)
-    {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
-
-        var stack = new Stack<T>();
-
-        stack.Push((T)this);
-
-        while (stack.Any())
-        {
-            var pop = stack.Pop();
-
-            if (!visitor(pop))
-                break;
-
-            foreach (var item in pop.Reverse())
-            {
-                stack.Push(item);
-            }
-        }
     }
 }

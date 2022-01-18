@@ -154,7 +154,7 @@ public class TreeNodeTests
         var node1 = new TreeNodeTest();
         var node2 = new TreeNodeTest(node1);
 
-        var array = new TreeNodeTest[1];
+        var array = new TreeNode[1];
 
         node1.CopyTo(array, 0);
 
