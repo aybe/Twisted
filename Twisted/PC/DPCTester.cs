@@ -1,18 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Twisted.Extensions;
-using Twisted.IO;
 
 namespace Twisted.PC;
 
 public static class DPCTester
 {
-    public static void Test(TestContext context, string path)
+    public static void Test(TestContext context, Stream stream)
     {
-        if (!Path.GetExtension(path).Equals(".DPC", StringComparison.OrdinalIgnoreCase))
-            throw new NotImplementedException();
-
-        using var stream = new BinaryStream(new MemoryStream(File.ReadAllBytes(path)));
-        using var reader = new BinaryReader(stream);
+        using var reader = new BinaryReader(stream, Encoding.Default, true);
 
         if (reader.ReadInt32(Endianness.BE) is not 0x4443504D)
             throw new InvalidDataException("Unknown magic sequence.");
@@ -334,17 +330,7 @@ public static class DPCTester
         context.WriteLine();
 
         {
-            var rv = stream.GetRegions(BinaryStreamRegionKind.Reading, BinaryStreamRegionType.Visited).ToArray();
-            var ri = stream.GetRegions(BinaryStreamRegionKind.Reading, BinaryStreamRegionType.Ignored).ToArray();
-            var sv = rv.Sum(s => s.Length);
-            var si = ri.Sum(s => s.Length);
-            var pv = sv / (double)stream.Length;
-            var pi = si / (double)stream.Length;
-
-            context.WriteLine($"Regions ignored: {pi:P3}");
-            context.WriteLine($"Regions visited: {pv:P3}");
-            context.WriteLine();
-
+/*
             if (false)
             {
                 // save reading statistics
@@ -394,33 +380,11 @@ public static class DPCTester
                     context.WriteLine($"Visited increase: {vv:P3}");
                 }
             }
-
-            context.WriteLine($"Ignored: {ri.Length}");
-
-            foreach (var region in ri)
-            {
-                context.WriteLine(region.ToString());
-            }
-
-            context.WriteLine();
-
-            context.WriteLine($"Visited: {rv.Length}");
-
-            foreach (var region in rv)
-            {
-                context.WriteLine(region.ToString());
-            }
-
-            context.WriteLine();
+*/
 
             DPCNode.ToStringVerbose = true;
 
             context.WriteLine(root.Print());
-
-            Assert.IsTrue(pi <= 1.0d, "More than 100% data ignored.");
-            Assert.IsTrue(pv <= 1.0d, "More than 100% data visited.");
-
-            // Assert.AreEqual(1.0d, pv, $"Visited: {pv:P}"); 
         }
 
         // perform some extra tests
