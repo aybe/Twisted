@@ -1,18 +1,16 @@
-﻿using System.Collections;
 using System.Text;
 using JetBrains.Annotations;
 using Twisted.Extensions;
 
 namespace Twisted.PS.V2;
 
-public abstract class DMDNode : IReadOnlyList<DMDNode>
+public abstract class DMDNode : TreeNode<DMDNode>
 {
-    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? type = null)
+    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? type = null) : base(parent)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        Parent   = parent;
         Position = reader.BaseStream.Position;
         Type     = type ?? reader.ReadUInt16(Endianness.BigEndian);
     }
@@ -22,27 +20,6 @@ public abstract class DMDNode : IReadOnlyList<DMDNode>
 
     [PublicAPI]
     public long Position { get; }
-
-    [PublicAPI]
-    public DMDNode? Parent { get; }
-
-    private IList<DMDNode> Children { get; } = new List<DMDNode>();
-
-    [PublicAPI]
-    public DMDNode Root
-    {
-        get
-        {
-            var root = this;
-
-            while (root.Parent != null)
-            {
-                root = root.Parent;
-            }
-
-            return root;
-        }
-    }
 
     public override string ToString()
     {
@@ -84,9 +61,7 @@ public abstract class DMDNode : IReadOnlyList<DMDNode>
         {
             reader.BaseStream.Position = address;
 
-            var node = ReadNode(this, reader);
-
-            Children.Add(node);
+            ReadNode(this, reader);
         }
     }
 
@@ -205,22 +180,4 @@ public abstract class DMDNode : IReadOnlyList<DMDNode>
 
         return tree;
     }
-
-    #region IReadOnlyList<DMDNode>
-
-    public DMDNode this[int index] => Children[index];
-
-    public int Count => Children.Count;
-
-    public IEnumerator<DMDNode> GetEnumerator()
-    {
-        return Children.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)Children).GetEnumerator();
-    }
-
-    #endregion
 }
