@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
-namespace Twisted.Tests;
+namespace Twisted;
 
 public abstract class TreeNode<T> : IList<T> where T : TreeNode<T>
 {
