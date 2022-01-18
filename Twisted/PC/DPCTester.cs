@@ -6,7 +6,7 @@ namespace Twisted.PC;
 
 public static class DPCTester
 {
-    public static void Test(TestContext context, Stream stream)
+    public static DPCNode Test(TestContext context, Stream stream)
     {
         using var reader = new BinaryReader(stream, Encoding.Default, true);
 
@@ -43,7 +43,7 @@ public static class DPCTester
             switch (nodeType)
             {
                 case 0xCC88_0180:
-                    node = new DPCNodeRoot(nodeReader, out nodeChildren);
+                    node = new DPCNodeRoot(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0009_3D00:
                 case 0x_0010_2700:
@@ -94,14 +94,14 @@ public static class DPCTester
                 case 0x_E457_0000:
                 case 0x_F915_0000:
                     Assert.IsTrue(parent is DPCNode020XXXXX);
-                    node = new DPCNodeXXXXXXXX(nodeReader, out nodeChildren);
+                    node = new DPCNodeXXXXXXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0010_0000:
                     Assert.IsTrue(parent is DPCNode0B060000);
-                    node = new DPCNode00100000(nodeReader, out nodeChildren);
+                    node = new DPCNode00100000(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_00F0_FFFF:
-                    node = new DPCNode00F0XXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode00F0XXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_00FF_0000:
                 case 0x_00FF_0014:
@@ -145,7 +145,7 @@ public static class DPCTester
                 case 0x_00FF_D600:
                 case 0x_00FF_EC13:
                 case 0x_00FF_F613:
-                    node = new DPCNode00FFXXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode00FFXXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0107_0000:
                 case 0x_0107_0100:
@@ -197,17 +197,17 @@ public static class DPCTester
                 case 0x_0107_F703:
                 case 0x_0107_F802:
                 case 0x_0107_FD03:
-                    node = new DPCNode0107XXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode0107XXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0309_0000:
-                    node = new DPCNode03090000(nodeReader, out nodeChildren);
+                    node = new DPCNode03090000(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0207_0000:
                 case 0x_0206_0000:
                 case 0x_0208_0000:
                 case 0x_0209_0000:
                 case 0x_020A_0000:
-                    node = new DPCNode020XXXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode020XXXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_040B_0000:
                 case 0x_040B_5B02:
@@ -226,22 +226,22 @@ public static class DPCTester
                 case 0x_040B_EE03:
                 case 0x_040B_EF03:
                 case 0x_040B_F403:
-                    node = new DPCNode040BXXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode040BXXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_050B_0000:
                 case 0x_050B_2A00:
                 case 0x_050B_8B00:
                 case 0x_050B_EF03:
                 case 0x_050B_F403:
-                    node = new DPCNode050BXXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode050BXXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_07FF_0000:
-                    node = new DPCNode07FF0000(nodeReader, out nodeChildren);
+                    node = new DPCNode07FF0000(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_08FF_0000:
                 case 0x_08FF_7805:
                 case 0x_08FF_F401:
-                    node = new DPCNode08FF0000(nodeReader, out nodeChildren);
+                    node = new DPCNode08FF0000(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0905_0000:
                 case 0x_0905_0203:
@@ -287,10 +287,10 @@ public static class DPCTester
                 case 0x_0905_F903:
                 case 0x_0905_FA03:
                 case 0x_0905_FB03:
-                    node = new DPCNode0905XXXX(nodeReader, out nodeChildren);
+                    node = new DPCNode0905XXXX(nodeReader, out nodeChildren, parent);
                     break;
                 case 0x_0B06_0000:
-                    node = new DPCNode0B060000(nodeReader, out nodeChildren);
+                    node = new DPCNode0B060000(nodeReader, out nodeChildren, parent);
                     break;
                 default:
                     throw new NotImplementedException(
@@ -300,10 +300,6 @@ public static class DPCTester
             Assert.AreNotEqual(0, node.Length, node.GetType().Name);
 
             root ??= node;
-
-            node.Parent = parent;
-
-            parent?.Children.Add(node);
 
             foreach (var children in nodeChildren)
             {
@@ -316,18 +312,21 @@ public static class DPCTester
             throw new InvalidDataException("DPC root node is null.");
         }
 
-        int count = 0, depth = 0;
+        return root;
 
-        root.Traverse(node =>
-        {
-            count += 1;
-            depth =  Math.Max(depth, node.Depth);
-        });
+        // perform some extra tests
 
-        context.WriteLine();
-        context.WriteLine($"Tree depth: {depth}");
-        context.WriteLine($"Tree nodes: {count}");
-        context.WriteLine();
+        //root.TraverseDFS(s =>
+        //{
+        //    if (s is DPCNode0107XXXX { B3: not 0 } node0107XXXX)
+        //    {
+        //        Assert.IsTrue(
+        //            node0107XXXX.Children.OfType<DPCNode00FFXXXX>().Any() ||
+        //            node0107XXXX.Children.OfType<DPCNode0107XXXX>().Any(),
+        //            node0107XXXX.ToString()
+        //        );
+        //    }
+        //});
 
         {
 /*
@@ -386,19 +385,5 @@ public static class DPCTester
 
             context.WriteLine(root.Print());
         }
-
-        // perform some extra tests
-
-        root.Traverse(s =>
-        {
-            if (s is DPCNode0107XXXX { B3: not 0 } node0107XXXX)
-            {
-                Assert.IsTrue(
-                    node0107XXXX.Children.OfType<DPCNode00FFXXXX>().Any() ||
-                    node0107XXXX.Children.OfType<DPCNode0107XXXX>().Any(),
-                    node0107XXXX.ToString()
-                );
-            }
-        });
     }
 }

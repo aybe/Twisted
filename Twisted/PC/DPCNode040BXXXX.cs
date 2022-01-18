@@ -5,7 +5,7 @@ namespace Twisted.PC;
 
 public sealed class DPCNode040BXXXX : DPCNode
 {
-    internal DPCNode040BXXXX(DPCNodeReader reader, out int[] children) : base(reader)
+    internal DPCNode040BXXXX(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
     {
         var bytes = reader.ReadBytes(16);
 

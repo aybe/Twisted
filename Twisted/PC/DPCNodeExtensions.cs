@@ -4,14 +4,14 @@ namespace Twisted.PC;
 
 public static class DPCNodeExtensions
 {
-    public static string Print(this DPCNode node)
+    public static string Print(this TreeNode node)
     {
         if (node is null)
             throw new ArgumentNullException(nameof(node));
 
         var builder = new StringBuilder();
 
-        var stack = new Stack<DPCNode>();
+        var stack = new Stack<TreeNode>();
 
         stack.Push(node);
 
@@ -23,7 +23,7 @@ public static class DPCNodeExtensions
 
             builder.AppendLine(str);
 
-            foreach (var item in pop.Children.AsEnumerable().Reverse())
+            foreach (var item in pop.Reverse())
             {
                 stack.Push(item);
             }
@@ -34,7 +34,7 @@ public static class DPCNodeExtensions
         return print;
     }
 
-    private static string PrintPrivate(DPCNode node)
+    private static string PrintPrivate(TreeNode node)
     {
         if (node is null)
             throw new ArgumentNullException(nameof(node));
@@ -47,9 +47,9 @@ public static class DPCNodeExtensions
 
         while (current.Parent != null)
         {
-            var count = current.Parent.Children.Count;
-            var index = current.Parent.Children.IndexOf(current);
-            var close = index != current.Parent.Children.Count - 1;
+            var count = current.Parent.Count;
+            var index = current.Parent.IndexOf(current);
+            var close = index != current.Parent.Count - 1;
 
             if (current.Depth < node.Depth)
             {

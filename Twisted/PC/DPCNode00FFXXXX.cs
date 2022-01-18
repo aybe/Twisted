@@ -5,7 +5,7 @@ namespace Twisted.PC;
 
 public sealed class DPCNode00FFXXXX : DPCNode
 {
-    internal DPCNode00FFXXXX(DPCNodeReader reader, out int[] children) : base(reader)
+    internal DPCNode00FFXXXX(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
     {
         // todo maybe size is 108
 
