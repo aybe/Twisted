@@ -10,11 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Version 1", "Version 1", "{387FEFFC-6C80-42EA-8B35-DE0761A93AFF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twisted", "Twisted\Twisted.csproj", "{467FA923-685B-4E41-9535-0B9092D3D901}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{5C7D7E97-BDA1-425E-A745-5C531C0C3D52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Twisted", "Twisted\Twisted.csproj", "{467FA923-685B-4E41-9535-0B9092D3D901}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +29,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{D3F792C0-B130-4604-8765-4001D39F2554} = {387FEFFC-6C80-42EA-8B35-DE0761A93AFF}
-		{467FA923-685B-4E41-9535-0B9092D3D901} = {5C7D7E97-BDA1-425E-A745-5C531C0C3D52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28C9312E-0355-4B29-B7D7-12DB0F479629}
