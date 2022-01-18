@@ -15,5 +15,7 @@ public sealed class DMDNodeXXXX : DMDNode
         var unknown2 = reader.ReadInt32(Endianness.LittleEndian);
 
         ReadAddressesThenNodes(reader, 1);
+
+        // TODO assert that children are 00FF or ???
     }
 }

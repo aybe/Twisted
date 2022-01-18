@@ -1,3 +1,4 @@
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using JetBrains.Annotations;
 using Twisted.Extensions;
@@ -33,16 +34,16 @@ public abstract class DMDNode : TreeNode<DMDNode>
 
         const uint @base = 0x800188B8;
 
-        var position = reader.BaseStream.Position;
-
         var address = reader.ReadUInt32(Endianness.LittleEndian);
 
         address -= @base;
 
+        // TODO add param bool validate = true, should never need false else it's stuff that shouldn't be a node?
+
         return address;
     }
 
-    protected void ReadAddressesThenNodes(BinaryReader reader, int count)
+    protected void ReadAddressesThenNodes(BinaryReader reader, int count) // TODO rename
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -65,6 +66,7 @@ public abstract class DMDNode : TreeNode<DMDNode>
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
     private static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
     {
         if (reader == null)
@@ -74,10 +76,28 @@ public abstract class DMDNode : TreeNode<DMDNode>
 
         var peek = reader.Peek(s => s.ReadUInt16(Endianness.BigEndian));
 
+        /*
+         * according to dbScanForInteractiveStuff
+         * 0 ok
+         * 1 ok
+         * 2 ok
+         * 3 ok
+         * 4 ok
+         * 5 ok
+         * 6 never encountered, 7 ok, 8 ok
+         * 9 ok
+         * B ok
+         * anything else is bad op code
+         */
+
         DMDNode node = peek switch
         {
+            // TODO are these geometry?
+
             0x0010 => new DMDNode0010(parent, reader),
             0x00F0 => new DMDNode0010(parent, reader),
+
+            // TODO this geometry stuff should be refactored
 
             0x0009 => new DMDNodeXXXX(parent, reader),
             0x0019 => new DMDNodeXXXX(parent, reader),

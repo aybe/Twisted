@@ -13,6 +13,12 @@ public sealed class DMDNode050B : DMDNode
         var unknown1 = reader.ReadInt16(Endianness.LittleEndian);
         var unknown2 = reader.ReadBytes(36);
 
+        var x = unknown2.ReadInt32(20, Endianness.LE); // TODO
+        var y = unknown2.ReadInt32(24, Endianness.LE); // TODO
+        var z = unknown2.ReadInt32(28, Endianness.LE); // TODO
+
+        var countMaybe = unknown2[34]; // TODO
+
         ReadAddressesThenNodes(reader, 1);
     }
 }
