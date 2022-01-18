@@ -8,4 +8,9 @@ public static class TestContextExtensions
     {
         context.WriteLine(string.Empty);
     }
+
+    public static void WriteLine(this TestContext context, object? value)
+    {
+        context.WriteLine(value?.ToString());
+    }
 }
