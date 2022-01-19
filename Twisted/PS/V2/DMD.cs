@@ -1,39 +1,34 @@
-﻿using JetBrains.Annotations;
-using Twisted.Extensions;
+﻿using Twisted.Extensions;
 
 namespace Twisted.PS.V2;
 
 public sealed class DMD : DMDNode
 {
+    public const uint BaseAddress = 0x800188B8;
+
     public DMD(BinaryReader reader) : base(null, reader, 0xBEEF)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        reader.BaseStream.Position = 0;
-
-        var magic = reader.ReadInt32(Endianness.LE);
-
-        if (magic != 0x50535844)
-            throw new InvalidDataException("Not a DMD file.");
+        var identifier = reader.ReadInt32(Endianness.LE);
+        if (identifier != 0x50535844)
+            throw new InvalidDataException($"Invalid identifier: 0x{identifier:X8}.");
 
         var version = reader.ReadInt32(Endianness.LE);
         if (version != 0x00000043)
-            throw new NotSupportedException($"Version not supported: 0x{version:X8}.");
+            throw new InvalidDataException($"Invalid version: 0x{version:X8}.");
 
-        Time = DateTimeOffset.FromUnixTimeSeconds(reader.ReadInt32(Endianness.LE)).ToLocalTime();
+        DateTimeOffset.FromUnixTimeSeconds(reader.ReadInt32(Endianness.LE));
 
-        var @base = reader.ReadUInt32(Endianness.LE);
-        if (@base != 0x800188B8)
-            throw new InvalidDataException($"Invalid base address: 0x{@base:X8}.");
+        // TODO the base address could be passed to base node and benefit both versions
 
-        var fat = ReadAddress(reader);
+        var baseAddress = reader.ReadUInt32(Endianness.LE);
+        if (baseAddress != BaseAddress)
+            throw new InvalidDataException($"Invalid base address: 0x{baseAddress:X8}.");
 
-        reader.BaseStream.Position = fat;
-
+        reader.BaseStream.Position = ReadAddress(reader);
+        
         ReadAddressesThenNodes(reader, reader.ReadInt32(Endianness.LE));
     }
-
-    [PublicAPI]
-    public DateTimeOffset Time { get; }
 }
