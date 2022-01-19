@@ -18,7 +18,7 @@ public sealed class DMDNode00FF : DMDNode
             throw new ArgumentNullException(nameof(reader));
 
         VerticesOffset = ReadAddress(reader);
-        NormalOffset   = ReadAddress(reader);
+        NormalOffset   = ReadAddress(reader, false); // TODO could it be that out of bounds signifies no normals?
         PolygonsOffset = ReadAddress(reader);
 
         var bytes = reader.ReadBytes(4);
