@@ -23,7 +23,7 @@ public abstract class DMDNode : TreeNode
 
     public override string ToString()
     {
-        return $"0x{Type:X4} @ {Position}";
+        return $"{GetType().Name} @ {Position}";
     }
 
     protected static uint ReadAddress(BinaryReader reader)
