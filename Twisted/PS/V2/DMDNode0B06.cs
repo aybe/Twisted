@@ -14,8 +14,20 @@ public sealed class DMDNode0B06 : DMDNode
 
         var unknown2 = reader.ReadBytes(8);
 
-        var countMaybe = unknown2[6]; // TODO if 1 then 3, if 2 then 4
+        var count = unknown2[6];
 
+        switch (count)
+        {
+            case 1:
+                count = 3;
+                break;
+            case 2:
+                count = 4;
+                break;
+            default:
+                throw new InvalidDataException(Position.ToString());
+        }
+        
         ReadAddressesThenNodes(reader, 3);
     }
 }
