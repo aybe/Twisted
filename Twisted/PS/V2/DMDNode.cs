@@ -1,45 +1,44 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Twisted.Extensions;
 
 namespace Twisted.PS.V2;
 
 public abstract class DMDNode : TreeNode
 {
-    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? type = null) : base(parent)
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
+    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? nodeType = null) : base(parent)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
         Position = reader.BaseStream.Position;
-        Type     = type ?? reader.ReadUInt16(Endianness.BigEndian);
+        NodeType = nodeType ?? reader.ReadUInt16(Endianness.BigEndian);
     }
 
-    [PublicAPI]
-    public ushort Type { get; }
-
-    [PublicAPI]
     public long Position { get; }
+
+    public ushort NodeType { get; }
 
     public override string ToString()
     {
-        return $"{GetType().Name} @ {Position}";
+        return $"{GetType().Name}, {nameof(Position)}: {Position}";
     }
 
-    protected static uint ReadAddress(BinaryReader reader)
+    protected static uint ReadAddress(BinaryReader reader, bool validate = false)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        const uint @base = 0x800188B8;
+        var address1 = reader.ReadUInt32(Endianness.LittleEndian);
+        var address2 = address1 - DMD.BaseAddress;
 
-        var address = reader.ReadUInt32(Endianness.LittleEndian);
+        if (validate) // TODO set to true and fix wrong assumptions
+        {
+            Assert.IsTrue(address2 >= DMD.BaseAddress);
+        }
 
-        address -= @base;
-
-        // TODO add param bool validate = true, should never need false else it's stuff that shouldn't be a node?
-
-        return address;
+        return address2;
     }
 
     protected void ReadAddressesThenNodes(BinaryReader reader, int count) // TODO rename
@@ -167,7 +166,7 @@ public abstract class DMDNode : TreeNode
 
             0x0B06 => new DMDNode0B06(parent, reader),
 
-            _ => throw new NotSupportedException($"Type = 0x{peek:X4}, Position = {position}")
+            _ => throw new NotSupportedException($"{nameof(NodeType)} = 0x{peek:X4}, {nameof(Position)} = {position}")
         };
 
         return node;
