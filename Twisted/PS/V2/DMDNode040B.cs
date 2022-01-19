@@ -1,6 +1,4 @@
-﻿using Twisted.Extensions;
-
-namespace Twisted.PS.V2;
+﻿namespace Twisted.PS.V2;
 
 public sealed class DMDNode040B : DMDNode
 {
@@ -10,7 +8,6 @@ public sealed class DMDNode040B : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown1 = reader.ReadInt16(Endianness.LittleEndian);
         var unknown2 = reader.ReadBytes(16);
 
         var countMaybe = unknown2[14]; // TODO

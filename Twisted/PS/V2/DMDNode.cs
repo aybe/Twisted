@@ -7,22 +7,22 @@ namespace Twisted.PS.V2;
 public abstract class DMDNode : TreeNode
 {
     [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
-    protected DMDNode(DMDNode? parent, BinaryReader reader, ushort? nodeType = null) : base(parent)
+    protected DMDNode(DMDNode? parent, BinaryReader reader, uint? nodeType = null) : base(parent)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
         Position = reader.BaseStream.Position;
-        NodeType = nodeType ?? reader.ReadUInt16(Endianness.BigEndian);
+        NodeType = nodeType ?? reader.ReadUInt32(Endianness.BigEndian);
     }
 
     public long Position { get; }
 
-    public ushort NodeType { get; }
+    public uint NodeType { get; }
 
     public override string ToString()
     {
-        return $"{GetType().Name}, {nameof(Position)}: {Position}";
+        return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X4}, {nameof(Position)}: {Position}";
     }
 
     protected static uint ReadAddress(BinaryReader reader, bool validate = false)

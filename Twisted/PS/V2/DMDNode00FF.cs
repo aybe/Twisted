@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Twisted.Extensions;
 using Twisted.PS.V2.Polygons;
 
 namespace Twisted.PS.V2;
@@ -17,8 +16,6 @@ public sealed class DMDNode00FF : DMDNode
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
-
-        var unknown1 = reader.ReadInt16(Endianness.LittleEndian);
 
         VerticesOffset = ReadAddress(reader);
         NormalOffset   = ReadAddress(reader);

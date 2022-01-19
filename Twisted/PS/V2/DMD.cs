@@ -6,7 +6,8 @@ public sealed class DMD : DMDNode
 {
     public const uint BaseAddress = 0x800188B8;
 
-    public DMD(BinaryReader reader) : base(null, reader, 0xBEEF)
+    public DMD(BinaryReader reader)
+        : base(null, reader, 0xCAFEBABE) // trick to make DMD a DMDNode itself
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -28,7 +29,7 @@ public sealed class DMD : DMDNode
             throw new InvalidDataException($"Invalid base address: 0x{baseAddress:X8}.");
 
         reader.BaseStream.Position = ReadAddress(reader);
-        
+
         ReadAddressesThenNodes(reader, reader.ReadInt32(Endianness.LE));
     }
 }
