@@ -25,23 +25,24 @@ public abstract class DMDNode : TreeNode
         return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X4}, {nameof(Position)}: {Position}";
     }
 
-    protected static uint ReadAddress(BinaryReader reader, bool validate = false)
+    protected static uint ReadAddress(BinaryReader reader, bool validate = true)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
+        var position = reader.BaseStream.Position;
         var address1 = reader.ReadUInt32(Endianness.LittleEndian);
         var address2 = address1 - DMD.BaseAddress;
 
-        if (validate) // TODO set to true and fix wrong assumptions
+        if (validate)
         {
-            Assert.IsTrue(address2 >= DMD.BaseAddress);
+            Assert.IsFalse(address2 >= reader.BaseStream.Length, $"{address2} >= {reader.BaseStream.Length} @ {position}");
         }
 
         return address2;
     }
 
-    protected void ReadAddressesThenNodes(BinaryReader reader, int count) // TODO rename
+    protected void ReadAddressesThenNodes(BinaryReader reader, int count, bool validate = true) // TODO rename
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -53,7 +54,7 @@ public abstract class DMDNode : TreeNode
 
         for (var i = 0; i < count; i++)
         {
-            addresses[i] = ReadAddress(reader);
+            addresses[i] = ReadAddress(reader, validate);
         }
 
         foreach (var address in addresses)
