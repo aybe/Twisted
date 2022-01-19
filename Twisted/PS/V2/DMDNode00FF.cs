@@ -23,6 +23,10 @@ public sealed class DMDNode00FF : DMDNode
 
         var bytes = reader.ReadBytes(4);
 
+        // TODO there may be 20 more bytes here
+
+        SetLength(reader);
+
         var count = bytes[0];
 
         reader.BaseStream.Position = PolygonsOffset;

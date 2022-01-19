@@ -11,6 +11,11 @@ public sealed class DMDNode0305 : DMDNode
         var unknown2 = reader.ReadBytes(12);
 
         var count = unknown2[7];
-        ReadAddressesThenNodes(reader, count);
+
+        var addresses = ReadAddresses(reader, count);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

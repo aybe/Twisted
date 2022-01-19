@@ -30,6 +30,11 @@ public sealed class DMD : DMDNode
 
         reader.BaseStream.Position = ReadAddress(reader);
 
-        ReadAddressesThenNodes(reader, reader.ReadInt32(Endianness.LE));
+        var addressesCount = reader.ReadInt32(Endianness.LE);
+        var addresses      = ReadAddresses(reader, addressesCount);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

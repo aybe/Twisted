@@ -1,6 +1,4 @@
-﻿using Twisted.Extensions;
-
-namespace Twisted.PS.V2;
+﻿namespace Twisted.PS.V2;
 
 public sealed class DMDNode020X : DMDNode
 {
@@ -10,9 +8,14 @@ public sealed class DMDNode020X : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown2 = reader.ReadBytes(12);
+        var unknown2 = reader.ReadBytes(16);
 
-        var count = reader.ReadInt32(Endianness.LittleEndian);
-        ReadAddressesThenNodes(reader, count);
+        var count = unknown2[12];
+
+        var addresses = ReadAddresses(reader, count);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

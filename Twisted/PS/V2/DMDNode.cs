@@ -18,11 +18,18 @@ public abstract class DMDNode : TreeNode
 
     public long Position { get; }
 
+    public long Length { get; private set; }
+
     public uint NodeType { get; }
+
+    protected void SetLength(BinaryReader reader)
+    {
+        Length = reader.BaseStream.Position - Position;
+    }
 
     public override string ToString()
     {
-        return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X4}, {nameof(Position)}: {Position}";
+        return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X4}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
     }
 
     protected static uint ReadAddress(BinaryReader reader, bool validate = true)
@@ -42,7 +49,7 @@ public abstract class DMDNode : TreeNode
         return address2;
     }
 
-    protected void ReadAddressesThenNodes(BinaryReader reader, int count, bool validate = true) // TODO rename
+    protected static uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -57,12 +64,7 @@ public abstract class DMDNode : TreeNode
             addresses[i] = ReadAddress(reader, validate);
         }
 
-        foreach (var address in addresses)
-        {
-            reader.BaseStream.Position = address;
-
-            ReadNode(this, reader);
-        }
+        return addresses;
     }
 
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
@@ -171,5 +173,27 @@ public abstract class DMDNode : TreeNode
         };
 
         return node;
+    }
+
+    protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        if (addresses == null)
+            throw new ArgumentNullException(nameof(addresses));
+
+        var nodes = new DMDNode[addresses.Length];
+
+        for (var i = 0; i < nodes.Length; i++)
+        {
+            reader.BaseStream.Position = addresses[i];
+
+            var node = ReadNode(parent, reader);
+
+            nodes[i] = node;
+        }
+
+        return nodes;
     }
 }

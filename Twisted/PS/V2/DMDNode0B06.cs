@@ -27,7 +27,11 @@ public sealed class DMDNode0B06 : DMDNode
             default:
                 throw new InvalidDataException(Position.ToString());
         }
-        
-        ReadAddressesThenNodes(reader, 3);
+
+        var addresses = ReadAddresses(reader, count);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

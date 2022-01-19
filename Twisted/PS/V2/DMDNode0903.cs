@@ -13,6 +13,10 @@ public sealed class DMDNode0903 : DMDNode
         var b3 = reader.ReadByte();
         var b4 = reader.ReadByte();
 
-        ReadAddressesThenNodes(reader, b3);
+        var addresses = ReadAddresses(reader, b3);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

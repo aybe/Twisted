@@ -12,6 +12,10 @@ public sealed class DMDNode040B : DMDNode
 
         var countMaybe = unknown2[14]; // TODO
 
-        ReadAddressesThenNodes(reader, 1);
+        var addresses = ReadAddresses(reader, countMaybe);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
     }
 }

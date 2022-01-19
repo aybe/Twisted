@@ -12,7 +12,11 @@ public sealed class DMDNodeXXXX : DMDNode
 
         var unknown2 = reader.ReadInt32(Endianness.LittleEndian);
 
-        ReadAddressesThenNodes(reader, 1);
+        var addresses = ReadAddresses(reader, 1);
+
+        SetLength(reader);
+
+        ReadNodes(this, reader, addresses);
 
         // TODO assert that children are 00FF or ???
     }

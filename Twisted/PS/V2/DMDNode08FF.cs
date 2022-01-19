@@ -9,5 +9,7 @@ public sealed class DMDNode08FF : DMDNode
             throw new ArgumentNullException(nameof(reader));
 
         var unknown2 = reader.ReadBytes(84);
+
+        SetLength(reader);
     }
 }
