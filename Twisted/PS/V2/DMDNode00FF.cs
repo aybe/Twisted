@@ -21,9 +21,7 @@ public sealed class DMDNode00FF : DMDNode
         NormalOffset   = ReadAddress(reader, false); // TODO could it be that out of bounds signifies no normals?
         PolygonsOffset = ReadAddress(reader);
 
-        var bytes = reader.ReadBytes(4);
-
-        // TODO there may be 20 more bytes here
+        var bytes = reader.ReadBytes(76);
 
         SetLength(reader);
 
