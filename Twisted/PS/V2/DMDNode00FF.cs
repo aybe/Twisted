@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Twisted.Extensions;
 using Twisted.PS.V2.Polygons;
 
 namespace Twisted.PS.V2;
@@ -21,11 +22,18 @@ public sealed class DMDNode00FF : DMDNode
         NormalOffset   = ReadAddress(reader, false); // TODO could it be that out of bounds signifies no normals?
         PolygonsOffset = ReadAddress(reader);
 
-        var bytes = reader.ReadBytes(76);
+        var bytes = reader.ReadBytes(28);
+
+        var flag = bytes[11];
+
+        if ((flag & 0x80) != 0)
+        {
+            var bytes3 = reader.ReadBytes(32); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. ..
+        }
 
         SetLength(reader);
 
-        var count = bytes[0];
+        var count = bytes.ReadUInt16(0, Endianness.LE);
 
         reader.BaseStream.Position = PolygonsOffset;
 
