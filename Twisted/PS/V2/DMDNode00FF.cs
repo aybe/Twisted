@@ -29,7 +29,7 @@ public sealed class DMDNode00FF : DMDNode
 
         reader.BaseStream.Position = PolygonsOffset;
 
-        Polygons = PolygonReader.TryRead(reader, count);
+        Polygons = PolygonReader.TryRead(reader, count, VerticesOffset, NormalOffset);
     }
 
     public override string ToString()
