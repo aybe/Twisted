@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Twisted.Extensions;
 using Twisted.PS.V2.Polygons;
 
@@ -12,6 +13,8 @@ public sealed class DMDNode00FF : DMDNode
     public readonly uint                    PolygonsOffset;
     public readonly IReadOnlyList<IPolygon> Polygons;
 
+    public byte Flags { get; }
+
     public DMDNode00FF(DMDNode? parent, BinaryReader reader)
         : base(parent, reader)
     {
@@ -24,9 +27,11 @@ public sealed class DMDNode00FF : DMDNode
 
         var bytes = reader.ReadBytes(28);
 
-        var flag = bytes[11];
+        Flags = bytes[11];
 
-        if ((flag & 0x80) != 0)
+        // Assert.IsTrue((Flags & 0x80) != 0, Position.ToString());
+
+        if ((Flags & 0x80) != 0)
         {
             var bytes3 = reader.ReadBytes(32); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. ..
         }
