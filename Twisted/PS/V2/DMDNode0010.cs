@@ -8,8 +8,22 @@ public sealed class DMDNode0010 : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        // var unknown2 = reader.ReadBytes(44); // BUG this doesn't makes sense at all
+        var addresses = default(uint[]?);
+
+        var special = (NodeType & 0xFFFF) != 0;
+
+        var bytes = reader.ReadBytes(special ? 4 : 44);
+
+        if (special)
+        {
+            addresses = ReadAddresses(reader, 1);
+        }
 
         SetLength(reader);
+
+        if (addresses != null)
+        {
+            ReadNodes(this, reader, addresses);
+        }
     }
 }
