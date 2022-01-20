@@ -33,7 +33,7 @@ public sealed class DMDNode00FF : DMDNode
 
         if ((Flags & 0x80) != 0)
         {
-            var bytes3 = reader.ReadBytes(32); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. ..
+            var bytes3 = reader.ReadBytes(32 + 16); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. ..
         }
 
         SetLength(reader);
