@@ -2,6 +2,7 @@
 
 namespace Twisted.PS.V2.Polygons;
 
+[Obsolete("This base class is not only for quads but triangles as well, push members up")]
 internal abstract class PolygonQuad : Polygon
 {
     protected PolygonQuad(
