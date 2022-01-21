@@ -44,13 +44,4 @@ public sealed class DMDNode00FF : DMDNode
 
         Polygons = PolygonReader.TryRead(reader, count, VerticesOffset, NormalOffset);
     }
-
-    public override string ToString()
-    {
-        return $"{base.ToString()}, " +
-               $"{nameof(VerticesOffset)}: {VerticesOffset}, " +
-               $"{nameof(NormalOffset)}: {NormalOffset}, " +
-               $"{nameof(PolygonsOffset)}: {PolygonsOffset}, " +
-               $"{nameof(Polygons)}: {Polygons.Count}";
-    }
 }
