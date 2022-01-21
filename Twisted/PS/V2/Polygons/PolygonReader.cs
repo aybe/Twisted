@@ -70,7 +70,7 @@ internal static class PolygonReader
             case 0x00010708: return new Polygon00010708(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x00030706: return new Polygon00030706(reader, vertices.ToInt32());
             case 0x00030806: return new Polygon00030806(reader, vertices.ToInt32());
-            case 0x00030906: return new Polygon00030906(reader, vertices.ToInt32());
+            case 0x00030906: return new Polygon00030906(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x00040808: return new Polygon00040808(reader, vertices.ToInt32());
             case 0x00040908: return new Polygon00040908(reader, vertices.ToInt32());
             case 0x00040A08: return new Polygon00040A08(reader, vertices.ToInt32(), normals.ToInt32());
