@@ -79,9 +79,9 @@ internal static class PolygonReader
             case 0x03010A09: return new Polygon03010A09(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x03030A09: return new Polygon03030A09(reader, vertices.ToInt32());
             case 0x03030B09: return new Polygon03030B09(reader, vertices.ToInt32());
-            case 0x03030C09: return new Polygon03030C09(reader, vertices.ToInt32());
             case 0x04010909: return new Polygon04010909(reader, vertices.ToInt32());
             case 0x04010A09: return new Polygon04010A09(reader, vertices.ToInt32());
+            case 0x03030C09: return new Polygon03030C09(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x04010B0C: return new Polygon04010B0C(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x04040C0C: return new Polygon04040C0C(reader, vertices.ToInt32());
             case 0x04040D0C: return new Polygon04040D0C(reader, vertices.ToInt32());
