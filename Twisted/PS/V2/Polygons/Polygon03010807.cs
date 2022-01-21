@@ -1,4 +1,6 @@
-﻿namespace Twisted.PS.V2.Polygons;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Twisted.PS.V2.Polygons;
 
 internal sealed class Polygon03010807 : PolygonQuad
 {
@@ -8,6 +10,8 @@ internal sealed class Polygon03010807 : PolygonQuad
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
+
+        Assert.AreEqual(0, Indices[3], "Triangle expected.");
 
         Bytes = reader.ReadBytes(20);
     }
