@@ -43,18 +43,17 @@ internal static class PolygonReader
 
             switch (type)
             {
-                case 0x00010505:
-                case 0x00030706:
-                case 0x00040808:
-                case 0x03010807:
-                case 0x03030A09:
-                case 0x04010909:
-                case 0x04040C0C:
-                case 0x83010907:
-                case 0x83030B09:
-                case 0x84010A09:
-                case 0x84040D0C:
-                    break;
+                case 0x00010505: break;
+                case 0x00030706: break;
+                case 0x00040808: break;
+                case 0x03010807: break;
+                case 0x03030A09: break;
+                case 0x04010909: break;
+                case 0x04040C0C: break;
+                case 0x83010907: break;
+                case 0x83030B09: break;
+                case 0x84010A09: break;
+                case 0x84040D0C: break;
                 default:
                     Assert.Fail($"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
                     break;
