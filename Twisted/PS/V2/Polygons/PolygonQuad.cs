@@ -2,7 +2,7 @@
 
 internal abstract class PolygonQuad : Polygon
 {
-    protected PolygonQuad(BinaryReader reader) : base(reader)
+    protected PolygonQuad(BinaryReader reader, int positionVertices = -1, int positionNormals = -1) : base(reader)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -10,6 +10,24 @@ internal abstract class PolygonQuad : Polygon
         var indices = ReadIndices(4);
 
         Indices = indices.Select(s => (int)s).ToArray();
+
+        if (positionVertices != -1)
+        {
+            var position = reader.BaseStream.Position;
+
+            foreach (var index in indices)
+            {
+                reader.BaseStream.Position = positionVertices + index * 8; 
+                var vertex = reader.ReadBytes(8);
+            }
+
+            reader.BaseStream.Position = position;
+        }
+        // ReSharper disable once RedundantIfElseBlock
+        else
+        {
+            // TODO assert fail
+        }
     }
 
     public override IReadOnlyList<int> Indices { get; }
