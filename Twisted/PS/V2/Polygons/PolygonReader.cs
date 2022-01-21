@@ -97,7 +97,7 @@ internal static class PolygonReader
             case 0x84010C0C: return new Polygon84010C0C(reader, vertices.ToInt32(), normals.ToInt32());
             case 0x84040D0C: return new Polygon84040D0C(reader, vertices.ToInt32());
             case 0x84040E0C: return new Polygon84040E0C(reader, vertices.ToInt32());
-            case 0x84040F0C: return new Polygon84040F0C(reader, vertices.ToInt32());
+            case 0x84040F0C: return new Polygon84040F0C(reader, vertices.ToInt32(), normals.ToInt32());
             default: throw new NotSupportedException($"Unknown polygon: 0x{type:X8} @ {reader.BaseStream.Position}");
         }
     }
