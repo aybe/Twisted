@@ -14,5 +14,7 @@ internal sealed class Polygon00030706 : PolygonQuad
         Assert.AreEqual(0, Indices[3], "Triangle expected.");
 
         Bytes = reader.ReadBytes(16);
+
+        // TODO int32 + rgba * 4?
     }
 }

@@ -10,5 +10,7 @@ internal sealed class Polygon00040808 : PolygonQuad
             throw new ArgumentNullException(nameof(reader));
 
         Bytes = reader.ReadBytes(20);
+        
+        // TODO four colors at end?
     }
 }
