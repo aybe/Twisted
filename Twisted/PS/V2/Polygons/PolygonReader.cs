@@ -63,17 +63,17 @@ internal static class PolygonReader
         switch (type)
         {
             case 0x00010504: return new Polygon00010504(reader);
-            case 0x00010505: return new Polygon00010505(reader);
-            case 0x00010604: return new Polygon00010604(reader);
-            case 0x00010605: return new Polygon00010605(reader);
-            case 0x00010706: return new Polygon00010706(reader);
-            case 0x00010708: return new Polygon00010708(reader);
+            case 0x00010505: return new Polygon00010505(reader, vertices.ToInt32());
+            case 0x00010604: return new Polygon00010604(reader, vertices.ToInt32());
+            case 0x00010605: return new Polygon00010605(reader, vertices.ToInt32());
+            case 0x00010706: return new Polygon00010706(reader, vertices.ToInt32());
+            case 0x00010708: return new Polygon00010708(reader, vertices.ToInt32());
             case 0x00030706: return new Polygon00030706(reader);
             case 0x00030806: return new Polygon00030806(reader);
             case 0x00030906: return new Polygon00030906(reader);
             case 0x00040808: return new Polygon00040808(reader);
             case 0x00040908: return new Polygon00040908(reader);
-            case 0x00040A08: return new Polygon00040A08(reader);
+            case 0x00040A08: return new Polygon00040A08(reader, vertices.ToInt32());
             case 0x03010807: return new Polygon03010807(reader, vertices.ToInt32());
             case 0x03010907: return new Polygon03010907(reader, vertices.ToInt32());
             case 0x03010A09: return new Polygon03010A09(reader, vertices.ToInt32());
