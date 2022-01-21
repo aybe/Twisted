@@ -74,10 +74,10 @@ internal static class PolygonReader
             case 0x00040808: return new Polygon00040808(reader);
             case 0x00040908: return new Polygon00040908(reader);
             case 0x00040A08: return new Polygon00040A08(reader);
-            case 0x03010807: return new Polygon03010807(reader);
             case 0x03010907: return new Polygon03010907(reader);
             case 0x03010A09: return new Polygon03010A09(reader);
             case 0x03030A09: return new Polygon03030A09(reader);
+            case 0x03010807: return new Polygon03010807(reader, vertices.ToInt32());
             case 0x03030B09: return new Polygon03030B09(reader);
             case 0x03030C09: return new Polygon03030C09(reader);
             case 0x04010909: return new Polygon04010909(reader);
