@@ -10,5 +10,10 @@ internal sealed class Polygon84010C0C : PolygonQuad
             throw new ArgumentNullException(nameof(reader));
 
         Bytes = reader.ReadBytes(36);
+        
+        // TODO tex stuff ? 4 bytes
+        // TODO ...
+        // TODO tex stuff E2 ? 4 bytes
+        // TODO normals ? 8 bytes
     }
 }
