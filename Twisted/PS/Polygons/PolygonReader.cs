@@ -6,7 +6,7 @@ namespace Twisted.PS.Polygons;
 
 internal static class PolygonReader
 {
-    public static IReadOnlyList<IPolygon> TryRead(BinaryReader reader, int count, uint vertices, uint normals)
+    public static IReadOnlyList<Polygon> TryRead(BinaryReader reader, int count, uint vertices, uint normals)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
@@ -14,7 +14,7 @@ internal static class PolygonReader
         if (count <= 0)
             throw new ArgumentOutOfRangeException(nameof(count));
 
-        var polygons = new IPolygon[count];
+        var polygons = new Polygon[count];
 
         for (var i = 0; i < count; i++)
         {
@@ -27,7 +27,7 @@ internal static class PolygonReader
     }
 
     [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
-    private static IPolygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
+    private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));

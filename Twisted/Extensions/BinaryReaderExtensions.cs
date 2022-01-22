@@ -21,7 +21,25 @@ public static class BinaryReaderExtensions
         return ascii;
     }
 
-    public static T[] Read<T>(this BinaryReader reader, Func<BinaryReader, T> func, int count)
+    public static T ReadObject<T>(this BinaryReader reader, Func<BinaryReader, T> func, long position)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        if (func == null)
+            throw new ArgumentNullException(nameof(func));
+
+        if (position < 0 || position >= reader.BaseStream.Length)
+            throw new ArgumentOutOfRangeException(nameof(position));
+
+        using var scope = new BinaryReaderPositionScope(reader, position);
+
+        var value = func(reader);
+
+        return value;
+    }
+
+    public static T[] ReadObjects<T>(this BinaryReader reader, Func<BinaryReader, T> func, int count)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));

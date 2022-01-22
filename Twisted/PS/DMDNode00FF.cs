@@ -39,7 +39,7 @@ public sealed class DMDNode00FF : DMDNode
 
     public uint PositionPolygons { get; }
 
-    public IReadOnlyList<IPolygon> Polygons { get; }
+    public IReadOnlyList<Polygon> Polygons { get; }
 
     public byte Flags { get; }
 

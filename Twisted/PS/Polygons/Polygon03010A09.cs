@@ -1,26 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Twisted.Extensions;
-
-namespace Twisted.PS.Polygons;
+﻿namespace Twisted.PS.Polygons;
 
 internal sealed class Polygon03010A09 : Polygon
 {
-    private readonly byte[] Bytes;
-
-    public Polygon03010A09(BinaryReader reader, int positionVertices, int normalsPosition)
-        : base(reader, positionVertices, 3,positionNormals:normalsPosition, polygonSize: 40, polygonFaces: 3, normalsOffset: 32)
+    public Polygon03010A09(BinaryReader reader, int positionVertices, int positionNormals)
+        : base(reader, 40, 3, positionVertices, positionNormals, 32)
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-        return;
-        Assert.AreEqual(0, Indices[3], "Triangle expected.");
-
-        Bytes = reader.ReadBytes(28);
-
-        var normal1 = Bytes.ReadUInt16(20, Endianness.LE);
-        var normal2 = Bytes.ReadUInt16(22, Endianness.LE);
-        var normal3 = Bytes.ReadUInt16(24, Endianness.LE);
-
-        ReadNormals(reader, normalsPosition, normal1, normal2, normal3);
     }
 }
