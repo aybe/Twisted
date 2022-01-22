@@ -7,11 +7,11 @@ internal sealed class Polygon00010708 : Polygon
     private readonly byte[] Bytes;
 
     public Polygon00010708(BinaryReader reader, int positionVertices, int positionNormals)
-        : base(reader, positionVertices, 4)
+        : base(reader, positionVertices, 4,positionNormals:positionNormals, polygonSize: 28, polygonFaces: 4, normalsOffset: 20)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
-
+        return;
         Bytes = reader.ReadBytes(16);
 
         var normal1 = Bytes.ReadUInt16(8,  Endianness.LE);

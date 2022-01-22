@@ -7,11 +7,11 @@ internal sealed class Polygon00010604 : Polygon
     private byte[] Bytes;
 
     public Polygon00010604(BinaryReader reader, int positionVertices)
-        : base(reader, positionVertices, 3)
+        : base(reader, positionVertices, 3, polygonSize: 24, polygonFaces: 3)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
-
+        return;
         Assert.AreEqual(0, Indices[3], "Triangle expected.");
 
         Bytes = reader.ReadBytes(12);

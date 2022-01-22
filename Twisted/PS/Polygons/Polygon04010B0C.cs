@@ -8,11 +8,11 @@ internal sealed class Polygon04010B0C : Polygon
     private readonly byte[] Bytes;
 
     public Polygon04010B0C(BinaryReader reader, int positionVertices, int positionNormals)
-        : base(reader, positionVertices, 4)
+        : base(reader, positionVertices, 4, positionNormals:positionNormals, polygonSize: 44, polygonFaces: 4, normalsOffset: 36)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
-
+        return;
         Bytes = reader.ReadBytes(32);
 
         var normal1 = Bytes.ReadUInt16(24, Endianness.LE);
