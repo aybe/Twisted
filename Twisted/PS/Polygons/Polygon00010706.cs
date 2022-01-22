@@ -3,7 +3,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.Polygons;
 
-internal sealed class Polygon00010706 : PolygonQuad
+internal sealed class Polygon00010706 : Polygon
 {
     private readonly byte[] Bytes;
 

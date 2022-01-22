@@ -2,7 +2,7 @@
 
 namespace Twisted.PS.Polygons;
 
-internal sealed class Polygon83010A07 : PolygonQuad
+internal sealed class Polygon83010A07 : Polygon
 {
     private byte[] Bytes;
 
