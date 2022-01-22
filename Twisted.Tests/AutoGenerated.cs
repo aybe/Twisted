@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Twisted.Extensions;
 using Twisted.IO;
 using Twisted.PC;
-using Twisted.PS.V2;
+using Twisted.PS;
 
 namespace Twisted.Tests;
 

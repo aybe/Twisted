@@ -1,0 +1,182 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
+
+namespace Twisted.PS;
+
+public abstract class DMDNode : TreeNode
+{
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
+    protected DMDNode(DMDNode? parent, BinaryReader reader, uint? nodeType = null) : base(parent)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        Position = reader.BaseStream.Position;
+        NodeType = nodeType ?? reader.ReadUInt32(Endianness.BigEndian);
+    }
+
+    public long Position { get; }
+
+    public long Length { get; private set; }
+
+    public uint NodeType { get; }
+
+    protected void SetLength(BinaryReader reader)
+    {
+        Length = reader.BaseStream.Position - Position;
+    }
+
+    public override string ToString()
+    {
+        return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
+    }
+
+    protected static uint ReadAddress(BinaryReader reader, bool validate = true)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        var position = reader.BaseStream.Position;
+        var address1 = reader.ReadUInt32(Endianness.LittleEndian);
+        var address2 = address1 - DMD.BaseAddress;
+
+        if (validate)
+        {
+            Assert.IsFalse(address2 >= reader.BaseStream.Length, $"{address2} >= {reader.BaseStream.Length} @ {position}");
+        }
+
+        return address2;
+    }
+
+    protected static uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        if (count < 0)
+            throw new ArgumentOutOfRangeException(nameof(count));
+
+        var addresses = new uint[count];
+
+        for (var i = 0; i < count; i++)
+        {
+            addresses[i] = ReadAddress(reader, validate);
+        }
+
+        return addresses;
+    }
+
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
+    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
+    private static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        var position = reader.BaseStream.Position;
+
+        var peek = reader.Peek(s => s.ReadUInt16(Endianness.BigEndian));
+
+        /*
+         * according to dbScanForInteractiveStuff
+         * 0 ok
+         * 1 ok
+         * 2 ok
+         * 3 ok
+         * 4 ok
+         * 5 ok
+         * 6 never encountered, 7 ok, 8 ok
+         * 9 ok
+         * B ok
+         * anything else is bad op code
+         */
+
+        switch (peek)
+        {
+            case 0x0010: return new DMDNode0010(parent, reader);
+            case 0x00F0: return new DMDNode0010(parent, reader);
+            case 0x0009: return new DMDNodeXXXX(parent, reader);
+            case 0x0019: return new DMDNodeXXXX(parent, reader);
+            case 0x0040: return new DMDNodeXXXX(parent, reader);
+            case 0x0064: return new DMDNodeXXXX(parent, reader);
+            case 0x0071: return new DMDNodeXXXX(parent, reader);
+            case 0x00E1: return new DMDNodeXXXX(parent, reader);
+            case 0x00E4: return new DMDNodeXXXX(parent, reader);
+            case 0x00F9: return new DMDNodeXXXX(parent, reader);
+            case 0x093D: return new DMDNodeXXXX(parent, reader);
+            case 0x0417: return new DMDNodeXXXX(parent, reader);
+            case 0x00C4: return new DMDNodeXXXX(parent, reader);
+            case 0x1027: return new DMDNodeXXXX(parent, reader);
+            case 0x1055: return new DMDNodeXXXX(parent, reader);
+            case 0x105C: return new DMDNodeXXXX(parent, reader);
+            case 0x105E: return new DMDNodeXXXX(parent, reader);
+            case 0x107A: return new DMDNodeXXXX(parent, reader);
+            case 0x108C: return new DMDNodeXXXX(parent, reader);
+            case 0x24F4: return new DMDNodeXXXX(parent, reader);
+            case 0x409C: return new DMDNodeXXXX(parent, reader);
+            case 0x4070: return new DMDNodeXXXX(parent, reader);
+            case 0x407E: return new DMDNodeXXXX(parent, reader);
+            case 0x4042: return new DMDNodeXXXX(parent, reader);
+            case 0x4038: return new DMDNodeXXXX(parent, reader);
+            case 0x40E8: return new DMDNodeXXXX(parent, reader);
+            case 0x40F4: return new DMDNodeXXXX(parent, reader);
+            case 0x4495: return new DMDNodeXXXX(parent, reader);
+            case 0x4406: return new DMDNodeXXXX(parent, reader);
+            case 0x44D2: return new DMDNodeXXXX(parent, reader);
+            case 0x5125: return new DMDNodeXXXX(parent, reader);
+            case 0x5195: return new DMDNodeXXXX(parent, reader);
+            case 0x643F: return new DMDNodeXXXX(parent, reader);
+            case 0x6472: return new DMDNodeXXXX(parent, reader);
+            case 0x6927: return new DMDNodeXXXX(parent, reader);
+            case 0x84DE: return new DMDNodeXXXX(parent, reader);
+            case 0x904A: return new DMDNodeXXXX(parent, reader);
+            case 0x90D0: return new DMDNodeXXXX(parent, reader);
+            case 0x90C9: return new DMDNodeXXXX(parent, reader);
+            case 0x905F: return new DMDNodeXXXX(parent, reader);
+            case 0x9076: return new DMDNodeXXXX(parent, reader);
+            case 0x907E: return new DMDNodeXXXX(parent, reader);
+            case 0x90EB: return new DMDNodeXXXX(parent, reader);
+            case 0xC1C5: return new DMDNodeXXXX(parent, reader);
+            case 0xA177: return new DMDNodeXXXX(parent, reader);
+            case 0xE457: return new DMDNodeXXXX(parent, reader);
+            case 0x00FF: return new DMDNode00FF(parent, reader);
+            case 0x0107: return new DMDNode0107(parent, reader);
+            case 0x0206: return new DMDNode020X(parent, reader);
+            case 0x0207: return new DMDNode020X(parent, reader);
+            case 0x0208: return new DMDNode020X(parent, reader);
+            case 0x0209: return new DMDNode020X(parent, reader);
+            case 0x020A: return new DMDNode020X(parent, reader);
+            case 0x0305: return new DMDNode0305(parent, reader);
+            case 0x040B: return new DMDNode040B(parent, reader);
+            case 0x050B: return new DMDNode050B(parent, reader);
+            case 0x07FF: return new DMDNode07FF(parent, reader);
+            case 0x08FF: return new DMDNode08FF(parent, reader);
+            case 0x0903: return new DMDNode0903(parent, reader);
+            case 0x0B06: return new DMDNode0B06(parent, reader);
+            default: throw new NotSupportedException($"{nameof(NodeType)} = 0x{peek:X4}, {nameof(Position)} = {position}");
+        }
+    }
+
+    protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
+    {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
+        if (addresses == null)
+            throw new ArgumentNullException(nameof(addresses));
+
+        var nodes = new DMDNode[addresses.Length];
+
+        for (var i = 0; i < nodes.Length; i++)
+        {
+            reader.BaseStream.Position = addresses[i];
+
+            var node = ReadNode(parent, reader);
+
+            nodes[i] = node;
+        }
+
+        return nodes;
+    }
+}
