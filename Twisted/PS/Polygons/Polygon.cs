@@ -21,7 +21,6 @@ internal abstract class Polygon : IPolygon
         if (polygonSize != -1 && polygonSize < 12)
             throw new ArgumentOutOfRangeException(nameof(polygonSize), polygonSize, "Polygon size should be at least 12 bytes.");
 
-        Reader   = reader ?? throw new ArgumentNullException(nameof(reader));
         Position = reader.BaseStream.Position;
         Type     = reader.ReadUInt32(Endianness.BigEndian);
 
@@ -30,7 +29,7 @@ internal abstract class Polygon : IPolygon
             throw new NotImplementedException();
         }
 
-        var indices = ReadIndices(4);
+        var indices = ReadIndices(reader, 4);
 
         Indices = indices.Select(s => (int)s).ToArray();
 
@@ -55,8 +54,6 @@ internal abstract class Polygon : IPolygon
         }
     }
 
-    private BinaryReader Reader { get; }
-
     public uint Type { get; }
 
     public IReadOnlyList<int> Indices { get; }
@@ -68,8 +65,11 @@ internal abstract class Polygon : IPolygon
         return $"{nameof(Type)}: 0x{Type:X8} @ {Position}, {nameof(Indices)}: {string.Join(", ", Indices)}";
     }
 
-    private short[] ReadIndices(int count)
+    private static short[] ReadIndices(BinaryReader reader, int count)
     {
+        if (reader == null)
+            throw new ArgumentNullException(nameof(reader));
+
         if (count <= 0)
             throw new ArgumentOutOfRangeException(nameof(count));
 
@@ -77,7 +77,7 @@ internal abstract class Polygon : IPolygon
 
         for (var i = 0; i < count; i++)
         {
-            indices[i] = Reader.ReadInt16(Endianness.LittleEndian);
+            indices[i] = reader.ReadInt16(Endianness.LittleEndian);
         }
 
         return indices;
