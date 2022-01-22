@@ -11,15 +11,24 @@ internal abstract class Polygon : IPolygon
         int positionVertices = -1,
         int countVertices = -1,
         int positionNormals = -1,
-        int countNormals = -1
+        int countNormals = -1,
+        int polygonSize = -1
     )
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
+        if (polygonSize != -1 && polygonSize < 12)
+            throw new ArgumentOutOfRangeException(nameof(polygonSize), polygonSize, "Polygon size should be at least 12 bytes.");
+
         Reader   = reader ?? throw new ArgumentNullException(nameof(reader));
         Position = reader.BaseStream.Position;
         Type     = reader.ReadUInt32(Endianness.BigEndian);
+
+        if (polygonSize != -1)
+        {
+            throw new NotImplementedException();
+        }
 
         var indices = ReadIndices(4);
 
