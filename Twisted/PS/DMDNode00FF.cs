@@ -5,16 +5,6 @@ namespace Twisted.PS;
 
 public sealed class DMDNode00FF : DMDNode
 {
-    public uint PositionVertices { get; }
-
-    public uint PositionNormals { get; }
-
-    public uint PositionPolygons { get; }
-
-    public IReadOnlyList<IPolygon> Polygons { get; }
-
-    public byte Flags { get; }
-
     public DMDNode00FF(DMDNode? parent, BinaryReader reader)
         : base(parent, reader)
     {
@@ -42,6 +32,16 @@ public sealed class DMDNode00FF : DMDNode
 
         Polygons = PolygonReader.TryRead(reader, count, PositionVertices, PositionNormals);
     }
+
+    public uint PositionVertices { get; }
+
+    public uint PositionNormals { get; }
+
+    public uint PositionPolygons { get; }
+
+    public IReadOnlyList<IPolygon> Polygons { get; }
+
+    public byte Flags { get; }
 
     public override string ToString()
     {

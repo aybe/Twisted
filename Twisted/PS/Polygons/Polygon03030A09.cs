@@ -6,7 +6,8 @@ internal sealed class Polygon03030A09 : PolygonQuad
 {
     private byte[] Bytes;
 
-    public Polygon03030A09(BinaryReader reader, int positionVertices) : base(reader, positionVertices, 3)
+    public Polygon03030A09(BinaryReader reader, int positionVertices)
+        : base(reader, positionVertices, 3)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));

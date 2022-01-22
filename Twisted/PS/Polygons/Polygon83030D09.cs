@@ -5,7 +5,7 @@ namespace Twisted.PS.Polygons;
 
 internal sealed class Polygon83030D09 : PolygonQuad
 {
-    private byte[] Bytes;
+    private readonly byte[] Bytes;
 
     public Polygon83030D09(BinaryReader reader, int positionVertices, int positionNormals)
         : base(reader, positionVertices, 3)
