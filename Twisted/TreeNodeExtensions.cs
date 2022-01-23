@@ -5,18 +5,9 @@ public static class TreeNodeExtensions
 {
     public static void TraverseBFS<T>(this T node, Action<T> visitor) where T : TreeNode
     {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
 
-        node.TraverseBFS(s =>
-        {
-            visitor(s);
-            return true;
-        });
-    }
-
-    public static void TraverseBFS<T>(this T node, Func<T, bool> visitor) where T : TreeNode
-    {
         if (visitor == null)
             throw new ArgumentNullException(nameof(visitor));
 
@@ -28,8 +19,7 @@ public static class TreeNodeExtensions
         {
             var dequeue = queue.Dequeue();
 
-            if (!visitor(dequeue))
-                break;
+            visitor(dequeue);
 
             foreach (var item in dequeue)
             {
@@ -40,18 +30,9 @@ public static class TreeNodeExtensions
 
     public static void TraverseDFS<T>(this T node, Action<T> visitor) where T : TreeNode
     {
-        if (visitor == null)
-            throw new ArgumentNullException(nameof(visitor));
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
 
-        node.TraverseDFS(s =>
-        {
-            visitor(s);
-            return true;
-        });
-    }
-
-    public static void TraverseDFS<T>(this T node, Func<T, bool> visitor) where T : TreeNode
-    {
         if (visitor == null)
             throw new ArgumentNullException(nameof(visitor));
 
@@ -63,8 +44,7 @@ public static class TreeNodeExtensions
         {
             var pop = stack.Pop();
 
-            if (!visitor(pop))
-                break;
+            visitor(pop);
 
             foreach (var item in pop.Reverse())
             {
