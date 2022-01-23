@@ -3,7 +3,7 @@
 public static class TreeNodeExtensions
     // NOTE having these as extensions removes the need from specifying T in caller
 {
-    public static void TraverseBFS<T>(this T node, Action<T> visitor) where T : TreeNode
+    public static void TraverseBfs<T>(this T node, Action<T> visitor) where T : TreeNode
     {
         if (node == null)
             throw new ArgumentNullException(nameof(node));
@@ -28,7 +28,7 @@ public static class TreeNodeExtensions
         }
     }
 
-    public static void TraverseDFS<T>(this T node, Action<T> visitor) where T : TreeNode
+    public static void TraverseDfsPreOrder<T>(this T node, Action<T> visitor) where T : TreeNode
     {
         if (node == null)
             throw new ArgumentNullException(nameof(node));

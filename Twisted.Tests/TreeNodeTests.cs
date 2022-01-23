@@ -285,7 +285,7 @@ public class TreeNodeTests
 
         var nodes = new List<TreeNodeTest>();
 
-        node1.TraverseBFS(s => { nodes.Add(s); });
+        node1.TraverseBfs(s => { nodes.Add(s); });
 
         CollectionAssert.AreEqual(
             new[]
@@ -322,7 +322,7 @@ public class TreeNodeTests
 
         var nodes = new List<TreeNodeTest>();
 
-        node1.TraverseDFS(s => { nodes.Add(s); });
+        node1.TraverseDfsPreOrder(s => { nodes.Add(s); });
 
         CollectionAssert.AreEqual(
             new[]

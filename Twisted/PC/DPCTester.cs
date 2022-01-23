@@ -316,7 +316,7 @@ public static class DPCTester
 
         // perform some extra tests
 
-        //root.TraverseDFS(s =>
+        //root.TraverseDfsPreOrder(s =>
         //{
         //    if (s is DPCNode0107XXXX { B3: not 0 } node0107XXXX)
         //    {
