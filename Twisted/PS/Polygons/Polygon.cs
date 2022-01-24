@@ -5,7 +5,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS.Polygons;
 
-public abstract class Polygon
+public abstract class Polygon : IBinaryObject
 {
     protected Polygon(
         BinaryReader reader,
@@ -39,6 +39,10 @@ public abstract class Polygon
         // read polygon data, this will be accessible to derived types for further reading
 
         Data = reader.ReadBytes(polygonSize);
+
+        // set polygon length, this will allow us to extract chunks of polygons for further analysis
+
+        Length = reader.BaseStream.Position - Position;
 
         // read polygon type
 
@@ -109,17 +113,24 @@ public abstract class Polygon
 
     protected byte[] Data { get; }
 
-    public long Position { get; }
-
     public uint Type { get; }
 
     public IReadOnlyList<Vector4> Vertices { get; }
 
     public IReadOnlyList<Vector4> Normals { get; }
 
+    public long Position { get; }
+
+    public long Length { get; }
+
+    public byte[] GetObjectData()
+    {
+        return Data;
+    }
+
     public override string ToString()
     {
         return
-            $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
+            $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
     }
 }
