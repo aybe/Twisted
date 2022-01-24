@@ -108,6 +108,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
          * anything else is bad op code
          */
 
+        // @formatter:off
         switch (peek)
         {
             case 0x0010: return new DMDNode0010(parent, reader);
@@ -172,6 +173,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
             case 0x0B06: return new DMDNode0B06(parent, reader);
             default: throw new NotSupportedException($"{nameof(NodeType)} = 0x{peek:X4}, {nameof(Position)} = {position}");
         }
+        // @formatter:on
     }
 
     protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
