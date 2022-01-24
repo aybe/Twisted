@@ -69,7 +69,7 @@ public abstract class DMDNode : TreeNode
 
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
     [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
-    private static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
+    public static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
