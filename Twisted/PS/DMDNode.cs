@@ -4,7 +4,7 @@ using Twisted.Extensions;
 
 namespace Twisted.PS;
 
-public abstract class DMDNode : TreeNode
+public abstract class DMDNode : TreeNode, IBinaryObject
 {
     [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
     protected DMDNode(DMDNode? parent, BinaryReader reader, uint? nodeType = null) : base(parent)
@@ -16,15 +16,31 @@ public abstract class DMDNode : TreeNode
         NodeType = nodeType ?? reader.ReadUInt32(Endianness.BigEndian);
     }
 
+    private byte[] ObjectData { get; set; } = null!;
+
+    public uint NodeType { get; }
+
     public long Position { get; }
 
     public long Length { get; private set; }
 
-    public uint NodeType { get; }
+    public byte[] GetObjectData()
+    {
+        return ObjectData.ToArray();
+    }
 
     protected void SetLength(BinaryReader reader)
     {
         Length = reader.BaseStream.Position - Position;
+
+        byte[] data;
+
+        using (new BinaryReaderPositionScope(reader, Position))
+        {
+            data = reader.ReadBytes(Length.ToInt32());
+        }
+
+        ObjectData = data;
     }
 
     public override string ToString()
