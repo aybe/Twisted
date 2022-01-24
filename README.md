@@ -5,11 +5,9 @@ This is an attempt to reverse-engineer the different file formats of the game Tw
 
 ## DMD format
 
-The DMD format is loosely based on the HMD format described in the PlayStation SDK documentation; by loosely, it is meant that it consists of a tree data structure where nodes are pointed to by pointers with values within some memory range of the PlayStation.
+The DMD format is loosely based on the HMD format described in the PlayStation SDK documentation; by loosely, it is meant that it consists of a tree data structure where nodes are pointed to by pointers with values within some memory range of the PlayStation. The format itself is pretty verbose, in some cases there can be tens of thousands of nodes and a node nesting depth greater than twenty.
 
-The format is pretty verbose, there can be tens of thousands of nodes and a node nesting depth greater than twenty in some cases.
-
-The layout of a DMD file:
+The layout of the content inside a DMD file:
 
 - header
   - magic number
