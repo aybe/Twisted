@@ -29,7 +29,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
         return ObjectData.ToArray();
     }
 
-    protected void SetLength(BinaryReader reader)
+    protected void SetupBinaryObject(BinaryReader reader)
     {
         Length = reader.BaseStream.Position - Position;
 

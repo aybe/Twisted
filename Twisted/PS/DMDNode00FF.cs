@@ -24,7 +24,7 @@ public sealed class DMDNode00FF : DMDNode
             var extraBytes = reader.ReadBytes(32 + 16); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. .. 
         }
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
 
         var count = bytes.ReadUInt16(0, Endianness.LE);
 

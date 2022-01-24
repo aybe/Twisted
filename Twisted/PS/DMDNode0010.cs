@@ -19,7 +19,7 @@ public sealed class DMDNode0010 : DMDNode
             addresses = ReadAddresses(reader, 1);
         }
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
 
         if (addresses != null)
         {

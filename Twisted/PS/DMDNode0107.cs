@@ -16,7 +16,7 @@ public sealed class DMDNode0107 : DMDNode
 
         // TODO there may be 76 more bytes in here
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
 
         ReadNodes(this, reader, addresses);
     }

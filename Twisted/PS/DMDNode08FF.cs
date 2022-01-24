@@ -10,6 +10,6 @@ public sealed class DMDNode08FF : DMDNode
 
         var unknown2 = reader.ReadBytes(84);
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
     }
 }

@@ -15,7 +15,7 @@ public sealed class DMDNode0903 : DMDNode
 
         var addresses = ReadAddresses(reader, b3);
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
 
         ReadNodes(this, reader, addresses);
     }

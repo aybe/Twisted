@@ -33,7 +33,7 @@ public sealed class DMD : DMDNode
         var addressesCount = reader.ReadInt32(Endianness.LE);
         var addresses      = ReadAddresses(reader, addressesCount);
 
-        SetLength(reader);
+        SetupBinaryObject(reader);
 
         ReadNodes(this, reader, addresses);
     }
