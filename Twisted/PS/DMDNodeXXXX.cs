@@ -10,7 +10,7 @@ public sealed class DMDNodeXXXX : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown2 = reader.ReadInt32(Endianness.LittleEndian);
+        var unknown2 = reader.ReadInt32(Endianness.LE);
 
         var addresses = ReadAddresses(reader, 1);
 

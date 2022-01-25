@@ -18,7 +18,7 @@ internal static class PolygonReader
 
         for (var i = 0; i < count; i++)
         {
-            var peek    = reader.Peek(s => s.ReadUInt32(Endianness.BigEndian));
+            var peek    = reader.Peek(s => s.ReadUInt32(Endianness.BE));
             var polygon = ReadPolygon(reader, peek, vertices, normals);
             polygons[i] = polygon;
         }

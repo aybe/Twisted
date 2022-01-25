@@ -13,7 +13,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
             throw new ArgumentNullException(nameof(reader));
 
         Position = reader.BaseStream.Position;
-        NodeType = reader.ReadUInt32(Endianness.BigEndian);
+        NodeType = reader.ReadUInt32(Endianness.BE);
     }
 
     private byte[] ObjectData { get; set; } = null!;
@@ -57,7 +57,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
             throw new ArgumentNullException(nameof(reader));
 
         var position = reader.BaseStream.Position;
-        var address1 = reader.ReadUInt32(Endianness.LittleEndian);
+        var address1 = reader.ReadUInt32(Endianness.LE);
         var address2 = address1 - DMD.BaseAddress;
 
         if (validate)
@@ -96,7 +96,7 @@ public abstract class DMDNode : TreeNode, IBinaryObject
 
         var position = reader.BaseStream.Position;
 
-        var peek = reader.Peek(s => s.ReadUInt16(Endianness.BigEndian));
+        var peek = reader.Peek(s => s.ReadUInt16(Endianness.BE));
 
         /*
          * according to dbScanForInteractiveStuff
