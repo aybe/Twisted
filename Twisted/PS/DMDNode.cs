@@ -30,8 +30,11 @@ public abstract class DMDNode : TreeNode, IBinaryObject
     }
 
     protected void SetupBinaryObject(BinaryReader reader)
+        // TODO there's a way to do that in ctor but it'd need an extra reader for each node to avoid 'Virtual member call in constructor'
     {
         Length = reader.BaseStream.Position - Position;
+
+        Assert.AreNotEqual(0, Length, "Invalid node length.");
 
         byte[] data;
 
