@@ -4,9 +4,11 @@ using System.Collections.Generic;
 namespace Twisted.Tests;
 
 /// <summary>
-///     Compares by array length then by array content.
+///     Compares arrays by length and by content.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">
+///     The type of elements in arrays to be compared.
+/// </typeparam>
 public sealed class ArrayComparer<T> : Comparer<T[]> where T : IComparable<T>
 {
     public static ArrayComparer<T> Instance { get; } = new();
