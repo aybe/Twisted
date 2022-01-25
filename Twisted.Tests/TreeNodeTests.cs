@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -283,9 +282,7 @@ public class TreeNodeTests
         node3.Add(node6);
         node3.Add(node7);
 
-        var nodes = new List<TreeNodeTest>();
-
-        node1.TraverseBfs(s => { nodes.Add(s); });
+        var nodes = node1.TraverseBfs().ToList();
 
         CollectionAssert.AreEqual(
             new[]
@@ -320,9 +317,7 @@ public class TreeNodeTests
         node3.Add(node6);
         node3.Add(node7);
 
-        var nodes = new List<TreeNodeTest>();
-
-        node1.TraverseDfsPreOrder(s => { nodes.Add(s); });
+        var nodes = node1.TraverseDfsPreOrder().ToList();
 
         CollectionAssert.AreEqual(
             new[]
