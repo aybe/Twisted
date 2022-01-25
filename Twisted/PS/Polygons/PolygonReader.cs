@@ -26,7 +26,8 @@ internal static class PolygonReader
         return polygons;
     }
 
-    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
+    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
+    [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
     private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
     {
         if (reader == null)
@@ -43,6 +44,7 @@ internal static class PolygonReader
 
             switch (type)
             {
+                // @formatter:off
                 case 0x00010505: break;
                 case 0x00030706: break;
                 case 0x00040808: break;
@@ -57,11 +59,13 @@ internal static class PolygonReader
                 default:
                     Assert.Fail($"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
                     break;
+                // @formatter:on
             }
         }
 
         switch (type)
         {
+            // @formatter:off
             case 0x00010504: return new Polygon00010504(reader, vertices.ToInt32()); // BUG no normals?
             case 0x00010505: return new Polygon00010505(reader, vertices.ToInt32()); // BUG no normals?
             case 0x00010604: return new Polygon00010604(reader, vertices.ToInt32()); // BUG no normals?
@@ -99,6 +103,7 @@ internal static class PolygonReader
             case 0x84040E0C: return new Polygon84040E0C(reader, vertices.ToInt32()); // BUG no normals?
             case 0x84040F0C: return new Polygon84040F0C(reader, vertices.ToInt32(), normals.ToInt32());
             default: throw new NotSupportedException($"Unknown polygon: 0x{type:X8} @ {reader.BaseStream.Position}");
+            // @formatter:on
         }
     }
 }

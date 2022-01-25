@@ -87,7 +87,8 @@ public abstract class DMDNode : TreeNode, IBinaryObject
     }
 
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
-    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
+    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
+    [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
     public static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
     {
         if (reader == null)
