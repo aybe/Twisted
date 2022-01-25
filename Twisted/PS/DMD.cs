@@ -7,14 +7,13 @@ public sealed class DMD : DMDNode
     public const uint BaseAddress = 0x800188B8;
 
     public DMD(BinaryReader reader)
-        : base(null, reader, 0xCAFEBABE) // trick to make DMD a DMDNode itself
+        : base(null, reader)
     {
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var identifier = reader.ReadInt32(Endianness.LE);
-        if (identifier != 0x50535844)
-            throw new InvalidDataException($"Invalid identifier: 0x{identifier:X8}.");
+        if (NodeType != 0x44585350)
+            throw new InvalidDataException($"Invalid identifier: 0x{NodeType:X8}.");
 
         var version = reader.ReadInt32(Endianness.LE);
         if (version != 0x00000043)
