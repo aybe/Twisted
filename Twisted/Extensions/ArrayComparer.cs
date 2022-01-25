@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Twisted.Tests;
+﻿namespace Twisted.Extensions;
 
 /// <summary>
 ///     Compares arrays by length and by content.
