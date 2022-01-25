@@ -12,9 +12,19 @@ public sealed class DMDNode0B06 : DMDNode
 
         Assert.IsTrue(parent is DMDNode0107);
 
-        var unknown2 = reader.ReadBytes(8);
+        var bytes = reader.ReadBytes(8);
 
-        var count = unknown2[6];
+        Assert.AreEqual(0, bytes[0]);
+        Assert.AreEqual(0, bytes[1]);
+        Assert.AreEqual(0, bytes[2]);
+        Assert.AreEqual(0, bytes[3]);
+        
+        Assert.AreEqual(0, bytes[4]);
+        Assert.AreEqual(0, bytes[5]);
+
+        var count = bytes[6];
+        
+        Assert.AreEqual(0, bytes[7]);
 
         switch (count)
         {

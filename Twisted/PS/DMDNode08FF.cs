@@ -8,7 +8,7 @@ public sealed class DMDNode08FF : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown2 = reader.ReadBytes(84);
+        var bytes = reader.ReadBytes(84);
 
         SetupBinaryObject(reader);
     }

@@ -1,4 +1,4 @@
-﻿using Twisted.Extensions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Twisted.PS;
 
@@ -10,15 +10,19 @@ public sealed class DMDNode050B : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown2 = reader.ReadBytes(36);
+        var bytes = reader.ReadBytes(36);
 
-        var x = unknown2.ReadInt32(20, Endianness.LE); // TODO
-        var y = unknown2.ReadInt32(24, Endianness.LE); // TODO
-        var z = unknown2.ReadInt32(28, Endianness.LE); // TODO
+        // TODO 32 bytes matrix ???
 
-        var countMaybe = unknown2[34]; // TODO
+        // Assert.AreEqual(0, bytes[32]);
+        
+        Assert.AreEqual(0, bytes[33]);
 
-        var addresses = ReadAddresses(reader, countMaybe);
+        var count = bytes[34];
+
+        // Assert.AreEqual(0, bytes[35]);
+
+        var addresses = ReadAddresses(reader, count);
 
         SetupBinaryObject(reader);
 

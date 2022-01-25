@@ -1,4 +1,6 @@
-﻿namespace Twisted.PS;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Twisted.PS;
 
 public sealed class DMDNode0903 : DMDNode
 {
@@ -12,6 +14,14 @@ public sealed class DMDNode0903 : DMDNode
         var b2 = reader.ReadByte();
         var b3 = reader.ReadByte();
         var b4 = reader.ReadByte();
+
+        // Assert.AreEqual(0, b1);
+
+        Assert.AreEqual(0, b2);
+        
+        Assert.AreNotEqual(0, b3);
+
+        Assert.AreEqual(0, b4);
 
         var addresses = ReadAddresses(reader, b3);
 

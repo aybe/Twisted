@@ -8,11 +8,13 @@ public sealed class DMDNode040B : DMDNode
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        var unknown2 = reader.ReadBytes(16);
+        var bytes = reader.ReadBytes(16);
 
-        var countMaybe = unknown2[14]; // TODO
+        // TODO int32 x, y, z ???
 
-        var addresses = ReadAddresses(reader, countMaybe);
+        var count = bytes[14];
+
+        var addresses = ReadAddresses(reader, count);
 
         SetupBinaryObject(reader);
 

@@ -1,4 +1,5 @@
-﻿using Twisted.Extensions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 using Twisted.PS.Polygons;
 
 namespace Twisted.PS;
@@ -17,11 +18,20 @@ public sealed class DMDNode00FF : DMDNode
 
         var bytes = reader.ReadBytes(28);
 
+        var u1 = bytes.ReadUInt32(0,  Endianness.BE);
+        var u2 = bytes.ReadUInt32(4,  Endianness.BE);
+        var u3 = bytes.ReadUInt32(8,  Endianness.BE);
+        var u4 = bytes.ReadUInt32(12, Endianness.BE);
+        var u5 = bytes.ReadUInt32(16, Endianness.BE);
+        var u6 = bytes.ReadUInt32(20, Endianness.BE);
+        var u7 = bytes.ReadUInt32(24, Endianness.BE);
+
         Flags = bytes[11];
 
         if ((Flags & 0x80) != 0)
         {
             var extraBytes = reader.ReadBytes(32 + 16); // TODO 00 10 00 00 .. .. .. .., 00 01 05 05 .. .. .. .. 
+            // TODO int32 x, y, z, unknown
         }
 
         SetupBinaryObject(reader);
