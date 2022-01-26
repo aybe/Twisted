@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Twisted.Extensions;
 using Twisted.PS;
 
 // ReSharper disable StringLiteralTypo

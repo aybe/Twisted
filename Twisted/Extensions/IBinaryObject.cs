@@ -1,4 +1,4 @@
-﻿namespace Twisted;
+﻿namespace Twisted.Extensions;
 
 public interface IBinaryObject
 {
