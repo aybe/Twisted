@@ -1,4 +1,0 @@
-- add Traverse methods that return a list
-- add missing Convert.To methods
-- add missing Read* methods to BinaryReader, byte[], etc
-- try read last node and compare to DMD
