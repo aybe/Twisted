@@ -1,21 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<DebugType>full</DebugType>
+		<LangVersion>9.0</LangVersion>
+		<BaseOutputPath>..\.bin\</BaseOutputPath>
+		<BaseIntermediateOutputPath>..\.obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="3.1.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="3.1.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+		<PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+	</ItemGroup>
 
 </Project>

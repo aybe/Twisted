@@ -1,7 +1,8 @@
-﻿namespace Twisted.IO;
-
-public enum BinaryStreamRegionType
+﻿namespace Twisted.IO
 {
-    Ignored,
-    Visited
+    public enum BinaryStreamRegionType
+    {
+        Ignored,
+        Visited
+    }
 }

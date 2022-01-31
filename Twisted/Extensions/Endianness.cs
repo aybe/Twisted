@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Twisted.Extensions;
-
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-public enum Endianness
+namespace Twisted.Extensions
 {
-    BE,
-    LE
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum Endianness
+    {
+        BE,
+        LE
+    }
 }

@@ -1,16 +1,20 @@
-﻿namespace Twisted.Extensions;
+﻿using System;
+using System.Collections.Generic;
 
-public sealed class DelegateComparer<T> : Comparer<T>
+namespace Twisted.Extensions
 {
-    public DelegateComparer(Func<T?, T?, int> compareFunc)
+    public sealed class DelegateComparer<T> : Comparer<T>
     {
-        CompareFunc = compareFunc ?? throw new ArgumentNullException(nameof(compareFunc));
-    }
+        public DelegateComparer(Func<T?, T?, int> compareFunc)
+        {
+            CompareFunc = compareFunc ?? throw new ArgumentNullException(nameof(compareFunc));
+        }
 
-    private Func<T?, T?, int> CompareFunc { get; }
+        private Func<T?, T?, int> CompareFunc { get; }
 
-    public override int Compare(T? x, T? y)
-    {
-        return CompareFunc(x, y);
+        public override int Compare(T? x, T? y)
+        {
+            return CompareFunc(x, y);
+        }
     }
 }

@@ -1,13 +1,16 @@
-﻿namespace Twisted.PC;
+﻿using System;
 
-public sealed class DPCNode00100000 : DPCNode
+namespace Twisted.PC
 {
-    internal DPCNode00100000(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+    public sealed class DPCNode00100000 : DPCNode
     {
-        var bytes = reader.ReadBytes(16);
+        internal DPCNode00100000(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+        {
+            var bytes = reader.ReadBytes(16);
 
-        SetLength(reader);
+            SetLength(reader);
 
-        children = Array.Empty<int>();
+            children = Array.Empty<int>();
+        }
     }
 }

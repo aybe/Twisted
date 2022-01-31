@@ -1,29 +1,33 @@
-﻿namespace Twisted.PS;
+﻿using System;
+using System.IO;
 
-public sealed class DMDNode0010 : DMDNode
+namespace Twisted.PS
 {
-    public DMDNode0010(DMDNode? parent, BinaryReader reader)
-        : base(parent, reader)
+    public sealed class DMDNode0010 : DMDNode
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-
-        var addresses = default(uint[]?);
-
-        var special = (NodeType & 0xFFFF) != 0;
-
-        var bytes = reader.ReadBytes(special ? 4 : 44);
-
-        if (special)
+        public DMDNode0010(DMDNode? parent, BinaryReader reader)
+            : base(parent, reader)
         {
-            addresses = ReadAddresses(reader, 1);
-        }
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
-        SetupBinaryObject(reader);
+            var addresses = default(uint[]?);
 
-        if (addresses != null)
-        {
-            ReadNodes(this, reader, addresses);
+            var special = (NodeType & 0xFFFF) != 0;
+
+            var bytes = reader.ReadBytes(special ? 4 : 44);
+
+            if (special)
+            {
+                addresses = ReadAddresses(reader, 1);
+            }
+
+            SetupBinaryObject(reader);
+
+            if (addresses != null)
+            {
+                ReadNodes(this, reader, addresses);
+            }
         }
     }
 }

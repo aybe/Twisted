@@ -1,49 +1,51 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using Twisted.Extensions;
 
-namespace Twisted.PS.Polygons;
-
-internal static class PolygonReader
+namespace Twisted.PS.Polygons
 {
-    public static IReadOnlyList<Polygon> TryRead(BinaryReader reader, int count, uint vertices, uint normals)
+    internal static class PolygonReader
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-
-        if (count <= 0)
-            throw new ArgumentOutOfRangeException(nameof(count));
-
-        var polygons = new Polygon[count];
-
-        for (var i = 0; i < count; i++)
+        public static IReadOnlyList<Polygon> TryRead(BinaryReader reader, int count, uint vertices, uint normals)
         {
-            var peek    = reader.Peek(s => s.ReadUInt32(Endianness.BE));
-            var polygon = ReadPolygon(reader, peek, vertices, normals);
-            polygons[i] = polygon;
-        }
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
-        return polygons;
-    }
+            if (count <= 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
-    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
-    [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
-    private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
-    {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
+            var polygons = new Polygon[count];
 
-        if (vertices >= reader.BaseStream.Length) // TODO delete once useless
-        {
-            Assert.Fail();
-        }
-
-        if (normals >= reader.BaseStream.Length) // TODO delete once useless
-        {
-            // all the data read by these is -12 in size -> type + 4 indices TODO are all quads?
-
-            switch (type)
+            for (var i = 0; i < count; i++)
             {
+                var peek    = reader.Peek(s => s.ReadUInt32(Endianness.BE));
+                var polygon = ReadPolygon(reader, peek, vertices, normals);
+                polygons[i] = polygon;
+            }
+
+            return polygons;
+        }
+
+        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
+        [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
+        private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            if (vertices >= reader.BaseStream.Length) // TODO delete once useless
+            {
+                Assert.Fail();
+            }
+
+            if (normals >= reader.BaseStream.Length) // TODO delete once useless
+            {
+                // all the data read by these is -12 in size -> type + 4 indices TODO are all quads?
+
+                switch (type)
+                {
                 // @formatter:off
                 case 0x00010505: break;
                 case 0x00030706: break;
@@ -59,12 +61,12 @@ internal static class PolygonReader
                 default:
                     Assert.Fail($"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
                     break;
-                // @formatter:on
+                    // @formatter:on
+                }
             }
-        }
 
-        switch (type)
-        {
+            switch (type)
+            {
             // @formatter:off
             case 0x00010504: return new Polygon00010504(reader, vertices.ToInt32()); // BUG no normals?
             case 0x00010505: return new Polygon00010505(reader, vertices.ToInt32()); // BUG no normals?
@@ -103,7 +105,8 @@ internal static class PolygonReader
             case 0x84040E0C: return new Polygon84040E0C(reader, vertices.ToInt32()); // BUG no normals?
             case 0x84040F0C: return new Polygon84040F0C(reader, vertices.ToInt32(), normals.ToInt32());
             default: throw new NotSupportedException($"Unknown polygon: 0x{type:X8} @ {reader.BaseStream.Position}");
-            // @formatter:on
+                // @formatter:on
+            }
         }
     }
 }

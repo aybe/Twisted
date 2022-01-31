@@ -1,116 +1,118 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using Twisted.Extensions;
 
-namespace Twisted.PS;
-
-public abstract class DMDNode : TreeNode, IBinaryObject
+namespace Twisted.PS
 {
-    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
-    protected DMDNode(DMDNode? parent, BinaryReader reader) : base(parent)
+    public abstract class DMDNode : TreeNode, IBinaryObject
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-
-        Position = reader.BaseStream.Position;
-        NodeType = reader.ReadUInt32(Endianness.BE);
-    }
-
-    private byte[] ObjectData { get; set; } = null!;
-
-    public uint NodeType { get; }
-
-    public long Position { get; }
-
-    public long Length { get; private set; }
-
-    public byte[] GetObjectData()
-    {
-        return ObjectData.ToArray();
-    }
-
-    protected void SetupBinaryObject(BinaryReader reader)
-        // TODO there's a way to do that in ctor but it'd need an extra reader for each node to avoid 'Virtual member call in constructor'
-    {
-        Length = reader.BaseStream.Position - Position;
-
-        Assert.AreNotEqual(0, Length, "Invalid node length.");
-
-        byte[] data;
-
-        using (new BinaryReaderPositionScope(reader, Position))
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
+        protected DMDNode(DMDNode? parent, BinaryReader reader) : base(parent)
         {
-            data = reader.ReadBytes(Length.ToInt32());
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            Position = reader.BaseStream.Position;
+            NodeType = reader.ReadUInt32(Endianness.BE);
         }
 
-        ObjectData = data;
-    }
+        private byte[] ObjectData { get; set; } = null!;
 
-    public override string ToString()
-    {
-        return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
-    }
+        public uint NodeType { get; }
 
-    protected static uint ReadAddress(BinaryReader reader, bool validate = true)
-    {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
+        public long Position { get; }
 
-        var position = reader.BaseStream.Position;
-        var address1 = reader.ReadUInt32(Endianness.LE);
-        var address2 = address1 - DMD.BaseAddress;
+        public long Length { get; private set; }
 
-        if (validate)
+        public byte[] GetObjectData()
         {
-            Assert.IsFalse(address2 >= reader.BaseStream.Length, $"{address2} >= {reader.BaseStream.Length} @ {position}");
+            return ObjectData.ToArray();
         }
 
-        return address2;
-    }
-
-    protected static uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
-    {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-
-        if (count < 0)
-            throw new ArgumentOutOfRangeException(nameof(count));
-
-        var addresses = new uint[count];
-
-        for (var i = 0; i < count; i++)
+        protected void SetupBinaryObject(BinaryReader reader)
+            // TODO there's a way to do that in ctor but it'd need an extra reader for each node to avoid 'Virtual member call in constructor'
         {
-            addresses[i] = ReadAddress(reader, validate);
+            Length = reader.BaseStream.Position - Position;
+
+            Assert.AreNotEqual(0, Length, "Invalid node length.");
+
+            byte[] data;
+
+            using (new BinaryReaderPositionScope(reader, Position))
+            {
+                data = reader.ReadBytes(Length.ToInt32());
+            }
+
+            ObjectData = data;
         }
 
-        return addresses;
-    }
+        public override string ToString()
+        {
+            return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
+        }
 
-    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
-    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
-    [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
-    public static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
-    {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
+        protected static uint ReadAddress(BinaryReader reader, bool validate = true)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
-        var position = reader.BaseStream.Position;
+            var position = reader.BaseStream.Position;
+            var address1 = reader.ReadUInt32(Endianness.LE);
+            var address2 = address1 - DMD.BaseAddress;
 
-        var peek = reader.Peek(s => s.ReadUInt16(Endianness.BE));
+            if (validate)
+            {
+                Assert.IsFalse(address2 >= reader.BaseStream.Length, $"{address2} >= {reader.BaseStream.Length} @ {position}");
+            }
 
-        /*
-         * according to dbScanForInteractiveStuff
-         * 0 ok
-         * 1 ok
-         * 2 ok
-         * 3 ok
-         * 4 ok
-         * 5 ok
-         * 6 never encountered, 7 ok, 8 ok
-         * 9 ok
-         * B ok
-         * anything else is bad op code
-         */
+            return address2;
+        }
+
+        protected static uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            var addresses = new uint[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                addresses[i] = ReadAddress(reader, validate);
+            }
+
+            return addresses;
+        }
+
+        [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
+        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
+        [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
+        public static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            var position = reader.BaseStream.Position;
+
+            var peek = reader.Peek(s => s.ReadUInt16(Endianness.BE));
+
+            /*
+             * according to dbScanForInteractiveStuff
+             * 0 ok
+             * 1 ok
+             * 2 ok
+             * 3 ok
+             * 4 ok
+             * 5 ok
+             * 6 never encountered, 7 ok, 8 ok
+             * 9 ok
+             * B ok
+             * anything else is bad op code
+             */
 
         // @formatter:off
         switch (peek)
@@ -177,28 +179,29 @@ public abstract class DMDNode : TreeNode, IBinaryObject
             case 0x0B06: return new DMDNode0B06(parent, reader);
             default: throw new NotSupportedException($"{nameof(NodeType)} = 0x{peek:X4}, {nameof(Position)} = {position}");
         }
-        // @formatter:on
-    }
-
-    protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
-    {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
-
-        if (addresses == null)
-            throw new ArgumentNullException(nameof(addresses));
-
-        var nodes = new DMDNode[addresses.Length];
-
-        for (var i = 0; i < nodes.Length; i++)
-        {
-            reader.BaseStream.Position = addresses[i];
-
-            var node = ReadNode(parent, reader);
-
-            nodes[i] = node;
+            // @formatter:on
         }
 
-        return nodes;
+        protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            if (addresses == null)
+                throw new ArgumentNullException(nameof(addresses));
+
+            var nodes = new DMDNode[addresses.Length];
+
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                reader.BaseStream.Position = addresses[i];
+
+                var node = ReadNode(parent, reader);
+
+                nodes[i] = node;
+            }
+
+            return nodes;
+        }
     }
 }

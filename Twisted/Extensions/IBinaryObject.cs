@@ -1,10 +1,11 @@
-﻿namespace Twisted.Extensions;
-
-public interface IBinaryObject
+﻿namespace Twisted.Extensions
 {
-    long Position { get; }
+    public interface IBinaryObject
+    {
+        long Position { get; }
 
-    long Length { get; }
+        long Length { get; }
 
-    byte[] GetObjectData();
+        byte[] GetObjectData();
+    }
 }

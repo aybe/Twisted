@@ -1,7 +1,8 @@
-﻿namespace Twisted.IO;
-
-public enum BinaryStreamRegionKind
+﻿namespace Twisted.IO
 {
-    Reading,
-    Writing
+    public enum BinaryStreamRegionKind
+    {
+        Reading,
+        Writing
+    }
 }

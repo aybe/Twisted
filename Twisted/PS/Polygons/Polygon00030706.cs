@@ -1,10 +1,13 @@
-﻿namespace Twisted.PS.Polygons;
+﻿using System.IO;
 
-internal sealed class Polygon00030706 : Polygon
+namespace Twisted.PS.Polygons
 {
-    public Polygon00030706(BinaryReader reader, int positionVertices)
-        : base(reader, 28, 3, positionVertices)
+    internal sealed class Polygon00030706 : Polygon
     {
-        // TODO int32 + rgba * 4?
+        public Polygon00030706(BinaryReader reader, int positionVertices)
+            : base(reader, 28, 3, positionVertices)
+        {
+            // TODO int32 + rgba * 4?
+        }
     }
 }

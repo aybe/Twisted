@@ -1,90 +1,93 @@
-﻿namespace Twisted.IO;
+﻿using System;
 
-public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEquatable<BinaryStreamRegion>
+namespace Twisted.IO
 {
-    public readonly long Position;
-    public readonly long Length;
-
-    internal BinaryStreamRegion(long position, long length)
+    public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEquatable<BinaryStreamRegion>
     {
-        Position = position;
-        Length   = length;
-    }
+        public readonly long Position;
+        public readonly long Length;
 
-    public override string ToString()
-    {
-        return $"{nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
-    }
-
-    #region IComparable
-
-    public int CompareTo(BinaryStreamRegion other)
-    {
-        var position = Position.CompareTo(other.Position);
-
-        if (position != 0)
+        internal BinaryStreamRegion(long position, long length)
         {
-            return position;
+            Position = position;
+            Length   = length;
         }
 
-        var length = Length.CompareTo(other.Length);
-
-        if (length != 0)
+        public override string ToString()
         {
-            return length;
+            return $"{nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
         }
 
-        return 0;
+        #region IComparable
+
+        public int CompareTo(BinaryStreamRegion other)
+        {
+            var position = Position.CompareTo(other.Position);
+
+            if (position != 0)
+            {
+                return position;
+            }
+
+            var length = Length.CompareTo(other.Length);
+
+            if (length != 0)
+            {
+                return length;
+            }
+
+            return 0;
+        }
+
+        public static bool operator <(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator >(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator <=(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >=(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return left.CompareTo(right) >= 0;
+        }
+
+        #endregion
+
+        #region IEquatable
+
+        public bool Equals(BinaryStreamRegion other)
+        {
+            return Position == other.Position && Length == other.Length;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is BinaryStreamRegion other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Position, Length);
+        }
+
+        public static bool operator ==(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BinaryStreamRegion left, BinaryStreamRegion right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
     }
-
-    public static bool operator <(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return left.CompareTo(right) < 0;
-    }
-
-    public static bool operator >(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return left.CompareTo(right) > 0;
-    }
-
-    public static bool operator <=(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return left.CompareTo(right) <= 0;
-    }
-
-    public static bool operator >=(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return left.CompareTo(right) >= 0;
-    }
-
-    #endregion
-
-    #region IEquatable
-
-    public bool Equals(BinaryStreamRegion other)
-    {
-        return Position == other.Position && Length == other.Length;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is BinaryStreamRegion other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Position, Length);
-    }
-
-    public static bool operator ==(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(BinaryStreamRegion left, BinaryStreamRegion right)
-    {
-        return !left.Equals(right);
-    }
-
-    #endregion
 }

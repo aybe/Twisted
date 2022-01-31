@@ -1,21 +1,25 @@
-﻿namespace Twisted.Extensions;
+﻿using System;
+using System.IO;
 
-public readonly struct BinaryReaderPositionScope : IDisposable
+namespace Twisted.Extensions
 {
-    private BinaryReader Reader { get; }
-
-    private long Position { get; }
-
-    public BinaryReaderPositionScope(BinaryReader reader, long? position = default)
+    public readonly struct BinaryReaderPositionScope : IDisposable
     {
-        Reader   = reader ?? throw new ArgumentNullException(nameof(reader));
-        Position = reader.BaseStream.Position;
+        private BinaryReader Reader { get; }
 
-        reader.BaseStream.Position = position ?? Position;
-    }
+        private long Position { get; }
 
-    public void Dispose()
-    {
-        Reader.BaseStream.Position = Position;
+        public BinaryReaderPositionScope(BinaryReader reader, long? position = default)
+        {
+            Reader   = reader ?? throw new ArgumentNullException(nameof(reader));
+            Position = reader.BaseStream.Position;
+
+            reader.BaseStream.Position = position ?? Position;
+        }
+
+        public void Dispose()
+        {
+            Reader.BaseStream.Position = Position;
+        }
     }
 }

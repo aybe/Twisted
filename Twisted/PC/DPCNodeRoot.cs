@@ -1,21 +1,22 @@
 ﻿using Twisted.Extensions;
 
-namespace Twisted.PC;
-
-public sealed class DPCNodeRoot : DPCNode
+namespace Twisted.PC
 {
-    internal DPCNodeRoot(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+    public sealed class DPCNodeRoot : DPCNode
     {
-        var address = reader.ReadAddress();
+        internal DPCNodeRoot(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+        {
+            var address = reader.ReadAddress();
 
-        reader.Position = address;
+            reader.Position = address;
 
-        var count = reader.ReadInt32(Endianness.LE);
+            var count = reader.ReadInt32(Endianness.LE);
 
-        var addresses = reader.ReadAddresses(count);
+            var addresses = reader.ReadAddresses(count);
 
-        SetLength(reader);
+            SetLength(reader);
 
-        children = addresses;
+            children = addresses;
+        }
     }
 }

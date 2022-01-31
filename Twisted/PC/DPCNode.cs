@@ -1,27 +1,30 @@
-﻿namespace Twisted.PC;
+﻿using System.Collections.Generic;
 
-public abstract class DPCNode : TreeNode
+namespace Twisted.PC
 {
-    private protected DPCNode(DPCNodeReader reader, DPCNode? parent = null) : base(parent)
+    public abstract class DPCNode : TreeNode
     {
-        Position = reader.Position;
-    }
+        private protected DPCNode(DPCNodeReader reader, DPCNode? parent = null) : base(parent)
+        {
+            Position = reader.Position;
+        }
 
-    public static bool ToStringVerbose { get; set; }
+        public static bool ToStringVerbose { get; set; }
 
-    public List<DPCNode> Children { get; } = new();
+        public List<DPCNode> Children { get; } = new List<DPCNode>();
 
-    public long Position { get; }
+        public long Position { get; }
 
-    public long Length { get; private set; }
+        public long Length { get; private set; }
 
-    public override string ToString()
-    {
-        return $"{GetType().Name[nameof(DPCNode).Length..]}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Depth)}: {Depth}";
-    }
+        public override string ToString()
+        {
+            return $"{GetType().Name[nameof(DPCNode).Length..]}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Depth)}: {Depth}";
+        }
 
-    private protected void SetLength(DPCNodeReader reader)
-    {
-        Length = reader.Position - Position;
+        private protected void SetLength(DPCNodeReader reader)
+        {
+            Length = reader.Position - Position;
+        }
     }
 }

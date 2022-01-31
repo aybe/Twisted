@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);**\*.meta</DefaultItemExcludes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<MSBuildProjectExtensionsPath>$(ProjectDir)..\.obj\</MSBuildProjectExtensionsPath>
+	</PropertyGroup>
+</Project>

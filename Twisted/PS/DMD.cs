@@ -1,39 +1,42 @@
-﻿using Twisted.Extensions;
+﻿using System;
+using System.IO;
+using Twisted.Extensions;
 
-namespace Twisted.PS;
-
-public sealed class DMD : DMDNode
+namespace Twisted.PS
 {
-    public const uint BaseAddress = 0x800188B8;
-
-    public DMD(BinaryReader reader)
-        : base(null, reader)
+    public sealed class DMD : DMDNode
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
+        public const uint BaseAddress = 0x800188B8;
 
-        if (NodeType != 0x44585350)
-            throw new InvalidDataException($"Invalid identifier: 0x{NodeType:X8}.");
+        public DMD(BinaryReader reader)
+            : base(null, reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
-        var version = reader.ReadInt32(Endianness.LE);
-        if (version != 0x00000043)
-            throw new InvalidDataException($"Invalid version: 0x{version:X8}.");
+            if (NodeType != 0x44585350)
+                throw new InvalidDataException($"Invalid identifier: 0x{NodeType:X8}.");
 
-        DateTimeOffset.FromUnixTimeSeconds(reader.ReadInt32(Endianness.LE));
+            var version = reader.ReadInt32(Endianness.LE);
+            if (version != 0x00000043)
+                throw new InvalidDataException($"Invalid version: 0x{version:X8}.");
 
-        // TODO the base address could be passed to base node and benefit both versions
+            DateTimeOffset.FromUnixTimeSeconds(reader.ReadInt32(Endianness.LE));
 
-        var baseAddress = reader.ReadUInt32(Endianness.LE);
-        if (baseAddress != BaseAddress)
-            throw new InvalidDataException($"Invalid base address: 0x{baseAddress:X8}.");
+            // TODO the base address could be passed to base node and benefit both versions
 
-        reader.BaseStream.Position = ReadAddress(reader);
+            var baseAddress = reader.ReadUInt32(Endianness.LE);
+            if (baseAddress != BaseAddress)
+                throw new InvalidDataException($"Invalid base address: 0x{baseAddress:X8}.");
 
-        var addressesCount = reader.ReadInt32(Endianness.LE);
-        var addresses      = ReadAddresses(reader, addressesCount);
+            reader.BaseStream.Position = ReadAddress(reader);
 
-        SetupBinaryObject(reader);
+            var addressesCount = reader.ReadInt32(Endianness.LE);
+            var addresses      = ReadAddresses(reader, addressesCount);
 
-        ReadNodes(this, reader, addresses);
+            SetupBinaryObject(reader);
+
+            ReadNodes(this, reader, addresses);
+        }
     }
 }

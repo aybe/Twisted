@@ -1,91 +1,95 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Twisted.PC;
-
-public static class DPCNodeExtensions
+namespace Twisted.PC
 {
-    public static string Print(this TreeNode node)
+    public static class DPCNodeExtensions
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
-
-        var builder = new StringBuilder();
-
-        var stack = new Stack<TreeNode>();
-
-        stack.Push(node);
-
-        while (stack.Any())
+        public static string Print(this TreeNode node)
         {
-            var pop = stack.Pop();
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
 
-            var str = PrintPrivate(pop);
+            var builder = new StringBuilder();
 
-            builder.AppendLine(str);
+            var stack = new Stack<TreeNode>();
 
-            foreach (var item in pop.Reverse())
+            stack.Push(node);
+
+            while (stack.Any())
             {
-                stack.Push(item);
+                var pop = stack.Pop();
+
+                var str = PrintPrivate(pop);
+
+                builder.AppendLine(str);
+
+                foreach (var item in pop.Reverse())
+                {
+                    stack.Push(item);
+                }
             }
+
+            var print = builder.ToString();
+
+            return print;
         }
 
-        var print = builder.ToString();
-
-        return print;
-    }
-
-    private static string PrintPrivate(TreeNode node)
-    {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
-
-        var builder = new StringBuilder();
-
-        builder.Append(node);
-
-        var current = node;
-
-        while (current.Parent != null)
+        private static string PrintPrivate(TreeNode node)
         {
-            var count = current.Parent.Count;
-            var index = current.Parent.IndexOf(current);
-            var close = index != current.Parent.Count - 1;
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
 
-            if (current.Depth < node.Depth)
+            var builder = new StringBuilder();
+
+            builder.Append(node);
+
+            var current = node;
+
+            while (current.Parent != null)
             {
-                if (count > 1 && close)
+                var count = current.Parent.Count;
+                var index = current.Parent.IndexOf(current);
+                var close = index != current.Parent.Count - 1;
+
+                if (current.Depth < node.Depth)
                 {
-                    builder.Insert(0, "│   ");
+                    if (count > 1 && close)
+                    {
+                        builder.Insert(0, "│   ");
+                    }
+                    else
+                    {
+                        builder.Insert(0, "    ");
+                    }
                 }
                 else
                 {
-                    builder.Insert(0, "    ");
-                }
-            }
-            else
-            {
-                if (count > 1)
-                {
-                    if (close)
+                    if (count > 1)
                     {
-                        builder.Insert(0, "├───");
+                        if (close)
+                        {
+                            builder.Insert(0, "├───");
+                        }
+                        else
+                        {
+                            builder.Insert(0, "└───");
+                        }
                     }
                     else
                     {
                         builder.Insert(0, "└───");
                     }
                 }
-                else
-                {
-                    builder.Insert(0, "└───");
-                }
+
+                current = current.Parent;
             }
 
-            current = current.Parent;
+            var text = builder.ToString();
+
+            return text;
         }
-
-        var text = builder.ToString();
-
-        return text;
     }
 }

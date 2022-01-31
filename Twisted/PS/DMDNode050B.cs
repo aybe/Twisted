@@ -1,31 +1,33 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.IO;
 
-namespace Twisted.PS;
-
-public sealed class DMDNode050B : DMDNode
+namespace Twisted.PS
 {
-    public DMDNode050B(DMDNode? parent, BinaryReader reader)
-        : base(parent, reader)
+    public sealed class DMDNode050B : DMDNode
     {
-        if (reader == null)
-            throw new ArgumentNullException(nameof(reader));
+        public DMDNode050B(DMDNode? parent, BinaryReader reader)
+            : base(parent, reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
-        var bytes = reader.ReadBytes(36);
+            var bytes = reader.ReadBytes(36);
 
-        // TODO 32 bytes matrix ???
+            // TODO 32 bytes matrix ???
 
-        // Assert.AreEqual(0, bytes[32]);
-        
-        Assert.AreEqual(0, bytes[33]);
+            // Assert.AreEqual(0, bytes[32]);
 
-        var count = bytes[34];
+            Assert.AreEqual(0, bytes[33]);
 
-        // Assert.AreEqual(0, bytes[35]);
+            var count = bytes[34];
 
-        var addresses = ReadAddresses(reader, count);
+            // Assert.AreEqual(0, bytes[35]);
 
-        SetupBinaryObject(reader);
+            var addresses = ReadAddresses(reader, count);
 
-        ReadNodes(this, reader, addresses);
+            SetupBinaryObject(reader);
+
+            ReadNodes(this, reader, addresses);
+        }
     }
 }

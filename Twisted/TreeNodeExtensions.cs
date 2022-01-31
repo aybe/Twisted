@@ -1,48 +1,53 @@
-﻿namespace Twisted;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-public static class TreeNodeExtensions
-    // NOTE having these as extensions removes the need from specifying T in caller
+namespace Twisted
 {
-    public static IEnumerable<T> TraverseBfs<T>(this T node) where T : TreeNode
+    public static class TreeNodeExtensions
+        // NOTE having these as extensions removes the need from specifying T in caller
     {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        var queue = new Queue<T>();
-
-        queue.Enqueue(node);
-
-        while (queue.Any())
+        public static IEnumerable<T> TraverseBfs<T>(this T node) where T : TreeNode
         {
-            var dequeue = queue.Dequeue();
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
 
-            yield return dequeue;
+            var queue = new Queue<T>();
 
-            foreach (var item in dequeue)
+            queue.Enqueue(node);
+
+            while (queue.Any())
             {
-                queue.Enqueue((T)item);
+                var dequeue = queue.Dequeue();
+
+                yield return dequeue;
+
+                foreach (var item in dequeue)
+                {
+                    queue.Enqueue((T)item);
+                }
             }
         }
-    }
 
-    public static IEnumerable<T> TraverseDfsPreOrder<T>(this T node) where T : TreeNode
-    {
-        if (node == null)
-            throw new ArgumentNullException(nameof(node));
-
-        var stack = new Stack<T>();
-
-        stack.Push(node);
-
-        while (stack.Any())
+        public static IEnumerable<T> TraverseDfsPreOrder<T>(this T node) where T : TreeNode
         {
-            var pop = stack.Pop();
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
 
-            yield return pop;
+            var stack = new Stack<T>();
 
-            foreach (var item in pop.Reverse())
+            stack.Push(node);
+
+            while (stack.Any())
             {
-                stack.Push((T)item);
+                var pop = stack.Pop();
+
+                yield return pop;
+
+                foreach (var item in pop.Reverse())
+                {
+                    stack.Push((T)item);
+                }
             }
         }
     }

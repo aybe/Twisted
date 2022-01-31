@@ -1,32 +1,32 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Twisted.Extensions;
+﻿using Twisted.Extensions;
 
-namespace Twisted.PC;
-
-public sealed class DPCNode0B060000 : DPCNode
+namespace Twisted.PC
 {
-    internal DPCNode0B060000(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+    public sealed class DPCNode0B060000 : DPCNode
     {
-        var bytes = reader.ReadBytes(8);
+        internal DPCNode0B060000(DPCNodeReader reader, out int[] children, DPCNode? parent = null) : base(reader, parent)
+        {
+            var bytes = reader.ReadBytes(8);
 
-        var i1 = bytes.ReadInt32(4, Endianness.LE);
+            var i1 = bytes.ReadInt32(4, Endianness.LE);
 
-        Assert.IsTrue(i1 is 0);
+            Assert.IsTrue(i1 is 0);
 
-        var b1 = reader.ReadByte();
-        var b2 = reader.ReadByte();
-        var b3 = reader.ReadByte();
-        var b4 = reader.ReadByte();
+            var b1 = reader.ReadByte();
+            var b2 = reader.ReadByte();
+            var b3 = reader.ReadByte();
+            var b4 = reader.ReadByte();
 
-        Assert.IsTrue(b1 is 0);
-        Assert.IsTrue(b2 is 0);
-        Assert.IsTrue(b3 is 1 or 2);
-        Assert.IsTrue(b4 is 0);
+            Assert.IsTrue(b1 is 0);
+            Assert.IsTrue(b2 is 0);
+            Assert.IsTrue(b3 is 1 or 2);
+            Assert.IsTrue(b4 is 0);
 
-        var addresses = reader.ReadAddresses(b3 == 1 ? 3 : 4);
+            var addresses = reader.ReadAddresses(b3 == 1 ? 3 : 4);
 
-        SetLength(reader);
+            SetLength(reader);
 
-        children = addresses;
+            children = addresses;
+        }
     }
 }
