@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Nullable: 1
+  NullableWarningDisable: 1
+  PreserveDirectoryStructure: 1
