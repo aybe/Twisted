@@ -11,8 +11,18 @@ namespace Twisted.Editor
     {
         private const string Header = "Project Generation";
 
-        [Tooltip("Enables '#nullable enable' at project-level and disables CS8632 warnings.")]
         public bool Nullable;
+
+        public bool NullableWarningDisable;
+
+        public bool PreserveDirectoryStructure;
+
+        private void Reset()
+        {
+            Nullable = true;
+            NullableWarningDisable = true;
+            PreserveDirectoryStructure = true;
+        }
 
         private void OnEnable()
         {
@@ -82,7 +92,17 @@ namespace Twisted.Editor
 
                     var settings = new SerializedObject(instance);
 
-                    properties.Add(new PropertyField(settings.FindProperty(nameof(Nullable))));
+                    var toggle1 = CreateToggleLeft("Define #nullable enable at project-level.");
+                    toggle1.BindProperty(settings.FindProperty(nameof(Nullable)));
+                    properties.Add(toggle1);
+
+                    var toggle2 = CreateToggleLeft("Define CS8632 at project-level.");
+                    toggle2.BindProperty(settings.FindProperty(nameof(NullableWarningDisable)));
+                    properties.Add(toggle2);
+
+                    var toggle3 = CreateToggleLeft("Preserve project structure for local assembly definitions.");
+                    toggle3.BindProperty(settings.FindProperty(nameof(PreserveDirectoryStructure)));
+                    properties.Add(toggle3);
 
                     root.Bind(settings);
 
@@ -92,6 +112,29 @@ namespace Twisted.Editor
             };
 
             return provider;
+        }
+
+        private static Toggle CreateToggleLeft(string label)
+        {
+            var toggle = new Toggle(label)
+            {
+                style =
+                {
+                    alignSelf = Align.FlexStart,
+                    flexDirection = FlexDirection.RowReverse
+                }
+            };
+
+            var element1 = toggle.Q(className: Toggle.inputUssClassName);
+
+            element1.style.flexGrow = 0.0f;
+
+            var element2 = toggle.Q(className: Toggle.labelUssClassName);
+
+            element2.style.marginLeft = 2.0f;
+            element2.style.paddingLeft = 2.0f;
+
+            return toggle;
         }
     }
 }

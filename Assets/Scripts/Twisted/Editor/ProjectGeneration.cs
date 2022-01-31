@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace Twisted.Editor
 {
@@ -45,7 +46,10 @@ namespace Twisted.Editor
                 }
 
                 nullable.Value = "enable";
+            }
 
+            if (settings.NullableWarningDisable)
+            {
                 var noWarnName = ns + "NoWarn";
 
                 var noWarns = root.Descendants(propertyGroupName).Descendants(noWarnName);
@@ -58,6 +62,32 @@ namespace Twisted.Editor
                     };
 
                     noWarn.Value = string.Join(";", set);
+                }
+            }
+
+            if (settings.PreserveDirectoryStructure)
+            {
+                var asmDefPath = root.Descendants(ns + "None")
+                    .Attributes("Include")
+                    .FirstOrDefault(s => s.Value.EndsWith(".asmdef", StringComparison.OrdinalIgnoreCase))?
+                    .Value;
+
+                if (asmDefPath != null)
+                {
+                    var dataPath = Path.GetDirectoryName(Application.dataPath)!;
+
+                    if (asmDefPath.IndexOf(dataPath, StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        var directoryName = Path.GetDirectoryName(asmDefPath);
+
+                        foreach (var element in root.Descendants(ns + "Compile"))
+                        {
+                            var include = element.Attribute("Include");
+                            var substring = include!.Value[(directoryName!.Length + 1)..];
+
+                            element.Add(new XElement(ns + "Link", substring));
+                        }
+                    }
                 }
             }
 
