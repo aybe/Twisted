@@ -29,7 +29,7 @@ namespace Twisted
             }
         }
 
-        public static IEnumerable<TreeNode> TraverseDfsPreOrder<T>(this T node) where T : TreeNode
+        public static IEnumerable<TreeNode> TraverseDfs<T>(this T node) where T : TreeNode
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
