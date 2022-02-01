@@ -1,4 +1,4 @@
-﻿#pragma warning disable
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -74,6 +74,8 @@ namespace Twisted.Editor
 
                 if (asmDefPath != null)
                 {
+                    asmDefPath = Path.GetFullPath(asmDefPath);
+
                     var dataPath = Path.GetDirectoryName(Application.dataPath)!;
 
                     if (asmDefPath.IndexOf(dataPath, StringComparison.OrdinalIgnoreCase) == -1)
