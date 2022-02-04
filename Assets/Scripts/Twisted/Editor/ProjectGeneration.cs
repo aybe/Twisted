@@ -48,7 +48,7 @@ namespace Twisted.Editor
                 nullable.Value = "enable";
             }
 
-            if (settings.NullableWarningDisable)
+            if (settings.NullableWarningsDisabled)
             {
                 var noWarnName = ns + "NoWarn";
 
@@ -65,7 +65,7 @@ namespace Twisted.Editor
                 }
             }
 
-            if (settings.PreserveDirectoryStructure)
+            if (settings.PreserveProjectStructure)
             {
                 var asmDefPath = root.Descendants(ns + "None")
                     .Attributes("Include")
@@ -84,13 +84,24 @@ namespace Twisted.Editor
 
                         foreach (var element in root.Descendants(ns + "Compile"))
                         {
-                            var include = element.Attribute("Include");
+                            var include   = element.Attribute("Include");
                             var substring = include!.Value[(directoryName!.Length + 1)..];
 
                             element.Add(new XElement(ns + "Link", substring));
                         }
                     }
                 }
+            }
+
+            if (settings.RemoveEmptyRootNamespace)
+            {
+                root.Descendants(ns + "RootNamespace").ToList().ForEach(s =>
+                {
+                    if (string.IsNullOrEmpty(s.Value))
+                    {
+                        s.Remove();
+                    }
+                });
             }
 
             // ReSharper disable once ConvertToUsingDeclaration
