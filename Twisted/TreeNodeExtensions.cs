@@ -5,9 +5,8 @@ using System.Linq;
 namespace Twisted
 {
     public static class TreeNodeExtensions
-        // NOTE having these as extensions removes the need from specifying T in caller
     {
-        public static IEnumerable<TreeNode> TraverseBfs<T>(this T node) where T : TreeNode
+        public static IEnumerable<TreeNode> TraverseBfs(this TreeNode node)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
@@ -29,7 +28,7 @@ namespace Twisted
             }
         }
 
-        public static IEnumerable<TreeNode> TraverseDfs<T>(this T node) where T : TreeNode
+        public static IEnumerable<TreeNode> TraverseDfs(this TreeNode node)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
