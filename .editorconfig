@@ -14,3 +14,6 @@ resharper_place_simple_embedded_statement_on_same_line = false
 
 [*.cs]
 dotnet_remove_unnecessary_suppression_exclusions = category: ReSharper
+
+# IDE0052: Remove unread private members
+dotnet_diagnostic.ide0052.severity = none
