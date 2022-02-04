@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using Twisted.PS;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -32,7 +34,9 @@ namespace Twisted.Editor
 
             View = new TreeNodeView(ViewState, string.IsNullOrEmpty(ViewPath) ? null : OpenFile(ViewPath!));
 
-            View.OnSelectionChanged += OnViewSelectionChanged;
+            View.NodeSelectionChanged += OnNodeClicked;
+
+            View.NodeSingleClicked += OnNodeClicked;
 
             ViewSearch = new SearchField();
 
@@ -44,7 +48,9 @@ namespace Twisted.Editor
 
         private void OnDisable()
         {
-            View.OnSelectionChanged -= OnViewSelectionChanged;
+            View.NodeSelectionChanged -= OnNodeClicked;
+
+            View.NodeSingleClicked -= OnNodeClicked;
 
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
@@ -131,11 +137,11 @@ namespace Twisted.Editor
         [SerializeField]
         private string ViewSearchString = null!;
 
-        private void OnViewSelectionChanged(object sender, TreeNodeViewSelectionEventArgs e)
+        private void OnNodeClicked(object sender, TreeNodeViewSelectionEventArgs args)
         {
-            foreach (var node in e.Nodes)
+            if (args.Nodes.OfType<DMDNode00FF>().FirstOrDefault() is { } ff)
             {
-                Debug.Log(node);
+                OpenNode(ff);
             }
         }
 
@@ -168,6 +174,14 @@ namespace Twisted.Editor
             var dmd = new DMD(reader);
 
             return dmd;
+        }
+
+        private static void OpenNode(DMDNode00FF node)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            Singleton<DMDViewerPreview>.instance.SetNode(node);
         }
 
         #endregion

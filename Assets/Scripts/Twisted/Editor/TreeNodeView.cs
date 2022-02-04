@@ -79,12 +79,41 @@ namespace Twisted.Editor
 
         protected override void SelectionChanged(IList<int> selectedIds)
         {
-            var nodes = selectedIds.Select(id => ((TreeViewItem<TreeNode>)FindItem(id, rootItem)).Data!).ToList();
-
-            OnSelectionChanged?.Invoke(this, new TreeNodeViewSelectionEventArgs(nodes));
+            NodeSelectionChanged?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(selectedIds), 0, 1));
         }
 
-        public event EventHandler<TreeNodeViewSelectionEventArgs>? OnSelectionChanged;
+        protected override void SingleClickedItem(int id)
+        {
+            NodeSingleClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 0, 1));
+        }
+
+        protected override void DoubleClickedItem(int id)
+        {
+            NodeDoubleClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 0, 2));
+        }
+
+        protected override void ContextClickedItem(int id)
+        {
+            NodeContextClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 1, 1));
+        }
+
+        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeSelectionChanged;
+
+        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeSingleClicked;
+
+        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeDoubleClicked;
+
+        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeContextClicked;
+
+        private TreeNode GetNode(int id)
+        {
+            return ((TreeViewItem<TreeNode>)FindItem(id, rootItem)).Data!;
+        }
+
+        private IList<TreeNode> GetNodes(IEnumerable<int> ids)
+        {
+            return ids.Select(GetNode).ToList();
+        }
 
         private sealed class TreeViewItem<T> : TreeViewItem
         {
