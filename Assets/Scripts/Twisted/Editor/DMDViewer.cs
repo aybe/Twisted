@@ -34,7 +34,7 @@ namespace Twisted.Editor
 
             View = new TreeNodeView(ViewState, string.IsNullOrEmpty(ViewPath) ? null : OpenFile(ViewPath!));
 
-            View.NodeSelectionChanged += OnNodeClicked;
+            View.NodeMouseSingleClick += ViewOnNodeMouseSingleClick;
 
             View.NodeMouseContextClick += ViewOnNodeMouseContextClick;
 
@@ -48,10 +48,10 @@ namespace Twisted.Editor
 
         private void OnDisable()
         {
-            View.NodeSelectionChanged -= OnNodeClicked;
+            View.NodeMouseSingleClick -= ViewOnNodeMouseSingleClick;
 
             View.NodeMouseContextClick -= ViewOnNodeMouseContextClick;
-            
+
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
 
@@ -137,14 +137,14 @@ namespace Twisted.Editor
         [SerializeField]
         private string ViewSearchString = null!;
 
-        private void OnNodeClicked(object sender, TreeNodeSelectionEventArgs e)
-        {
-           OpenNode(e.Nodes.OfType<DMDNode00FF>().FirstOrDefault());
-        }
-
         private void OnViewSearchKeyPressed()
         {
             View.SetFocusAndEnsureSelectedItem();
+        }
+
+        private void ViewOnNodeMouseSingleClick(object sender, TreeNodeClickEventArgs e)
+        {
+            OpenNode(e.Node as DMDNode00FF);
         }
 
         private void ViewOnNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
