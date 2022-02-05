@@ -79,31 +79,23 @@ namespace Twisted.Editor
 
         protected override void SelectionChanged(IList<int> selectedIds)
         {
-            NodeSelectionChanged?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(selectedIds), 0, 1));
+            NodeSelectionChanged?.Invoke(this, new TreeNodeSelectionEventArgs(GetNodes(selectedIds.ToArray())));
         }
 
         protected override void SingleClickedItem(int id)
         {
-            NodeSingleClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 0, 1));
+            NodeMouseSingleClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
         }
 
         protected override void DoubleClickedItem(int id)
         {
-            NodeDoubleClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 0, 2));
+            NodeMouseDoubleClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
         }
 
         protected override void ContextClickedItem(int id)
         {
-            NodeContextClicked?.Invoke(this, new TreeNodeViewSelectionEventArgs(GetNodes(new[] { id }), 1, 1));
+            NodeMouseContextClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
         }
-
-        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeSelectionChanged;
-
-        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeSingleClicked;
-
-        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeDoubleClicked;
-
-        public event EventHandler<TreeNodeViewSelectionEventArgs>? NodeContextClicked;
 
         private TreeNode GetNode(int id)
         {
@@ -114,6 +106,19 @@ namespace Twisted.Editor
         {
             return ids.Select(GetNode).ToList();
         }
+
+        private IList<TreeNode> GetNodes(params int[] ids)
+        {
+            return ids.Select(GetNode).ToList();
+        }
+
+        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseContextClick;
+
+        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseDoubleClick;
+
+        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseSingleClick;
+
+        public event EventHandler<TreeNodeSelectionEventArgs>? NodeSelectionChanged;
 
         private sealed class TreeViewItem<T> : TreeViewItem
         {

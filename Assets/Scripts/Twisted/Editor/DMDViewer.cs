@@ -36,7 +36,7 @@ namespace Twisted.Editor
 
             View.NodeSelectionChanged += OnNodeClicked;
 
-            View.NodeSingleClicked += OnNodeClicked;
+            View.NodeMouseSingleClick += OnNodeClicked;
 
             ViewSearch = new SearchField();
 
@@ -50,7 +50,7 @@ namespace Twisted.Editor
         {
             View.NodeSelectionChanged -= OnNodeClicked;
 
-            View.NodeSingleClicked -= OnNodeClicked;
+            View.NodeMouseSingleClick -= OnNodeClicked;
 
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
@@ -137,9 +137,17 @@ namespace Twisted.Editor
         [SerializeField]
         private string ViewSearchString = null!;
 
-        private void OnNodeClicked(object sender, TreeNodeViewSelectionEventArgs args)
+        private void OnNodeClicked(object sender, TreeNodeSelectionEventArgs e)
         {
-            if (args.Nodes.OfType<DMDNode00FF>().FirstOrDefault() is { } ff)
+            if (e.Nodes.OfType<DMDNode00FF>().FirstOrDefault() is { } ff)
+            {
+                OpenNode(ff);
+            }
+        }
+
+        private void OnNodeClicked(object sender, TreeNodeClickEventArgs e)
+        {
+            if (e.Node is DMDNode00FF ff)
             {
                 OpenNode(ff);
             }
