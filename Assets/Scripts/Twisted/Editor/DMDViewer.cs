@@ -34,9 +34,9 @@ namespace Twisted.Editor
 
             View = new TreeNodeView(ViewState, string.IsNullOrEmpty(ViewPath) ? null : OpenFile(ViewPath!));
 
-            View.NodeMouseSingleClick += OnViewNodeMouseSingleClick;
-
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
+
+            View.NodeSelectionChanged += OnViewNodeSelectionChanged;
 
             ViewSearch = new SearchField();
 
@@ -48,9 +48,9 @@ namespace Twisted.Editor
 
         private void OnDisable()
         {
-            View.NodeMouseSingleClick -= OnViewNodeMouseSingleClick;
-
             View.NodeMouseContextClick -= OnViewNodeMouseContextClick;
+
+            View.NodeSelectionChanged -= OnViewNodeSelectionChanged;
 
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
@@ -172,11 +172,6 @@ namespace Twisted.Editor
 
         #region Handlers
 
-        private void OnViewNodeMouseSingleClick(object sender, TreeNodeClickEventArgs e)
-        {
-            OpenNode(e.Node as DMDNode00FF);
-        }
-
         private void OnViewNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
         {
             var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
@@ -200,6 +195,19 @@ namespace Twisted.Editor
             menu.ShowAsContext();
 
             Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
+        }
+
+        private void OnViewNodeSelectionChanged(object sender, TreeNodeSelectionEventArgs e)
+        {
+            // animations and context menus combined don't play well at all, the former will get paused by the latter when it opens
+            // furthermore, it's rather sadistic from end-user perspective to lose his actual selection for a simple context click
+
+            var current = Event.current;
+
+            if (current.type == EventType.MouseDown && current.button == 1)
+                return;
+
+            OpenNode(e.Nodes.OfType<DMDNode00FF>().FirstOrDefault());
         }
 
         private void OnViewSearchKeyPressed()

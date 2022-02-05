@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Twisted.Editor
 {
@@ -12,6 +13,7 @@ namespace Twisted.Editor
         {
             enableItemHovering            = true;
             showAlternatingRowBackgrounds = true;
+            getNewSelectionOverride       = GetNewSelectionOverride;
 
             SetRoot(root);
         }
@@ -21,6 +23,37 @@ namespace Twisted.Editor
         public bool HasRoot => Root != null;
 
         public TreeNode? SelectedNode => FindItem(state.lastClickedID, rootItem) is TreeViewItem<TreeNode> item ? item.Data : null;
+
+        private List<int> GetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
+        {
+            // multi-selection isn't implemented for this method, throw if it's the case
+
+            const string message = "The new selection override doesn't support multi-selection.";
+
+            try
+            {
+                Assert.IsFalse(CanMultiSelect(null!), message);
+            }
+            catch (Exception e) // because the above can fail... guys, how difficult would it have been to have a CanMultiSelect() overload?
+            {
+                throw new AssertionException(message, e.Message);
+            }
+
+            // we want a user-friendly context click behavior, i.e. one that doesn't sadistically changes actual selection
+
+            var selection = new List<int>();
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 1)
+            {
+                selection.AddRange(GetSelection());
+            }
+            else
+            {
+                selection.Add(clickedItem.id);
+            }
+
+            return selection;
+        }
 
         public void SetRoot(TreeNode? root)
         {
