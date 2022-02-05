@@ -97,10 +97,13 @@ namespace Twisted
 
             meshRenderer.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer"));
 
+            // frame the object but unlike Unity, make it pleasant
 
+            var view = SceneView.lastActiveSceneView;
 
-
+            if (view != null)
             {
+                view.Frame(meshRenderer.bounds, false);
             }
         }
     }
