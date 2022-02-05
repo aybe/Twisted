@@ -20,6 +20,8 @@ namespace Twisted.Editor
 
         public bool HasRoot => Root != null;
 
+        public TreeNode? SelectedNode => FindItem(state.lastClickedID, rootItem) is TreeViewItem<TreeNode> item ? item.Data : null;
+
         public void SetRoot(TreeNode? root)
         {
             Root = root;
