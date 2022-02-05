@@ -167,7 +167,7 @@ namespace Twisted.Editor
 
         private static void OpenNode(DMDNode00FF? node)
         {
-            Singleton<DMDViewerPreview>.instance.SetNode(node);
+            Singleton<DMDPreview>.instance.SetNode(node);
         }
 
         #endregion

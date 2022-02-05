@@ -12,7 +12,7 @@ namespace Twisted
 {
     [ExecuteAlways]
     [Singleton(Automatic = true)]
-    public sealed class DMDViewerPreview : MonoBehaviour, ISingleton
+    public sealed class DMDPreview : MonoBehaviour, ISingleton
     {
         public void SetNode(DMDNode00FF? node, bool split = true)
         {
