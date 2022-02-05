@@ -151,7 +151,7 @@ namespace Twisted.Editor
 
         #region Methods
 
-        private static DMD OpenFile(string path)
+        private DMD OpenFile(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
@@ -159,6 +159,8 @@ namespace Twisted.Editor
             using var reader = new BinaryReader(new MemoryStream(File.ReadAllBytes(path)));
 
             var dmd = new DMD(reader);
+
+            titleContent.text = Path.GetFileName(path);
 
             return dmd;
         }
