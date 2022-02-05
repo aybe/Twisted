@@ -216,5 +216,22 @@ namespace Twisted.Editor
         }
 
         #endregion
+
+        #region Help
+
+        private void ShowButton(Rect rect)
+        {
+            if (GUI.Button(rect, Styles.Help, EditorStyles.iconButton))
+            {
+                EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
+            }
+        }
+
+        private static class Styles
+        {
+            public static GUIContent Help { get; } = EditorGUIUtility.TrIconContent("_Help", "Open help for DMD Viewer.");
+        }
+
+        #endregion
     }
 }
