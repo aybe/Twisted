@@ -38,6 +38,8 @@ namespace Twisted.Editor
 
             View.NodeMouseSingleClick += OnNodeClicked;
 
+            View.NodeMouseContextClick += ViewOnNodeMouseContextClick;
+
             ViewSearch = new SearchField();
 
             ViewSearch.downOrUpArrowKeyPressed += OnViewSearchKeyPressed;
@@ -52,6 +54,8 @@ namespace Twisted.Editor
 
             View.NodeMouseSingleClick -= OnNodeClicked;
 
+            View.NodeMouseContextClick -= ViewOnNodeMouseContextClick;
+            
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
 
@@ -156,6 +160,31 @@ namespace Twisted.Editor
         private void OnViewSearchKeyPressed()
         {
             View.SetFocusAndEnsureSelectedItem();
+        }
+
+        private void ViewOnNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
+        {
+            var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
+
+            var menu = new GenericMenu();
+
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Hex Dump/Clipboard"),
+                false,
+                s => { EditorGUIUtility.systemCopyBuffer = s as string; },
+                data
+            );
+
+            menu.AddItem(
+                EditorGUIUtility.TrTextContent("Hex Dump/Console"),
+                false,
+                Debug.Log,
+                data
+            );
+
+            menu.ShowAsContext();
+
+            Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
         }
 
         private void ViewUpdateRowHeight()
