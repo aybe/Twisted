@@ -137,10 +137,40 @@ namespace Twisted.Editor
         [SerializeField]
         private string ViewSearchString = null!;
 
-        private void OnViewSearchKeyPressed()
+        private void UpdateViewRowHeight()
         {
-            View.SetFocusAndEnsureSelectedItem();
+            View.SetRowHeight(ViewRowHeight);
         }
+
+        private void UpdateViewSearchString()
+        {
+            View.searchString = ViewSearchString;
+        }
+
+        #endregion
+
+        #region Methods
+
+        private static DMD OpenFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
+
+            using var reader = new BinaryReader(new MemoryStream(File.ReadAllBytes(path)));
+
+            var dmd = new DMD(reader);
+
+            return dmd;
+        }
+
+        private static void OpenNode(DMDNode00FF? node)
+        {
+            Singleton<DMDViewerPreview>.instance.SetNode(node);
+        }
+
+        #endregion
+
+        #region Handlers
 
         private void OnViewNodeMouseSingleClick(object sender, TreeNodeClickEventArgs e)
         {
@@ -172,35 +202,9 @@ namespace Twisted.Editor
             Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
         }
 
-        private void UpdateViewRowHeight()
+        private void OnViewSearchKeyPressed()
         {
-            View.SetRowHeight(ViewRowHeight);
-        }
-
-        private void UpdateViewSearchString()
-        {
-            View.searchString = ViewSearchString;
-        }
-
-        #endregion
-
-        #region Methods
-
-        private static DMD OpenFile(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-
-            using var reader = new BinaryReader(new MemoryStream(File.ReadAllBytes(path)));
-
-            var dmd = new DMD(reader);
-
-            return dmd;
-        }
-
-        private static void OpenNode(DMDNode00FF? node)
-        {
-            Singleton<DMDViewerPreview>.instance.SetNode(node);
+            View.SetFocusAndEnsureSelectedItem();
         }
 
         #endregion
