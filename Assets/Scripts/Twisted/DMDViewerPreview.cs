@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Twisted.Extensions;
 using Twisted.PS;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,10 +14,26 @@ namespace Twisted
     [RequireComponent(typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer))]
     public sealed class DMDViewerPreview : MonoBehaviour, ISingleton
     {
-        public void SetNode(DMDNode00FF node)
+        public void SetNode(DMDNode00FF? node)
         {
+            var meshFilter   = GetComponent<MeshFilter>();
+            var meshCollider = GetComponent<MeshCollider>();
+            var meshRenderer = GetComponent<MeshRenderer>();
+
+            // welcome to Unity... when a property to a reference doesn't behave as it normally should,
+            // destroying a reference simply isn't enough, you have to nullify that property as well...
+            // or you'll scratch your head on why it works only once and that cryptic 'Missing' message
+
+            DestroyImmediate(meshFilter.sharedMesh);
+            DestroyImmediate(meshCollider.sharedMesh);
+            DestroyImmediate(meshRenderer.sharedMaterial);
+
+            meshFilter.sharedMesh       = null;
+            meshCollider.sharedMesh     = null;
+            meshRenderer.sharedMaterial = null;
+
             if (node == null)
-                throw new ArgumentNullException(nameof(node));
+                return;
 
             var polygons = node.Polygons;
 
@@ -74,24 +91,16 @@ namespace Twisted
                 triangles = indices.ToArray()
             };
 
-            var meshFilter = GetComponent<MeshFilter>();
-
-            if (meshFilter.sharedMesh != null)
-            {
-                DestroyImmediate(meshFilter.sharedMesh); // BUG this is editor-only
-            }
-
             meshFilter.sharedMesh = mesh;
-
-            var meshCollider = GetComponent<MeshCollider>();
 
             meshCollider.sharedMesh = mesh;
 
-            var meshRenderer = GetComponent<MeshRenderer>();
+            meshRenderer.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer"));
 
-            if (meshRenderer.sharedMaterial == null)
+
+
+
             {
-                meshRenderer.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer"));
             }
         }
     }

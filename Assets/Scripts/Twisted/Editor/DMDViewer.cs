@@ -198,11 +198,8 @@ namespace Twisted.Editor
             return dmd;
         }
 
-        private static void OpenNode(DMDNode00FF node)
+        private static void OpenNode(DMDNode00FF? node)
         {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
             Singleton<DMDViewerPreview>.instance.SetNode(node);
         }
 
