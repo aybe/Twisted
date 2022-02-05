@@ -34,23 +34,23 @@ namespace Twisted.Editor
 
             View = new TreeNodeView(ViewState, string.IsNullOrEmpty(ViewPath) ? null : OpenFile(ViewPath!));
 
-            View.NodeMouseSingleClick += ViewOnNodeMouseSingleClick;
+            View.NodeMouseSingleClick += OnViewNodeMouseSingleClick;
 
-            View.NodeMouseContextClick += ViewOnNodeMouseContextClick;
+            View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
             ViewSearch = new SearchField();
 
             ViewSearch.downOrUpArrowKeyPressed += OnViewSearchKeyPressed;
 
-            ViewUpdateRowHeight();
-            ViewUpdateSearchString();
+            UpdateViewRowHeight();
+            UpdateViewSearchString();
         }
 
         private void OnDisable()
         {
-            View.NodeMouseSingleClick -= ViewOnNodeMouseSingleClick;
+            View.NodeMouseSingleClick -= OnViewNodeMouseSingleClick;
 
-            View.NodeMouseContextClick -= ViewOnNodeMouseContextClick;
+            View.NodeMouseContextClick -= OnViewNodeMouseContextClick;
 
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
@@ -95,7 +95,7 @@ namespace Twisted.Editor
                         if (scope.changed)
                         {
                             ViewRowHeight = value;
-                            ViewUpdateRowHeight();
+                            UpdateViewRowHeight();
                         }
                     }
 
@@ -108,7 +108,7 @@ namespace Twisted.Editor
                         if (scope.changed)
                         {
                             ViewSearchString = value;
-                            ViewUpdateSearchString();
+                            UpdateViewSearchString();
                         }
                     }
                 }
@@ -142,12 +142,12 @@ namespace Twisted.Editor
             View.SetFocusAndEnsureSelectedItem();
         }
 
-        private void ViewOnNodeMouseSingleClick(object sender, TreeNodeClickEventArgs e)
+        private void OnViewNodeMouseSingleClick(object sender, TreeNodeClickEventArgs e)
         {
             OpenNode(e.Node as DMDNode00FF);
         }
 
-        private void ViewOnNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
+        private void OnViewNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
         {
             var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
 
@@ -172,12 +172,12 @@ namespace Twisted.Editor
             Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
         }
 
-        private void ViewUpdateRowHeight()
+        private void UpdateViewRowHeight()
         {
             View.SetRowHeight(ViewRowHeight);
         }
 
-        private void ViewUpdateSearchString()
+        private void UpdateViewSearchString()
         {
             View.searchString = ViewSearchString;
         }
