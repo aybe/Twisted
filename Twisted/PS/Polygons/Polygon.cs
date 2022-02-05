@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -113,7 +113,7 @@ namespace Twisted.PS.Polygons
             }
         }
 
-        protected byte[] Data { get; }
+        private byte[] Data { get; }
 
         public uint Type { get; }
 
@@ -127,7 +127,7 @@ namespace Twisted.PS.Polygons
 
         public byte[] GetObjectData()
         {
-            return Data;
+            return Data.ToArray();
         }
 
         public override string ToString()
