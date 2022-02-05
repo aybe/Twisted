@@ -329,6 +329,16 @@ namespace Twisted.Extensions
             return endianness.IsIdentical() ? value : BinaryPrimitives.ReverseEndianness(value);
         }
 
+        public static byte ReadByte(this byte[] bytes, int index)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            var value = bytes[index];
+
+            return value;
+        }
+
         public static short ReadInt16(this byte[] bytes, int index, Endianness endianness)
         {
             if (bytes is null)

@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using Twisted.Extensions;
+using Twisted.PS.Texturing;
 
 namespace Twisted.PS.Polygons
 {
@@ -134,6 +135,77 @@ namespace Twisted.PS.Polygons
         {
             return
                 $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
+        }
+
+        protected static Texture ReadTexture(byte[] data, int indices, int index)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            if (data.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
+
+            if (indices is not (3 or 4))
+                throw new ArgumentOutOfRangeException(nameof(indices));
+
+            if (index < 0 || index > data.Length - indices * 4)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            var uvs = new TextureUV[indices];
+
+            for (var i = 0; i < indices; i++)
+            {
+                uvs[i] = ReadTextureUV(data, index + i * 4);
+            }
+
+            var page = ReadTexturePage(data, index + 6);
+
+            var palette = ReadTexturePalette(data, index + 2);
+
+            var texture = new Texture(uvs, page, palette);
+
+            return texture;
+        }
+
+        private static TexturePage ReadTexturePage(byte[] data, int index)
+        {
+            var raw = data.ReadInt32(index, Endianness.LE);
+
+            var x = (raw & 0b_00000000_00001111) * 64;
+            var y = (raw & 0b_00000000_00010000) / 16 * 256;
+            var a = (raw & 0b_00000000_01100000) / 32;
+            var b = (raw & 0b_00000001_10000000) / 128;
+            var d = (raw & 0b_00001000_00000000) / 1024;
+
+            var page = new TexturePage(x, y, (TexturePageAlpha)a, (TexturePageColors)b, (TexturePageDisable)d);
+
+            return page;
+        }
+
+        private static TexturePalette ReadTexturePalette(byte[] data, int index)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            if (index < 0 || index > data.Length - sizeof(short))
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            var raw = data.ReadInt16(index, Endianness.LE);
+
+            var x = (raw & 0b00000000_00111111) * 16;
+            var y = (raw & 0b01111111_11000000) / 64;
+
+            var palette = new TexturePalette(x, y);
+
+            return palette;
+        }
+
+        private static TextureUV ReadTextureUV(byte[] data, int index)
+        {
+            var u = data.ReadByte(index + 0);
+            var v = data.ReadByte(index + 1);
+
+            return new TextureUV(u, v);
         }
     }
 }
