@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using Twisted.Extensions;
@@ -9,6 +6,7 @@ using Twisted.Extensions;
 namespace Twisted.PS.Texturing
 {
     public sealed class Tim
+        // NOTE: this can't be a FrameBufferObject itself, but the picture and palette are
     {
         public Tim(Stream stream)
         {
@@ -26,40 +24,20 @@ namespace Twisted.PS.Texturing
 
             var flags = reader.ReadInt32(Endianness.LE);
 
-            PixelMode = (TimPixelMode)(flags & 0b111);
+            Format = (FrameBufferObjectFormat)(flags & 0b111);
 
             if ((flags & 0b1000) != default)
             {
-                Palette = new TimPalette(reader);
+                Palette = new FrameBufferObject(reader, Format);
             }
 
-            PixelData = new TimPixelData(reader, PixelMode);
-
-            Assert.AreEqual(stream.Length, stream.Position, "TIM file not fully read.");
+            Picture = new FrameBufferObject(reader, Format, true);
         }
 
-        public TimPalette? Palette { get; }
+        public FrameBufferObjectFormat Format { get; }
 
-        public TimPixelMode PixelMode { get; }
+        public FrameBufferObject? Palette { get; }
 
-        public TimPixelData PixelData { get; }
-
-        public static (Point position, Size size, IReadOnlyList<byte> data) ReadFrameBufferObject(BinaryReader reader)
-        {
-            if (reader == null)
-                throw new ArgumentNullException(nameof(reader));
-
-            var s = reader.ReadUInt32(Endianness.LE);
-            var x = reader.ReadUInt16(Endianness.LE);
-            var y = reader.ReadUInt16(Endianness.LE);
-            var w = reader.ReadUInt16(Endianness.LE);
-            var h = reader.ReadUInt16(Endianness.LE);
-
-            var position = new Point(x, y);
-            var size     = new Size(w, h);
-            var data     = new ReadOnlyCollection<byte>(reader.ReadBytes((int)(s - 12)));
-
-            return (position, size, data);
-        }
+        public FrameBufferObject Picture { get; }
     }
 }

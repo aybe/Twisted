@@ -6,6 +6,35 @@ namespace Twisted.Extensions
 {
     public static class BinaryReaderExtensions
     {
+        /// <summary>
+        ///     Gets if this instance can read the specified number of bytes from current position.
+        /// </summary>
+        /// <param name="reader">
+        ///     The source reader.
+        /// </param>
+        /// <param name="count">
+        ///     The number of bytes.
+        /// </param>
+        /// <returns>
+        ///     <c>true</c> if the specified number of bytes can be read from current position, otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="reader" /> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     <paramref name="count" /> is negative.
+        /// </exception>
+        public static bool CanRead(this BinaryReader reader, int count)
+        {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            return reader.BaseStream.Length - reader.BaseStream.Position >= count;
+        }
+
         public static string ReadStringAscii(this BinaryReader reader, int length)
         {
             if (reader == null)
