@@ -365,5 +365,6 @@ FodyWeavers.xsd
 
 .twisted*
 *.bak
+*.cd
 *.g.cs
 *[Tt][Ee][Mm][Pp]*
