@@ -45,10 +45,11 @@ namespace Twisted.PS.Texturing
             var h = reader.ReadUInt16(Endianness.LE);
 
             var t = (int)(n - 12);
+            var u = w * h * 2;
 
-            if (w * h * 2 != t)
+            if (t < u)
             {
-                throw new InvalidDataException("Object dimensions don't match object pixel data.");
+                throw new InvalidDataException($"Expected at least {u} bytes but pixel data is only {t} bytes.");
             }
 
             if (reinterpret)
@@ -66,15 +67,17 @@ namespace Twisted.PS.Texturing
 
             Rectangle = new Rectangle(new Point(x, y), new Size(w, h));
 
-            if (!reader.CanRead(t))
+            if (!reader.CanRead(u))
                 return;
 
-            var pixels = reader.ReadBytes(t);
+            var pixels = reader.ReadBytes(u);
 
-            if (pixels.Length < t)
+            if (pixels.Length < u)
             {
                 throw new InvalidDataException("Couldn't read all pixel data.");
             }
+
+            reader.BaseStream.Position += t - u; // account for possible garbage at end of block
 
             Pixels = new ReadOnlyCollection<byte>(pixels);
         }

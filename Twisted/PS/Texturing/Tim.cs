@@ -32,8 +32,6 @@ namespace Twisted.PS.Texturing
             }
 
             Picture = new FrameBufferObject(reader, Format, true);
-
-            Assert.AreEqual(stream.Length, stream.Position, "TIM file was not fully read.");
         }
 
         public FrameBufferObjectFormat Format { get; }
