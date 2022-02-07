@@ -52,17 +52,26 @@ namespace Twisted.PS.Texturing
                 throw new InvalidDataException($"Expected at least {u} bytes but pixel data is only {t} bytes.");
             }
 
-            if (reinterpret)
+            if (reinterpret) // TIM pixel data blocks do encode their width in 16-bit units, decode that
             {
-                w = format switch
+                switch (format)
                 {
-                    FrameBufferObjectFormat.Indexed4 => (ushort)(w * 4),
-                    FrameBufferObjectFormat.Indexed8 => (ushort)(w * 2),
-                    FrameBufferObjectFormat.Direct15 => w,
-                    FrameBufferObjectFormat.Direct24 => (ushort)(w * 2 / 3),
-                    FrameBufferObjectFormat.Mixed    => w, // special case, leave alone
-                    _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-                };
+                    case FrameBufferObjectFormat.Indexed4:
+                        w = (ushort)(w * 4);
+                        break;
+                    case FrameBufferObjectFormat.Indexed8:
+                        w = (ushort)(w * 2);
+                        break;
+                    case FrameBufferObjectFormat.Direct15:
+                        break;
+                    case FrameBufferObjectFormat.Direct24:
+                        w = (ushort)(w * 2 / 3);
+                        break;
+                    case FrameBufferObjectFormat.Mixed: // special case, leave alone
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(format), format, null);
+                }
             }
 
             Rectangle = new Rectangle(new Point(x, y), new Size(w, h));
