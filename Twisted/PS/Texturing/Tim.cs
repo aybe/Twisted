@@ -28,7 +28,7 @@ namespace Twisted.PS.Texturing
 
             if ((flags & 0b1000) != default)
             {
-                Palette = new FrameBufferObject(reader, Format);
+                Palette = new FrameBufferObject(reader, FrameBufferObjectFormat.Direct15);
             }
 
             Picture = new FrameBufferObject(reader, Format, true);

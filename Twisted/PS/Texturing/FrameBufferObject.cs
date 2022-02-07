@@ -43,9 +43,9 @@ namespace Twisted.PS.Texturing
 
             var w = reader.ReadUInt16(Endianness.LE);
             var h = reader.ReadUInt16(Endianness.LE);
-            
+
             var t = (int)(n - 12);
-            
+
             if (w * h * 2 != t)
             {
                 throw new InvalidDataException("Object dimensions don't match object pixel data.");
@@ -64,11 +64,7 @@ namespace Twisted.PS.Texturing
                 };
             }
 
-            var rectangle = new Rectangle(new Point(x, y), new Size(w, h));
-
-            // CheckRectangle(rectangle, Max); // BUG TODO this fails as there some savage TIMs, either trim or handle gracefully
-
-            Rectangle = rectangle;
+            Rectangle = new Rectangle(new Point(x, y), new Size(w, h));
 
             if (!reader.CanRead(t))
                 return;
@@ -116,8 +112,6 @@ namespace Twisted.PS.Texturing
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            VerifyRectangle(source.Rectangle);
-
             if (Pixels is not byte[] pixels)
                 throw new InvalidOperationException("This instance's pixel data cannot be written to.");
 
@@ -125,22 +119,22 @@ namespace Twisted.PS.Texturing
             var y = source.Rectangle.Location.Y;
             var w = source.Rectangle.Size.Width;
             var h = source.Rectangle.Size.Height;
-
-            w = source.Format switch
+            var p = source.Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => w / 4,
-                FrameBufferObjectFormat.Indexed8 => w / 2,
-                FrameBufferObjectFormat.Direct15 => w,
-                FrameBufferObjectFormat.Direct24 => w * 3 / 2,
-                FrameBufferObjectFormat.Mixed    => w,
-                _                                => throw new ArgumentOutOfRangeException(nameof(source), "Unknown pixel format.")
+                FrameBufferObjectFormat.Indexed4 => w / 2,
+                FrameBufferObjectFormat.Indexed8 => w,
+                FrameBufferObjectFormat.Direct15 => w * 2,
+                FrameBufferObjectFormat.Direct24 => throw new ArgumentOutOfRangeException(),
+                FrameBufferObjectFormat.Mixed    => throw new ArgumentOutOfRangeException(),
+                _                                => throw new ArgumentOutOfRangeException()
             };
 
-            for (var i = 0; i < w * h; i++)
+            for (var i = 0; i < h; i++)
             {
-                var u = i % w;
-                var v = i / w;
-                pixels[(v + y) * 2048 + (u + x) * 2] = source.Pixels[v * w + u];
+                for (var j = 0; j < p; j++)
+                {
+                    pixels[(y + i) * 2048 + x * 2 + j] = source.Pixels[i * p + j];
+                }
             }
         }
 
