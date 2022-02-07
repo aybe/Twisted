@@ -115,6 +115,16 @@ namespace Twisted.PS.Texturing
             var w = source.Rectangle.Size.Width;
             var h = source.Rectangle.Size.Height;
 
+            w = source.Format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => w / 4,
+                FrameBufferObjectFormat.Indexed8 => w / 2,
+                FrameBufferObjectFormat.Direct15 => w,
+                FrameBufferObjectFormat.Direct24 => w * 3 / 2,
+                FrameBufferObjectFormat.Mixed    => w,
+                _                                => throw new ArgumentOutOfRangeException(nameof(source), "Unknown pixel format.")
+            };
+
             for (var i = 0; i < w * h; i++)
             {
                 var u = i % w;
