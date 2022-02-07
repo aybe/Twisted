@@ -50,7 +50,7 @@ namespace Twisted.PS.Texturing
                 w = format switch
                 {
                     FrameBufferObjectFormat.Indexed4 => (ushort)(w * 4),
-                    FrameBufferObjectFormat.Indexed8 => (ushort)(w * 8),
+                    FrameBufferObjectFormat.Indexed8 => (ushort)(w * 2),
                     FrameBufferObjectFormat.Direct15 => w,
                     FrameBufferObjectFormat.Direct24 => (ushort)(w * 2 / 3),
                     FrameBufferObjectFormat.Mixed    => w, // special case, leave alone
