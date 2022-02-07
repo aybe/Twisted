@@ -69,7 +69,14 @@ namespace Twisted.PS.Texturing
             if (!reader.CanRead(t))
                 return;
 
-            Pixels = new ReadOnlyCollection<byte>(reader.ReadBytes(t));
+            var pixels = reader.ReadBytes(t);
+
+            if (pixels.Length < t)
+            {
+                throw new InvalidDataException("Couldn't read all pixel data.");
+            }
+
+            Pixels = new ReadOnlyCollection<byte>(pixels);
         }
 
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
