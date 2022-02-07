@@ -13,7 +13,6 @@ namespace Twisted.PS.Texturing
     ///     Base class for a frame buffer object.
     /// </summary>
     public class FrameBufferObject
-        // bug check passed pixels size
     {
         private static readonly Rectangle PlayStationVideoMemory = new(0, 0, 1024, 512);
 
@@ -44,6 +43,13 @@ namespace Twisted.PS.Texturing
 
             var w = reader.ReadUInt16(Endianness.LE);
             var h = reader.ReadUInt16(Endianness.LE);
+            
+            var t = (int)(n - 12);
+            
+            if (w * h * 2 != t)
+            {
+                throw new InvalidDataException("Object dimensions don't match object pixel data.");
+            }
 
             if (reinterpret)
             {
@@ -63,8 +69,6 @@ namespace Twisted.PS.Texturing
             // CheckRectangle(rectangle, Max); // BUG TODO this fails as there some savage TIMs, either trim or handle gracefully
 
             Rectangle = rectangle;
-
-            var t = (int)(n - 12);
 
             if (!reader.CanRead(t))
                 return;
