@@ -107,6 +107,11 @@ namespace Twisted.PS.Texturing
             return new FrameBufferObject(FrameBufferObjectFormat.Direct15, PlayStationVideoMemory, new byte[1024 * 512 * 2]);
         }
 
+        public override string ToString()
+        {
+            return $"{nameof(Format)}: {Format}, {nameof(Pixels)}: {Pixels.Count}, {nameof(Rectangle)}: {Rectangle}";
+        }
+
         public void Blit(FrameBufferObject source)
         {
             if (source == null)
