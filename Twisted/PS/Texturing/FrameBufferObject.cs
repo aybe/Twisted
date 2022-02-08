@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Twisted.Extensions;
 
 namespace Twisted.PS.Texturing
@@ -17,64 +20,23 @@ namespace Twisted.PS.Texturing
             Format    = format;
             Rectangle = rectangle;
             Pixels    = pixels;
-
-            var width = Rectangle.Width;
-
-            width = Format switch
-            {
-                FrameBufferObjectFormat.Indexed4 => width * 4,
-                FrameBufferObjectFormat.Indexed8 => width * 2,
-                FrameBufferObjectFormat.Direct15 => width,
-                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
-                FrameBufferObjectFormat.Mixed    => width, // special case, leave alone
-                _                                => throw new InvalidOperationException($"Unknown format: {Format}.")
-            };
-
-            RenderSize = new Size(width, Rectangle.Height);
         }
 
         /// <summary>
         ///     Gets the pixel format for this instance.
         /// </summary>
         /// <seealso cref="Rectangle" />
-        /// <seealso cref="RenderSize" />
         public FrameBufferObjectFormat Format { get; }
 
         /// <summary>
         ///     Gets the rectangle for this instance (see Remarks).
         /// </summary>
         /// <remarks>
-        ///     The horizontal axis is expressed as 16-bit units; depending <see cref="Format" />, the value may differ from actual render size.
+        ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
-        /// <seealso cref="RenderSize" />
         public Rectangle Rectangle { get; }
 
         public IReadOnlyList<byte> Pixels { get; }
-
-        /// <summary>
-        ///     Gets the render size for this instance (see Remarks).
-        /// </summary>
-        /// <remarks>
-        ///     This property returns the render size in pixels for this instance.
-        /// </remarks>
-        /// <seealso cref="Rectangle" />
-        [Obsolete]public Size RenderSize { get; }
-
-        /// <summary>
-        ///     Creates an instance the size of the PlayStation video memory.
-        /// </summary>
-        /// <returns>
-        ///     The created frame buffer object.
-        /// </returns>
-        public static FrameBufferObject CreatePlayStationVideoMemory()
-        {
-            return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new byte[1024 * 512 * 2]);
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(Format)}: {Format}, {nameof(Rectangle)}: {Rectangle}, {nameof(Pixels)}: {Pixels.Count}";
-        }
 
         public void Blit(FrameBufferObject source)
         {
@@ -98,6 +60,27 @@ namespace Twisted.PS.Texturing
             }
         }
 
+        /// <summary>
+        ///     Gets the actual width for this instance.
+        /// </summary>
+        /// <returns>
+        ///     The actual width according <see cref="Format" />.
+        /// </returns>
+        public int GetWidth()
+        {
+            var width = Rectangle.Width;
+
+            return Format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => width * 4,
+                FrameBufferObjectFormat.Indexed8 => width * 2,
+                FrameBufferObjectFormat.Direct15 => width,
+                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                FrameBufferObjectFormat.Mixed    => width, // special case
+                _                                => throw new InvalidOperationException($"Unknown format: {Format}.")
+            };
+        }
+
         public Color[] ToColorArray(Rectangle rectangle, bool translucency)
         {
             var x = rectangle.Location.X;
@@ -119,6 +102,94 @@ namespace Twisted.PS.Texturing
             }
 
             return colors;
+        }
+
+        [SupportedOSPlatform("windows")]
+        public Bitmap ToBitmap(FrameBufferObject? paletteObject, bool translucency)
+        {
+            var bitmap = new Bitmap(
+                GetWidth(),
+                Rectangle.Height,
+                Format switch
+                {
+                    FrameBufferObjectFormat.Indexed4 => PixelFormat.Format4bppIndexed,
+                    FrameBufferObjectFormat.Indexed8 => PixelFormat.Format8bppIndexed,
+                    FrameBufferObjectFormat.Direct15 => PixelFormat.Format16bppRgb555,
+                    FrameBufferObjectFormat.Direct24 => PixelFormat.Format24bppRgb,
+                    FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(),
+                    _                                => throw new ArgumentOutOfRangeException()
+                }
+            );
+            
+            var pixels = Pixels as byte[] ?? Pixels.ToArray();
+
+            var data = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+            
+            Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
+            
+            bitmap.UnlockBits(data);
+
+            if (Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
+            {
+                if (paletteObject != null)
+                {
+                    var palette     = bitmap.Palette;
+                    var paletteData = paletteObject.Pixels as byte[] ?? paletteObject.Pixels.ToArray();
+                    var paletteSize = paletteObject.GetWidth();
+
+                    for (var i = 0; i < paletteSize; i++)
+                    {
+                        var u = paletteData.ReadUInt16(i * 2, Endianness.LE);
+                        var v = new TimColor(u);
+                        var w = v.ToColor(translucency);
+                        palette.Entries[i] = w;
+                    }
+
+                    bitmap.Palette = palette;
+                }
+            }
+
+            return bitmap;
+
+            switch (Format)
+            {
+                case FrameBufferObjectFormat.Indexed4:
+                    for (var y = 0; y < Rectangle.Height; y++)
+                    {
+                        for (var x = 0; x < Rectangle.Width; x++)
+                        {
+                            for (int p = 0; p < 4; p++)
+                            {
+                                var i  = y * Rectangle.Width * 2 + x * 2 /*+ p / 2*/;
+                                var b  = this.Pixels[i];
+                                var u  = pixels.ReadInt16(i, Endianness.LE);
+                                var v = (u >> p) & 0b1111;
+                                // 0 >> 0
+                                // 1 >> 4
+                                // 2 >> 0
+                                // 3 >> 4
+                            }
+                        }
+                    }
+
+                    break;
+                case FrameBufferObjectFormat.Indexed8:
+                    break;
+                case FrameBufferObjectFormat.Direct15:
+                    break;
+                case FrameBufferObjectFormat.Direct24:
+                    break;
+                case FrameBufferObjectFormat.Mixed:
+                    throw new NotSupportedException();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return bitmap;
+        }
+        public override string ToString()
+        {
+            return $"{nameof(Format)}: {Format}, {nameof(Rectangle)}: {Rectangle}, {nameof(Pixels)}: {Pixels.Count}";
         }
 
         public static void WriteTga(FrameBufferObject source, Stream destination, FrameBufferObjectFormat format) // TODO this can benefit any object actually
@@ -201,6 +272,17 @@ namespace Twisted.PS.Texturing
             // NOTE: no Developer Data - Field 9
 
             // writer.Write(Encoding.ASCII.GetBytes("TRUEVISION-XFILE.\0"));
+        }
+
+        /// <summary>
+        ///     Creates an instance the size of the PlayStation video memory.
+        /// </summary>
+        /// <returns>
+        ///     The created frame buffer object.
+        /// </returns>
+        public static FrameBufferObject CreatePlayStationVideoMemory()
+        {
+            return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new byte[1024 * 512 * 2]);
         }
     }
 }
