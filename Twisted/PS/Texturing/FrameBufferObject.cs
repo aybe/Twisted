@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -12,111 +10,65 @@ namespace Twisted.PS.Texturing
     /// <summary>
     ///     Base class for a frame buffer object.
     /// </summary>
-    public class FrameBufferObject
+    public sealed class FrameBufferObject
     {
-        private static readonly Rectangle PlayStationVideoMemory = new(0, 0, 1024, 512);
-
-        internal FrameBufferObject(BinaryReader reader, FrameBufferObjectFormat format, bool reinterpret = false)
-            // special constructor for TIM
-        {
-            if (reader == null)
-                throw new ArgumentNullException(nameof(reader));
-
-            Format = format;
-            Pixels = Array.Empty<byte>();
-
-            // the following is because there can be incomplete blocks, e.g. Ridge Racer palette-only TIMs
-
-            if (!reader.CanRead(4))
-                return;
-
-            var n = reader.ReadUInt32(Endianness.LE);
-
-            if (!reader.CanRead(2))
-                return;
-
-            var x = reader.ReadUInt16(Endianness.LE);
-            var y = reader.ReadUInt16(Endianness.LE);
-
-            if (!reader.CanRead(2))
-                return;
-
-            var w = reader.ReadUInt16(Endianness.LE);
-            var h = reader.ReadUInt16(Endianness.LE);
-
-            var t = (int)(n - 12);
-            var u = w * h * 2;
-
-            if (t < u)
-            {
-                throw new InvalidDataException($"Expected at least {u} bytes but pixel data is only {t} bytes.");
-            }
-
-            if (reinterpret) // TIM pixel data blocks do encode their width in 16-bit units, decode that
-            {
-                switch (format)
-                {
-                    case FrameBufferObjectFormat.Indexed4:
-                        w = (ushort)(w * 4);
-                        break;
-                    case FrameBufferObjectFormat.Indexed8:
-                        w = (ushort)(w * 2);
-                        break;
-                    case FrameBufferObjectFormat.Direct15:
-                        break;
-                    case FrameBufferObjectFormat.Direct24:
-                        w = (ushort)(w * 2 / 3);
-                        break;
-                    case FrameBufferObjectFormat.Mixed: // special case, leave alone
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(format), format, null);
-                }
-            }
-
-            Rectangle = new Rectangle(new Point(x, y), new Size(w, h));
-
-            if (!reader.CanRead(u))
-                return;
-
-            var pixels = reader.ReadBytes(u);
-
-            if (pixels.Length < u)
-            {
-                throw new InvalidDataException("Couldn't read all pixel data.");
-            }
-
-            reader.BaseStream.Position += t - u; // account for possible garbage at end of block
-
-            Pixels = new ReadOnlyCollection<byte>(pixels);
-        }
-
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public FrameBufferObject(FrameBufferObjectFormat format, Rectangle rectangle, IReadOnlyList<byte> pixels)
         {
-            VerifyRectangle(rectangle, PlayStationVideoMemory);
-            VerifyPixels(pixels, PlayStationVideoMemory);
-
             Format    = format;
             Rectangle = rectangle;
             Pixels    = pixels;
+
+            var width = Rectangle.Width;
+
+            width = Format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => width * 4,
+                FrameBufferObjectFormat.Indexed8 => width * 2,
+                FrameBufferObjectFormat.Direct15 => width,
+                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                FrameBufferObjectFormat.Mixed    => width, // special case, leave alone
+                _                                => throw new InvalidOperationException($"Unknown format: {Format}.")
+            };
+
+            RenderSize = new Size(width, Rectangle.Height);
         }
 
+        /// <summary>
+        ///     Gets the pixel format for this instance.
+        /// </summary>
+        /// <seealso cref="Rectangle" />
+        /// <seealso cref="RenderSize" />
         public FrameBufferObjectFormat Format { get; }
 
+        /// <summary>
+        ///     Gets the rectangle for this instance (see Remarks).
+        /// </summary>
+        /// <remarks>
+        ///     The horizontal axis is expressed as 16-bit units; depending <see cref="Format" />, the value may differ from actual render size.
+        /// </remarks>
+        /// <seealso cref="RenderSize" />
         public Rectangle Rectangle { get; }
 
         public IReadOnlyList<byte> Pixels { get; }
 
         /// <summary>
-        ///     Creates a frame buffer object the size of the PlayStation video memory.
+        ///     Gets the render size for this instance (see Remarks).
+        /// </summary>
+        /// <remarks>
+        ///     This property returns the render size in pixels for this instance.
+        /// </remarks>
+        /// <seealso cref="Rectangle" />
+        public Size RenderSize { get; }
+
+        /// <summary>
+        ///     Creates an instance the size of the PlayStation video memory.
         /// </summary>
         /// <returns>
         ///     The created frame buffer object.
         /// </returns>
         public static FrameBufferObject CreatePlayStationVideoMemory()
         {
-            return new FrameBufferObject(FrameBufferObjectFormat.Direct15, PlayStationVideoMemory, new byte[1024 * 512 * 2]);
+            return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new byte[1024 * 512 * 2]);
         }
 
         public override string ToString()
@@ -157,8 +109,6 @@ namespace Twisted.PS.Texturing
 
         public Color[] ToColorArray(Rectangle rectangle, bool translucency)
         {
-            VerifyRectangle(rectangle);
-
             var x = rectangle.Location.X;
             var y = rectangle.Location.Y;
             var w = rectangle.Size.Width;
@@ -178,26 +128,6 @@ namespace Twisted.PS.Texturing
             }
 
             return colors;
-        }
-
-        private static void VerifyPixels(IReadOnlyList<byte> pixels, Rectangle rectangle)
-        {
-            if (pixels == null)
-                throw new ArgumentNullException(nameof(pixels));
-
-            if (pixels.Count / 2 != rectangle.Width * rectangle.Height)
-                throw new ArgumentOutOfRangeException(nameof(pixels), pixels, $"Size of the array of pixels does not match rectangle size: {rectangle}.");
-        }
-
-        private static void VerifyRectangle(Rectangle rectangle, Rectangle limits)
-        {
-            if (!limits.Contains(rectangle))
-                throw new ArgumentOutOfRangeException(nameof(rectangle), rectangle, $"Rectangle cannot be contained within {limits}.");
-        }
-
-        private void VerifyRectangle(Rectangle rectangle)
-        {
-            VerifyRectangle(rectangle, Rectangle);
         }
 
         public static void WriteTga(FrameBufferObject source, Stream destination, FrameBufferObjectFormat format) // TODO this can benefit any object actually
