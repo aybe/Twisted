@@ -44,7 +44,7 @@ namespace Twisted.PS.Texturing
 
                         var palRect = new Rectangle(rect.X, rect.Y + i, rect.Width, 1);
 
-                        var palData = palBlock.Pixels.AsSpan(0, rect.Width * 2).ToArray();
+                        var palData = palBlock.Pixels.AsSpan(0, rect.Width).ToArray();
 
                         palettes[i] = new FrameBufferObject(format, palRect, palData);
                     }
@@ -58,7 +58,7 @@ namespace Twisted.PS.Texturing
 
             var picRect = picBlock.Rectangle;
 
-            var picData = picBlock.Pixels.AsSpan(0, picRect.Width * 2 * picRect.Height).ToArray();
+            var picData = picBlock.Pixels.AsSpan(0, picRect.Width * picRect.Height).ToArray();
 
             Picture = new FrameBufferObject(Format, picRect, picData);
         }
@@ -92,7 +92,7 @@ namespace Twisted.PS.Texturing
             if (!reader.TryRead(s => s.ReadInt16(Endianness.LE), out var h))
                 return false;
 
-            if (!reader.TryRead(s => s.ReadBytes(n - 12), out var p))
+            if (!reader.TryRead(s => s.ReadInt16(Endianness.LE), out var p, (n - 12) / 2))
                 return false;
 
             result = new TimBlock(n, p, new Rectangle(x, y, w, h));
@@ -102,7 +102,7 @@ namespace Twisted.PS.Texturing
 
         private sealed class TimBlock
         {
-            public TimBlock(int length, byte[] pixels, Rectangle rectangle)
+            public TimBlock(int length, short[] pixels, Rectangle rectangle)
             {
                 Length    = length;
                 Pixels    = pixels;
@@ -113,7 +113,7 @@ namespace Twisted.PS.Texturing
 
             public Rectangle Rectangle { get; }
 
-            public byte[] Pixels { get; }
+            public short[] Pixels { get; }
         }
     }
 }

@@ -8,11 +8,11 @@ namespace Twisted.PS.Texturing
     public readonly struct TimColor : IEquatable<TimColor>
     {
         public TimColor(BinaryReader reader)
-            : this(reader.ReadUInt16(Endianness.LE))
+            : this(reader.ReadInt16(Endianness.LE))
         {
         }
 
-        public TimColor(ushort value)
+        public TimColor(short value)
         {
             R = (byte)((value >> 00) & 0b11111);
             G = (byte)((value >> 05) & 0b11111);
