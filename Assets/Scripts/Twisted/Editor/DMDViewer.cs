@@ -32,7 +32,7 @@ namespace Twisted.Editor
 
             ViewState ??= new TreeViewState();
 
-            View = new TreeNodeView(ViewState, string.IsNullOrEmpty(ViewPath) ? null : OpenFile(ViewPath!));
+            View = new TreeNodeView(ViewState, File.Exists(ViewPath) ? OpenFile(ViewPath!) : null);
 
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
