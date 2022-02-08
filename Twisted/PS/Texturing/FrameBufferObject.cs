@@ -58,7 +58,7 @@ namespace Twisted.PS.Texturing
         ///     This property returns the render size in pixels for this instance.
         /// </remarks>
         /// <seealso cref="Rectangle" />
-        public Size RenderSize { get; }
+        [Obsolete]public Size RenderSize { get; }
 
         /// <summary>
         ///     Creates an instance the size of the PlayStation video memory.
@@ -73,7 +73,7 @@ namespace Twisted.PS.Texturing
 
         public override string ToString()
         {
-            return $"{nameof(Format)}: {Format}, {nameof(Pixels)}: {Pixels.Count}, {nameof(Rectangle)}: {Rectangle}";
+            return $"{nameof(Format)}: {Format}, {nameof(Rectangle)}: {Rectangle}, {nameof(Pixels)}: {Pixels.Count}";
         }
 
         public void Blit(FrameBufferObject source)
@@ -88,21 +88,12 @@ namespace Twisted.PS.Texturing
             var y = source.Rectangle.Location.Y;
             var w = source.Rectangle.Size.Width;
             var h = source.Rectangle.Size.Height;
-            var p = source.Format switch
-            {
-                FrameBufferObjectFormat.Indexed4 => w / 2,
-                FrameBufferObjectFormat.Indexed8 => w,
-                FrameBufferObjectFormat.Direct15 => w * 2,
-                FrameBufferObjectFormat.Direct24 => throw new ArgumentOutOfRangeException(),
-                FrameBufferObjectFormat.Mixed    => throw new ArgumentOutOfRangeException(),
-                _                                => throw new ArgumentOutOfRangeException()
-            };
 
             for (var i = 0; i < h; i++)
             {
-                for (var j = 0; j < p; j++)
+                for (var j = 0; j < w * 2; j++)
                 {
-                    pixels[(y + i) * 2048 + x * 2 + j] = source.Pixels[i * p + j];
+                    pixels[(y + i) * 2048 + x * 2 + j] = source.Pixels[i * w * 2 + j];
                 }
             }
         }

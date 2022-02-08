@@ -58,7 +58,7 @@ namespace Twisted.PS.Texturing
 
             var picRect = picBlock.Rectangle;
 
-            var picData = picBlock.Pixels.AsSpan(picRect.Width * 2 * picRect.Height).ToArray();
+            var picData = picBlock.Pixels.AsSpan(0, picRect.Width * 2 * picRect.Height).ToArray();
 
             Picture = new FrameBufferObject(Format, picRect, picData);
         }
