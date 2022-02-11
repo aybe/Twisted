@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
+using System.IO;
+using System.Text;
+using Twisted.Extensions;
 
 namespace Twisted.PS.Texturing
 {
@@ -59,12 +58,10 @@ namespace Twisted.PS.Texturing
         }
 
         /// <summary>
-        ///     Gets the actual width for this instance.
+        ///     Gets the render width for this instance.
         /// </summary>
-        /// <returns>
-        ///     The actual width according <see cref="Format" />.
-        /// </returns>
-        public int GetWidth()
+        [Obsolete]
+        public int GetRenderWidth()
         {
             var width = Rectangle.Width;
 
@@ -75,57 +72,15 @@ namespace Twisted.PS.Texturing
                 FrameBufferObjectFormat.Direct15 => width,
                 FrameBufferObjectFormat.Direct24 => width * 2 / 3,
                 FrameBufferObjectFormat.Mixed    => width, // special case
-                _                                => throw new InvalidOperationException($"Unknown format: {Format}.")
+                _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
             };
         }
 
-        [SupportedOSPlatform("windows")]
-        public Bitmap ToBitmap(FrameBufferObject? paletteObject, bool translucency)
+        public Size GetRenderSize() // todo
         {
-            var bitmap = new Bitmap(
-                GetWidth(),
-                Rectangle.Height,
-                Format switch
-                {
-                    FrameBufferObjectFormat.Indexed4 => PixelFormat.Format4bppIndexed,
-                    FrameBufferObjectFormat.Indexed8 => PixelFormat.Format8bppIndexed,
-                    FrameBufferObjectFormat.Direct15 => PixelFormat.Format16bppRgb555,
-                    FrameBufferObjectFormat.Direct24 => PixelFormat.Format24bppRgb,
-                    FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(),
-                    _                                => throw new ArgumentOutOfRangeException()
-                }
-            );
-            
-            var pixels = Pixels as short[] ?? Pixels.ToArray();
-
-            var data = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
-            
-            Marshal.Copy(pixels, 0, data.Scan0, pixels.Length);
-            
-            bitmap.UnlockBits(data);
-
-            if (Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
-            {
-                if (paletteObject != null)
-                {
-                    var palette     = bitmap.Palette;
-                    var paletteData = paletteObject.Pixels as short[] ?? paletteObject.Pixels.ToArray();
-                    var paletteSize = paletteObject.GetWidth();
-
-                    for (var i = 0; i < paletteSize; i++)
-                    {
-                        var u = paletteData[i]; // BUG this is little-endian
-                        var v = new TimColor(u);
-                        var w = v.ToColor(translucency);
-                        palette.Entries[i] = w;
-                    }
-
-                    bitmap.Palette = palette;
-                }
-            }
-
-            return bitmap;
+            return new Size(GetRenderWidth(), Rectangle.Height);
         }
+
         public override string ToString()
         {
             return $"{nameof(Format)}: {Format}, {nameof(Rectangle)}: {Rectangle}, {nameof(Pixels)}: {Pixels.Count}";
@@ -140,6 +95,151 @@ namespace Twisted.PS.Texturing
         public static FrameBufferObject CreatePlayStationVideoMemory()
         {
             return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
+        }
+
+        public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, bool translucency = false)
+            // http://www.paulbourke.net/dataformats/tga/
+        {
+            if (stream is null)
+                throw new ArgumentNullException(nameof(stream));
+
+            if (picture is null)
+                throw new ArgumentNullException(nameof(picture));
+
+            switch (picture.Format)
+            {
+                case FrameBufferObjectFormat.Indexed4:
+                case FrameBufferObjectFormat.Indexed8:
+                case FrameBufferObjectFormat.Direct15:
+                case FrameBufferObjectFormat.Direct24:
+                    break;
+                case FrameBufferObjectFormat.Mixed:
+                default:
+                    throw new NotSupportedException(picture.Format.ToString());
+            }
+
+            if (palette is { Format: not FrameBufferObjectFormat.Direct15 })
+            {
+                throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferObjectFormat.Direct15}.");
+            }
+
+            // TGA file header
+
+            using var writer = new BinaryWriter(stream, Encoding.Default, true);
+
+            const byte idLength = 0;
+
+            var colorMapType = (byte)(palette is null ? 0 : 1);
+
+            var imageType = picture.Format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => (byte)1,
+                FrameBufferObjectFormat.Indexed8 => (byte)1,
+                FrameBufferObjectFormat.Direct15 => (byte)2,
+                FrameBufferObjectFormat.Direct24 => (byte)2,
+                FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(picture.Format.ToString()),
+                _                                => throw new NotSupportedException(picture.Format.ToString())
+            };
+
+            const short firstEntryIndex = 0;
+
+            var colorMapLength = (short)(palette is null ? 0 : palette.GetRenderSize().Width);
+
+            var colorMapEntrySize = (byte)(palette is null ? 0 : 16);
+
+            const short xOrigin = 0;
+            const short yOrigin = 0;
+
+            var imageWidth  = (short)picture.GetRenderSize().Width;
+            var imageHeight = (short)picture.GetRenderSize().Height;
+
+            var pixelDepth = picture.Format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => (byte)8,
+                FrameBufferObjectFormat.Indexed8 => (byte)8,
+                FrameBufferObjectFormat.Direct15 => (byte)15,
+                FrameBufferObjectFormat.Direct24 => (byte)24,
+                FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(picture.Format.ToString()),
+                _                                => throw new NotSupportedException(picture.Format.ToString())
+            };
+
+            var imageDescriptor = (byte)0b00100000; // top/left
+
+            if (picture is { Format: not FrameBufferObjectFormat.Direct24 })
+            {
+                if (translucency)
+                {
+                    imageDescriptor |= 0b00000011; // alpha channel
+                }
+            }
+
+            writer.Write(idLength);
+            writer.Write(colorMapType);
+            writer.Write(imageType);
+            writer.Write(firstEntryIndex, Endianness.LE);
+            writer.Write(colorMapLength,  Endianness.LE);
+            writer.Write(colorMapEntrySize);
+            writer.Write(xOrigin,     Endianness.LE);
+            writer.Write(yOrigin,     Endianness.LE);
+            writer.Write(imageWidth,  Endianness.LE);
+            writer.Write(imageHeight, Endianness.LE);
+            writer.Write(pixelDepth);
+            writer.Write(imageDescriptor);
+
+            // Color map data
+
+            if (palette is not null)
+            {
+                foreach (var p in palette.Pixels) // R5G5B5A1 -> B5G5R5A1
+                {
+                    writer.Write((short)((p & 0x83E0) | ((p >> 10) & 0x1F) | (p << 10)), Endianness.LE);
+                }
+            }
+
+            // Image data
+
+            switch (picture.Format)
+            {
+                case FrameBufferObjectFormat.Indexed4:
+                    foreach (var p in picture.Pixels)
+                    {
+                        writer.Write((byte)((p >> 00) & 0xF));
+                        writer.Write((byte)((p >> 04) & 0xF));
+                        writer.Write((byte)((p >> 08) & 0xF));
+                        writer.Write((byte)((p >> 12) & 0xF));
+                    }
+                    break;
+                case FrameBufferObjectFormat.Indexed8:
+                    foreach (var p in picture.Pixels)
+                    {
+                        writer.Write(p, Endianness.LE);
+                    }
+                    break;
+                case FrameBufferObjectFormat.Direct15:
+                    foreach (var p in picture.Pixels) // R5G5B5A1 -> B5G5R5A1
+                    {
+                        writer.Write((short)((p & 0x83E0) | ((p >> 10) & 0x1F) | (p << 10)), Endianness.LE);
+                    }
+
+                    break;
+                case FrameBufferObjectFormat.Direct24:
+                    for (var i = 0; i < picture.Pixels.Count; i += 3) // R8G8B8 -> B8G8R8
+                    {
+                        var p1 = picture.Pixels[i + 0];
+                        var p2 = picture.Pixels[i + 1];
+                        var p3 = picture.Pixels[i + 2];
+                        writer.Write((byte)((p2 >> 0) & 0xFF));
+                        writer.Write((byte)((p1 >> 8) & 0xFF));
+                        writer.Write((byte)((p1 >> 0) & 0xFF));
+                        writer.Write((byte)((p3 >> 8) & 0xFF));
+                        writer.Write((byte)((p3 >> 0) & 0xFF));
+                        writer.Write((byte)((p2 >> 8) & 0xFF));
+                    }
+                    break;
+                case FrameBufferObjectFormat.Mixed:
+                default:
+                    throw new NotSupportedException(picture.Format.ToString());
+            }
         }
     }
 }
