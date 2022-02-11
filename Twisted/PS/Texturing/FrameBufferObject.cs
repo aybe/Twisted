@@ -53,9 +53,9 @@ namespace Twisted.PS.Texturing
                 {
                     FrameBufferObjectFormat.Indexed4 => width * 4,
                     FrameBufferObjectFormat.Indexed8 => width * 2,
+                    FrameBufferObjectFormat.Mixed    => width, // special case, 16-bit page with with mixed content
                     FrameBufferObjectFormat.Direct15 => width,
                     FrameBufferObjectFormat.Direct24 => width * 2 / 3,
-                    FrameBufferObjectFormat.Mixed    => width, // special case
                     _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
                 };
 
@@ -116,8 +116,8 @@ namespace Twisted.PS.Texturing
                 case FrameBufferObjectFormat.Indexed8:
                 case FrameBufferObjectFormat.Direct15:
                 case FrameBufferObjectFormat.Direct24:
-                    break;
                 case FrameBufferObjectFormat.Mixed:
+                    break;
                 default:
                     throw new NotSupportedException(picture.Format.ToString());
             }
@@ -139,9 +139,9 @@ namespace Twisted.PS.Texturing
             {
                 FrameBufferObjectFormat.Indexed4 => (byte)1,
                 FrameBufferObjectFormat.Indexed8 => (byte)1,
+                FrameBufferObjectFormat.Mixed    => (byte)2,
                 FrameBufferObjectFormat.Direct15 => (byte)2,
                 FrameBufferObjectFormat.Direct24 => (byte)2,
-                FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(picture.Format.ToString()),
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
 
@@ -161,9 +161,9 @@ namespace Twisted.PS.Texturing
             {
                 FrameBufferObjectFormat.Indexed4 => (byte)8,
                 FrameBufferObjectFormat.Indexed8 => (byte)8,
+                FrameBufferObjectFormat.Mixed    => (byte)15,
                 FrameBufferObjectFormat.Direct15 => (byte)15,
                 FrameBufferObjectFormat.Direct24 => (byte)24,
-                FrameBufferObjectFormat.Mixed    => throw new NotSupportedException(picture.Format.ToString()),
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
 
@@ -219,6 +219,7 @@ namespace Twisted.PS.Texturing
                         writer.Write(p, Endianness.LE);
                     }
                     break;
+                case FrameBufferObjectFormat.Mixed:
                 case FrameBufferObjectFormat.Direct15:
                     foreach (var p in picture.Pixels) // R5G5B5A1 -> B5G5R5A1
                     {
@@ -240,7 +241,6 @@ namespace Twisted.PS.Texturing
                         writer.Write((byte)((p2 >> 8) & 0xFF));
                     }
                     break;
-                case FrameBufferObjectFormat.Mixed:
                 default:
                     throw new NotSupportedException(picture.Format.ToString());
             }
