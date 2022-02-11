@@ -31,9 +31,37 @@ namespace Twisted.PS.Texturing
         /// <remarks>
         ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
+        /// <seealso cref="RenderSize" />
         public Rectangle Rectangle { get; }
 
         public IReadOnlyList<short> Pixels { get; }
+
+        /// <summary>
+        ///     Gets the render size for this instance (see Remarks).
+        /// </summary>
+        /// <remarks>
+        ///     Use this property to get the actual render size.
+        /// </remarks>
+        /// <seealso cref="Rectangle" />
+        public Size RenderSize
+        {
+            get
+            {
+                var width = Rectangle.Width;
+
+                width = Format switch
+                {
+                    FrameBufferObjectFormat.Indexed4 => width * 4,
+                    FrameBufferObjectFormat.Indexed8 => width * 2,
+                    FrameBufferObjectFormat.Direct15 => width,
+                    FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                    FrameBufferObjectFormat.Mixed    => width, // special case
+                    _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
+                };
+
+                return new Size(width, Rectangle.Height);
+            }
+        }
 
         public void Blit(FrameBufferObject source)
         {
@@ -55,30 +83,6 @@ namespace Twisted.PS.Texturing
                     pixels[(y + i) * 1024 + x + j] = source.Pixels[i * w + j];
                 }
             }
-        }
-
-        /// <summary>
-        ///     Gets the render width for this instance.
-        /// </summary>
-        [Obsolete]
-        public int GetRenderWidth()
-        {
-            var width = Rectangle.Width;
-
-            return Format switch
-            {
-                FrameBufferObjectFormat.Indexed4 => width * 4,
-                FrameBufferObjectFormat.Indexed8 => width * 2,
-                FrameBufferObjectFormat.Direct15 => width,
-                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
-                FrameBufferObjectFormat.Mixed    => width, // special case
-                _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
-            };
-        }
-
-        public Size GetRenderSize() // todo
-        {
-            return new Size(GetRenderWidth(), Rectangle.Height);
         }
 
         public override string ToString()
@@ -143,15 +147,15 @@ namespace Twisted.PS.Texturing
 
             const short firstEntryIndex = 0;
 
-            var colorMapLength = (short)(palette is null ? 0 : palette.GetRenderSize().Width);
+            var colorMapLength = (short)(palette is null ? 0 : palette.RenderSize.Width);
 
             var colorMapEntrySize = (byte)(palette is null ? 0 : 16);
 
             const short xOrigin = 0;
             const short yOrigin = 0;
 
-            var imageWidth  = (short)picture.GetRenderSize().Width;
-            var imageHeight = (short)picture.GetRenderSize().Height;
+            var imageWidth  = (short)picture.RenderSize.Width;
+            var imageHeight = (short)picture.RenderSize.Height;
 
             var pixelDepth = picture.Format switch
             {
