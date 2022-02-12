@@ -181,8 +181,8 @@ namespace Twisted.PS.Texturing
             {
                 FrameBufferObjectFormat.Indexed4 => (byte)8,
                 FrameBufferObjectFormat.Indexed8 => (byte)8,
-                FrameBufferObjectFormat.Mixed    => (byte)15,
-                FrameBufferObjectFormat.Direct15 => (byte)15,
+                FrameBufferObjectFormat.Mixed    => (byte)16,
+                FrameBufferObjectFormat.Direct15 => (byte)16,
                 FrameBufferObjectFormat.Direct24 => (byte)24,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
