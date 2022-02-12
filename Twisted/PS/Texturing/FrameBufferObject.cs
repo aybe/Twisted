@@ -141,9 +141,9 @@ namespace Twisted.PS.Texturing
 
                 var colors = 1 << bitsPerPixel;
 
-                if (palette.RenderSize.Width < colors)
+                if (palette.RenderSize.Width != colors)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette needs to be at least {colors} colors.");
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette must be exactly {colors} colors.");
                 }
             }
 
