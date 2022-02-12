@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -148,9 +148,7 @@ namespace Twisted.PS.Texturing
             }
 
             // TGA file header
-
-            using var writer = new BinaryWriter(stream, Encoding.Default, true);
-
+            
             const byte idLength = 0;
 
             var colorMapType = (byte)(palette is null ? 0 : 1);
@@ -196,6 +194,8 @@ namespace Twisted.PS.Texturing
                     imageDescriptor |= 0b00000011; // alpha channel
                 }
             }
+
+            using var writer = new BinaryWriter(stream, Encoding.Default, true);
 
             writer.Write(idLength);
             writer.Write(colorMapType);
