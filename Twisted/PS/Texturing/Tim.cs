@@ -44,7 +44,7 @@ namespace Twisted.PS.Texturing
 
                         var palRect = new Rectangle(rect.X, rect.Y + i, rect.Width, 1);
 
-                        var palData = palBlock.Pixels.AsSpan(0, rect.Width).ToArray();
+                        var palData = palBlock.Pixels.AsSpan(i * palRect.Width, rect.Width).ToArray();
 
                         palettes[i] = new FrameBufferObject(format, palRect, palData);
                     }
