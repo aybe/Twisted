@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -125,6 +125,26 @@ namespace Twisted.PS.Texturing
             if (palette is { Format: not FrameBufferObjectFormat.Direct15 })
             {
                 throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferObjectFormat.Direct15}.");
+            }
+
+            if (palette is not null && picture.Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
+            {
+                var bitsPerPixel = picture.Format switch
+                {
+                    FrameBufferObjectFormat.Indexed4 => 4,
+                    FrameBufferObjectFormat.Indexed8 => 8,
+                    FrameBufferObjectFormat.Direct15 => 16,
+                    FrameBufferObjectFormat.Direct24 => 24,
+                    FrameBufferObjectFormat.Mixed    => 16,
+                    _                                => throw new NotSupportedException(picture.Format.ToString())
+                };
+
+                var colors = 1 << bitsPerPixel;
+
+                if (palette.RenderSize.Width < colors)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette needs to be at least {colors} colors.");
+                }
             }
 
             // TGA file header
