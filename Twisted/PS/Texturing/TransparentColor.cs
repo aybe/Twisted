@@ -35,7 +35,7 @@ namespace Twisted.PS.Texturing
 
         public byte B => (byte)((Value >> 10) & 0b11111);
 
-        public bool A => ((Value >> 11) & 0b1) != 0;
+        public bool A => ((Value >> 15) & 0b1) != 0;
 
         /// <summary>
         ///     Converts this instance to a color, specifying semi-transparency processing.
