@@ -277,7 +277,7 @@ namespace Twisted.PS.Texturing
                     break;
                 case FrameBufferObjectFormat.Direct15:
                 case FrameBufferObjectFormat.Mixed:
-                    if (transparencyFinal) // BUG why is this hit by 8-bit????
+                    if (transparencyFinal)
                     {
                         foreach (var p in picture.Pixels)
                         {
