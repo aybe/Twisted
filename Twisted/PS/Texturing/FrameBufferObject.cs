@@ -111,6 +111,8 @@ namespace Twisted.PS.Texturing
             if (picture is null)
                 throw new ArgumentNullException(nameof(picture));
 
+            // check that picture is a known format
+
             switch (picture.Format)
             {
                 case FrameBufferObjectFormat.Indexed4:
@@ -123,28 +125,25 @@ namespace Twisted.PS.Texturing
                     throw new NotSupportedException(picture.Format.ToString());
             }
 
-            if (palette is { Format: not FrameBufferObjectFormat.Direct15 })
-            {
-                throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferObjectFormat.Direct15}.");
-            }
+            // check that picture, if indexed, has a palette with correct format and color count
 
-            if (palette is not null && picture.Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
+            if (picture.Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
             {
-                var bitsPerPixel = picture.Format switch
+                if (palette is null)
                 {
-                    FrameBufferObjectFormat.Indexed4 => 4,
-                    FrameBufferObjectFormat.Indexed8 => 8,
-                    FrameBufferObjectFormat.Direct15 => 16,
-                    FrameBufferObjectFormat.Direct24 => 24,
-                    FrameBufferObjectFormat.Mixed    => 16,
-                    _                                => throw new NotSupportedException(picture.Format.ToString())
-                };
+                    throw new ArgumentNullException(nameof(palette), $"Palette is required for {picture.Format} format.");
+                }
 
-                var colors = 1 << bitsPerPixel;
+                if (palette.Format is not FrameBufferObjectFormat.Direct15)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not in {FrameBufferObjectFormat.Direct15} format.");
+                }
+
+                var colors = 1 << (picture.Format == FrameBufferObjectFormat.Indexed4 ? 4 : 8);
 
                 if (palette.RenderSize.Width != colors)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette must be exactly {colors} colors.");
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette color must be exactly {colors}.");
                 }
             }
 
