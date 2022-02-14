@@ -101,7 +101,7 @@ namespace Twisted.PS.Texturing
             return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
         }
 
-        public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, bool translucency = false)
+        public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, TransparentColorMode mode = TransparentColorMode.None)
             // http://www.paulbourke.net/dataformats/tga/
         {
             if (stream is null)
@@ -147,8 +147,11 @@ namespace Twisted.PS.Texturing
                 }
             }
 
+            var transparentColor = mode.HasFlagFast(TransparentColorMode.Color);
+            var transparentBlack = mode.HasFlagFast(TransparentColorMode.Black);
+
             // TGA file header
-            
+
             const byte idLength = 0;
 
             var colorMapType = (byte)(palette is null ? 0 : 1);
@@ -167,7 +170,7 @@ namespace Twisted.PS.Texturing
 
             var colorMapLength = (short)(palette is null ? 0 : palette.RenderSize.Width);
 
-            var colorMapEntrySize = (byte)(palette is null ? 0 : 16);
+            var colorMapEntrySize = (byte)(palette is null ? 0 : 32); // TGA does 16-bit but since STP we must go 32-bit
 
             const short xOrigin = 0;
             const short yOrigin = 0;
@@ -189,7 +192,7 @@ namespace Twisted.PS.Texturing
 
             if (picture is { Format: not FrameBufferObjectFormat.Direct24 })
             {
-                if (translucency)
+                if (transparentColor || transparentBlack)
                 {
                     imageDescriptor |= 0b00000011; // alpha channel
                 }
@@ -214,9 +217,12 @@ namespace Twisted.PS.Texturing
 
             if (palette is not null)
             {
-                foreach (var p in palette.Pixels) // R5G5B5A1 -> B5G5R5A1
+                foreach (var p in palette.Pixels)
                 {
-                    writer.Write((short)((p & 0x83E0) | ((p >> 10) & 0x1F) | (p << 10)), Endianness.LE);
+                    var color1 = new TransparentColor(p);
+                    var color2 = color1.ToColor(mode);
+                    var color3 = color2.ToArgb();
+                    writer.Write(color3);
                 }
             }
 
