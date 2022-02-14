@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -100,6 +101,22 @@ namespace Twisted.PS.Texturing
         public static FrameBufferObject CreatePlayStationVideoMemory()
         {
             return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
+        }
+
+        public static int GetColorCount(FrameBufferObjectFormat format)
+        {
+            if (!Enum.IsDefined(typeof(FrameBufferObjectFormat), format))
+                throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(FrameBufferObjectFormat));
+
+            return format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => 16,
+                FrameBufferObjectFormat.Indexed8 => 256,
+                FrameBufferObjectFormat.Mixed    => 65536,
+                FrameBufferObjectFormat.Direct15 => 65536,
+                FrameBufferObjectFormat.Direct24 => 16777216,
+                _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            };
         }
 
         public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, TransparentColorMode mode = TransparentColorMode.None)

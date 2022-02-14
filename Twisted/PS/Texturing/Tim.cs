@@ -36,17 +36,16 @@ namespace Twisted.PS.Texturing
                 {
                     var rect = palBlock.Rectangle;
 
-                    var palettes = new FrameBufferObject[rect.Height];
+                    var colors   = FrameBufferObject.GetColorCount(Format);
+                    var columns  = rect.Width / colors;
+                    var palettes = new FrameBufferObject[columns * rect.Height];
 
                     for (var i = 0; i < palettes.Length; i++)
                     {
-                        const FrameBufferObjectFormat format = FrameBufferObjectFormat.Direct15;
+                        var palRect = new Rectangle(rect.X + i % columns * colors, rect.Y + i / columns, colors, 1);
+                        var palData = palBlock.Pixels.AsSpan(i * palRect.Width, colors).ToArray();
 
-                        var palRect = new Rectangle(rect.X, rect.Y + i, rect.Width, 1);
-
-                        var palData = palBlock.Pixels.AsSpan(i * palRect.Width, rect.Width).ToArray();
-
-                        palettes[i] = new FrameBufferObject(format, palRect, palData);
+                        palettes[i] = new FrameBufferObject(FrameBufferObjectFormat.Direct15, palRect, palData);
                     }
 
                     Palettes = new ReadOnlyCollection<FrameBufferObject>(palettes);
