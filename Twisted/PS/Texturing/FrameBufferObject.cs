@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Twisted.Extensions;
 
@@ -149,6 +150,15 @@ namespace Twisted.PS.Texturing
 
             var transparentColor = mode.HasFlagFast(TransparentColorMode.Color);
             var transparentBlack = mode.HasFlagFast(TransparentColorMode.Black);
+            var transparentMixed = false; // transparent 16-bit must become 32-bit
+
+            if (picture is { Format: FrameBufferObjectFormat.Direct15 or FrameBufferObjectFormat.Mixed })
+            {
+                if (transparentColor || transparentBlack)
+                {
+                    transparentMixed = picture.Pixels.Any(s => new TransparentColor(s).A);
+                }
+            }
 
             // TGA file header
 
@@ -170,7 +180,7 @@ namespace Twisted.PS.Texturing
 
             var colorMapLength = (short)(palette is null ? 0 : palette.RenderSize.Width);
 
-            var colorMapEntrySize = (byte)(palette is null ? 0 : 32); // TGA does 16-bit but since STP we must go 32-bit
+            var colorMapEntrySize = (byte)(palette is null ? 0 : 32); // TGA does 16-bit but since STP we must go 32-bit // TODO this can be generalized with transparentMixed
 
             const short xOrigin = 0;
             const short yOrigin = 0;
@@ -182,8 +192,8 @@ namespace Twisted.PS.Texturing
             {
                 FrameBufferObjectFormat.Indexed4 => (byte)8,
                 FrameBufferObjectFormat.Indexed8 => (byte)8,
-                FrameBufferObjectFormat.Mixed    => (byte)16,
-                FrameBufferObjectFormat.Direct15 => (byte)16,
+                FrameBufferObjectFormat.Mixed    => (byte)(transparentMixed ? 32 : 16),
+                FrameBufferObjectFormat.Direct15 => (byte)(transparentMixed ? 32 : 16),
                 FrameBufferObjectFormat.Direct24 => (byte)24,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
@@ -247,11 +257,23 @@ namespace Twisted.PS.Texturing
                     break;
                 case FrameBufferObjectFormat.Mixed:
                 case FrameBufferObjectFormat.Direct15:
-                    foreach (var p in picture.Pixels) // R5G5B5A1 -> B5G5R5A1
+                    if (transparentMixed) // BUG why is this hit by 8-bit????
                     {
-                        writer.Write((short)((p & 0x83E0) | ((p >> 10) & 0x1F) | (p << 10)), Endianness.LE);
+                        foreach (var p in picture.Pixels) // R5G5B5A1 -> B5G5R5A1
+                        {
+                            var color1 = new TransparentColor(p);
+                            var color2 = color1.ToColor(mode);
+                            var color3 = color2.ToArgb();
+                            writer.Write(color3, Endianness.LE);
+                        }
                     }
-
+                    else
+                    {
+                        foreach (var p in picture.Pixels) // R5G5B5A1 -> B5G5R5A1
+                        {
+                            writer.Write((short)((p & 0x83E0) | ((p >> 10) & 0x1F) | (p << 10)), Endianness.LE);
+                        }
+                    }
                     break;
                 case FrameBufferObjectFormat.Direct24:
                     for (var i = 0; i < picture.Pixels.Count; i += 3) // R8G8B8 -> B8G8R8
