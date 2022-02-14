@@ -162,7 +162,7 @@ namespace Twisted.PS.Polygons
 
             var palette = ReadTexturePalette(data, index + 2);
 
-            var texture = new Texture(uvs, page, palette);
+            var texture = new Texture(page, palette, uvs);
 
             return texture;
         }

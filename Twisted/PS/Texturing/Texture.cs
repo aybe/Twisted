@@ -6,7 +6,7 @@ namespace Twisted.PS.Texturing
     public readonly struct Texture
         // TODO texture window?
     {
-        public Texture(IReadOnlyList<TextureUV> uvs, TexturePage page, TexturePalette palette)
+        public Texture(TexturePage page, TexturePalette palette, IReadOnlyList<TextureUV> uvs)
         {
             if (uvs == null)
                 throw new ArgumentNullException(nameof(uvs));
@@ -14,15 +14,20 @@ namespace Twisted.PS.Texturing
             if (uvs.Count is not (3 or 4))
                 throw new ArgumentOutOfRangeException(nameof(uvs), "3 or 4 UVs expected.");
 
-            UVs     = uvs ?? throw new ArgumentNullException(nameof(uvs));
             Page    = page;
             Palette = palette;
+            UVs     = uvs ?? throw new ArgumentNullException(nameof(uvs));
         }
-
-        public IReadOnlyList<TextureUV> UVs { get; }
 
         public TexturePage Page { get; }
 
         public TexturePalette Palette { get; }
+
+        public IReadOnlyList<TextureUV> UVs { get; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Page)}: {Page}, {nameof(Palette)}: {Palette}";
+        }
     }
 }
