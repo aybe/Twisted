@@ -131,12 +131,12 @@ namespace Twisted.PS.Texturing
             {
                 if (palette is null)
                 {
-                    throw new ArgumentNullException(nameof(palette), $"Palette is required for {picture.Format} format.");
+                    throw new ArgumentNullException(nameof(palette), $"Palette is required for picture with format {picture.Format}.");
                 }
 
                 if (palette.Format is not FrameBufferObjectFormat.Direct15)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not in {FrameBufferObjectFormat.Direct15} format.");
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferObjectFormat.Direct15}.");
                 }
 
                 var colors = 1 << (picture.Format == FrameBufferObjectFormat.Indexed4 ? 4 : 8);
