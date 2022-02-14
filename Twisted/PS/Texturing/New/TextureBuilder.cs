@@ -27,7 +27,7 @@ namespace Twisted.PS.Texturing.New
             switch (key.PageFormat)
             {
                 case TexturePageFormat.Indexed4:
-                    var bytes = obj.Pixels as byte[] ?? obj.Pixels.ToArray();
+                    // var bytes = obj.Pixels as byte[] ?? obj.Pixels.ToArray();
                     var shorts = new short[obj.Pixels.Count / 2];
                     var index = pageY * 1024 + pageX;
 
