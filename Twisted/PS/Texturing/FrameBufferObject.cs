@@ -158,9 +158,9 @@ namespace Twisted.PS.Texturing
 
                 var colors = 1 << (picture.Format == FrameBufferObjectFormat.Indexed4 ? 4 : 8);
 
-                if (palette.RenderSize.Width != colors)
+                if (palette.RenderSize.Width != colors) // TGA is strict about that
                 {
-                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette color must be exactly {colors}.");
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette color count must be {colors}.");
                 }
             }
 
@@ -168,9 +168,9 @@ namespace Twisted.PS.Texturing
 
             var transparencyColor = mode.HasFlagFast(TransparentColorMode.Color);
             var transparencyBlack = mode.HasFlagFast(TransparentColorMode.Black);
-            var transparencyFinal = transparencyColor || transparencyBlack;
+            var transparency      = transparencyColor || transparencyBlack;
 
-            if (transparencyFinal)
+            if (transparency)
             {
                 var pixels = picture.Format switch
                 {
@@ -182,79 +182,60 @@ namespace Twisted.PS.Texturing
                     _                                => throw new NotSupportedException(picture.Format.ToString())
                 };
 
-                transparencyFinal = pixels?.Any(s => new TransparentColor(s).A) ?? false;
+                transparency = pixels?.Any(s => new TransparentColor(s).A) ?? false;
 
-                transparencyFinal |= transparencyBlack;
+                transparency |= transparencyBlack; // allow this as it's useful
             }
 
             // TGA file header
 
-            const byte idLength = 0;
-
-            var colorMapType = (byte)(palette is null ? 0 : 1);
-
             var imageType = picture.Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => (byte)1,
-                FrameBufferObjectFormat.Indexed8 => (byte)1,
-                FrameBufferObjectFormat.Mixed    => (byte)2,
-                FrameBufferObjectFormat.Direct15 => (byte)2,
-                FrameBufferObjectFormat.Direct24 => (byte)2,
+                FrameBufferObjectFormat.Indexed4 => 1,
+                FrameBufferObjectFormat.Indexed8 => 1,
+                FrameBufferObjectFormat.Mixed    => 2,
+                FrameBufferObjectFormat.Direct15 => 2,
+                FrameBufferObjectFormat.Direct24 => 2,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
-
-            const short firstEntryIndex = 0;
-
-            var colorMapLength = (short)(palette is null ? 0 : palette.RenderSize.Width);
-
-            var colorMapEntrySize = (byte)(palette is null ? 0 : transparencyFinal ? 32 : 16);
-
-            const short xOrigin = 0;
-            const short yOrigin = 0;
-
-            var imageWidth  = (short)picture.RenderSize.Width;
-            var imageHeight = (short)picture.RenderSize.Height;
 
             var pixelDepth = picture.Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => (byte)8,
-                FrameBufferObjectFormat.Indexed8 => (byte)8,
-                FrameBufferObjectFormat.Mixed    => (byte)(transparencyFinal ? 32 : 16),
-                FrameBufferObjectFormat.Direct15 => (byte)(transparencyFinal ? 32 : 16),
-                FrameBufferObjectFormat.Direct24 => (byte)24,
+                FrameBufferObjectFormat.Indexed4 => 8,
+                FrameBufferObjectFormat.Indexed8 => 8,
+                FrameBufferObjectFormat.Mixed    => transparency ? 32 : 16,
+                FrameBufferObjectFormat.Direct15 => transparency ? 32 : 16,
+                FrameBufferObjectFormat.Direct24 => 24,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
 
-            var imageDescriptor = (byte)0b00100000; // top/left
+            var imageDescriptor = 0b00100000; // top/left
 
-            if (picture is { Format: not FrameBufferObjectFormat.Direct24 })
+            if (picture.Format is not FrameBufferObjectFormat.Direct24 && transparency)
             {
-                if (transparencyFinal)
-                {
-                    imageDescriptor |= 0b00000011; // alpha channel
-                }
+                imageDescriptor |= 0b00000011; // alpha channel
             }
 
             using var writer = new BinaryWriter(stream, Encoding.Default, true);
 
-            writer.Write(idLength);
-            writer.Write(colorMapType);
-            writer.Write(imageType);
-            writer.Write(firstEntryIndex, Endianness.LE);
-            writer.Write(colorMapLength,  Endianness.LE);
-            writer.Write(colorMapEntrySize);
-            writer.Write(xOrigin,     Endianness.LE);
-            writer.Write(yOrigin,     Endianness.LE);
-            writer.Write(imageWidth,  Endianness.LE);
-            writer.Write(imageHeight, Endianness.LE);
-            writer.Write(pixelDepth);
-            writer.Write(imageDescriptor);
+            writer.Write((byte)0);                                                                // ID length
+            writer.Write((byte)(palette is null ? 0 : 1));                                        // Color map type
+            writer.Write((byte)imageType);                                                        //
+            writer.Write((short)0, Endianness.LE);                                                // First entry index
+            writer.Write((short)(palette is null ? 0 : palette.RenderSize.Width), Endianness.LE); // Color map length
+            writer.Write((byte)(palette is null ? 0 : transparency ? 32 : 16));                   // Color map entry size
+            writer.Write((short)0, Endianness.LE);                                                // X-origin
+            writer.Write((short)0, Endianness.LE);                                                // Y-origin
+            writer.Write((short)picture.RenderSize.Width, Endianness.LE);                         // Image width
+            writer.Write((short)picture.RenderSize.Height, Endianness.LE);                        // Image height
+            writer.Write((byte)pixelDepth);                                                       //
+            writer.Write((byte)imageDescriptor);                                                  //
 
             // Color map data
 
             if (palette is not null)
             {
-                if (transparencyFinal)
+                if (transparency) // we must use 32-bit palette entries
                 {
                     foreach (var p in palette.Pixels)
                     {
@@ -264,7 +245,7 @@ namespace Twisted.PS.Texturing
                         writer.Write(color3);
                     }
                 }
-                else
+                else // we can keep 16-bit palette entries
                 {
                     foreach (var p in palette.Pixels) // R5G5B5A1 -> B5G5R5A1
                     {
@@ -294,7 +275,7 @@ namespace Twisted.PS.Texturing
                     break;
                 case FrameBufferObjectFormat.Direct15:
                 case FrameBufferObjectFormat.Mixed:
-                    if (transparencyFinal)
+                    if (transparency)
                     {
                         foreach (var p in picture.Pixels)
                         {
