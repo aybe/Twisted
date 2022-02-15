@@ -82,10 +82,13 @@ namespace Twisted.Editor
                     {
                         var directoryName = Path.GetDirectoryName(asmDefPath);
 
-                        foreach (var element in root.Descendants(ns + "Compile"))
+                        foreach (var element in root.Descendants().Where(s => s.Name.LocalName is "Compile" or "None"))
                         {
-                            var include   = element.Attribute("Include");
-                            var substring = include!.Value[(directoryName!.Length + 1)..];
+                            var include = element.Attribute("Include");
+                            if (include is null) 
+                                continue;
+
+                            var substring = include.Value[(directoryName!.Length + 1)..];
 
                             element.Add(new XElement(ns + "Link", substring));
                         }
