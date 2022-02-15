@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Twisted.Extensions;
 using Twisted.PS;
+using Twisted.PS.Polygons;
+using Twisted.PS.Texturing.New;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -99,7 +101,7 @@ namespace Twisted
 
                     mf.sharedMesh     = mesh;
                     mc.sharedMesh     = mesh;
-                    mr.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer"));
+                    mr.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = GetTexture(list) };
                     pb.Polygons       = list.Select(s => string.Concat(s.GetObjectData().Select(t => t.ToString("X2")))).ToList();
                 }
             }
@@ -121,6 +123,21 @@ namespace Twisted
             }
 
             view.Frame(bounds, false);
+
+            // TODO this is the wrong place
+            
+            TextureBuilder.GetTexture(node.Polygons);
+        }
+
+        private static Texture GetTexture(IReadOnlyList<Polygon> polygons)
+        {
+            if (polygons == null)
+                throw new ArgumentNullException(nameof(polygons));
+
+            if (polygons.Count == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(polygons));
+
+            return null!;
         }
     }
 }
