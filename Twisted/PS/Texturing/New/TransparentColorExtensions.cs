@@ -6,6 +6,7 @@ namespace Twisted.PS.Texturing
     public static class TransparentColorExtensions
     {
         public static Color ToColor(this TransparentColor color, TransparentColorMode mode = TransparentColorMode.None)
+            // BUG this is conflicting with System.Drawing extension method
         {
             return color.ToColor32(mode);
         }

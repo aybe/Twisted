@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Twisted.PS.Texturing
 {
-    public readonly struct Texture
+    public readonly struct Texture // TODO rename because it's weird
         // TODO texture window?
     {
         public Texture(TexturePage page, TexturePalette palette, IReadOnlyList<TextureUV> uvs)
