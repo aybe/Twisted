@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -176,9 +176,24 @@ namespace Twisted.Editor
 
         private void OnViewNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
         {
-            var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
-
             var menu = new GenericMenu();
+
+            {
+                var content = EditorGUIUtility.TrTextContent("Refresh");
+
+                if (e.Node is DMDNode00FF node)
+                {
+                    menu.AddItem(content, false, s => OpenNode(s as DMDNode00FF), node);
+                }
+                else
+                {
+                    menu.AddDisabledItem(content);
+                }
+            }
+
+            menu.AddSeparator("/");
+
+            var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
 
             menu.AddItem(
                 EditorGUIUtility.TrTextContent("Hex Dump/Clipboard"),
