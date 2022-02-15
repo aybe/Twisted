@@ -1,5 +1,8 @@
-﻿namespace Twisted.PS.Texturing.New
+﻿using System;
+
+namespace Twisted.PS.Texturing.New
 {
+    [Obsolete]
     public enum TexturePageFormat
     {
         Indexed4,

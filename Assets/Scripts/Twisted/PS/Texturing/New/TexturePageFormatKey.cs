@@ -2,6 +2,7 @@
 
 namespace Twisted.PS.Texturing.New
 {
+    [Obsolete]
     public readonly struct TexturePageFormatKey : IEquatable<TexturePageFormatKey>
     {
         public TexturePage Page { get; }

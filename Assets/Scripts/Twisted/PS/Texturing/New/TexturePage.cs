@@ -2,6 +2,7 @@
 
 namespace Twisted.PS.Texturing.New
 {
+    [Obsolete]
     public readonly struct TexturePage : IComparable, IComparable<TexturePage>, IEquatable<TexturePage>
     {
         public int Index { get; }

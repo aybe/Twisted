@@ -1,4 +1,6 @@
-﻿#if UNITY_ASSERTIONS
+﻿
+using System;
+#if UNITY_ASSERTIONS
 using UnityEngine.Assertions;
 using AssertImpl = UnityEngine.Assertions.Assert;
 
@@ -9,6 +11,7 @@ using AssertImpl = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Twisted
 {
+    [Obsolete("Inline these members.")]
     internal static class Assert
     {
         public static void AreEqual<T>(T expected, T actual, string? message = null)
