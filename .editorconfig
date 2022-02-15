@@ -1,19 +1,25 @@
-﻿[*.{cs,vb}]
+[*.cs]
+dotnet_remove_unnecessary_suppression_exclusions = category: ReSharper
 
 # ReSharper properties
+resharper_blank_lines_after_block_statements = 0
 resharper_blank_lines_after_control_transfer_statements = 1
+resharper_blank_lines_after_multiline_statements = 0
 resharper_blank_lines_around_single_line_auto_property = 1
 resharper_blank_lines_before_block_statements = 1
 resharper_csharp_int_align_comments = true
 resharper_csharp_max_line_length = 180
 resharper_int_align_assignments = true
+resharper_int_align_fields = true
+resharper_int_align_invocations = false
 resharper_int_align_switch_expressions = true
 resharper_int_align_variables = true
+resharper_keep_existing_embedded_arrangement = false
+resharper_place_accessorholder_attribute_on_same_line = false
 resharper_place_field_attribute_on_same_line = false
 resharper_place_simple_embedded_statement_on_same_line = false
+resharper_xmldoc_max_line_length = 180
 
-[*.cs]
-dotnet_remove_unnecessary_suppression_exclusions = category: ReSharper
 
 # IDE0052: Remove unread private members
 dotnet_diagnostic.ide0052.severity = none

@@ -1,0 +1,20 @@
+{
+    "name": "Twisted",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "twisted",
+            "expression": "",
+            "define": "UNITY_DEBUG"
+        }
+    ],
+    "noEngineReferences": false
+}
