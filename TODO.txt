@@ -30,4 +30,6 @@ move stuff to binary extensions
 		see if twisted can have a dependency
 do texturing
 
-- project generation settings should have a global toggle
+- project generation settings should
+ - have a global toggle
+ - not rebuild structure for project asmdef, only packages
