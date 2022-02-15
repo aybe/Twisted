@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Twisted.Extensions;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Twisted.PS.Texturing
 {
@@ -34,7 +36,19 @@ namespace Twisted.PS.Texturing
         ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
         /// <seealso cref="RenderSize" />
+        [Obsolete("Use Rect instead.")]
         public Rectangle Rectangle { get; }
+
+        /// <summary>
+        ///     Gets the rectangle for this instance (see Remarks).
+        /// </summary>
+        /// <remarks>
+        ///     The horizontal axis is expressed as 16-bit units.
+        /// </remarks>
+        /// <seealso cref="RenderSize" />
+#pragma warning disable CS0618
+        public RectInt Rect => new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
+#pragma warning restore CS0618
 
         public IReadOnlyList<short> Pixels { get; }
 
@@ -119,6 +133,7 @@ namespace Twisted.PS.Texturing
             };
         }
 
+        [Obsolete("Use overload")]
         public static TransparentColor[] GetPalette(FrameBufferObject obj, int x, int y, int width)
         {
             if (obj is null)
@@ -365,6 +380,157 @@ namespace Twisted.PS.Texturing
             {
                 writer.Write(pixel, Endianness.LE);
             }
+        }
+
+        public static Texture2D GetTexture(
+            FrameBufferObjectFormat picFormat,
+            FrameBufferObject       picBuffer,
+            RectInt                 picRect,
+            RectInt?                palRect   = null,
+            FrameBufferObject?      palBuffer = null,
+            TransparentColorMode    mode      = TransparentColorMode.None)
+        {
+            if (picBuffer is null)
+                throw new ArgumentNullException(nameof(picBuffer));
+
+            if (!Enum.IsDefined(typeof(FrameBufferObjectFormat), picFormat))
+                throw new InvalidEnumArgumentException(nameof(picFormat), (int)picFormat, typeof(FrameBufferObjectFormat));
+
+            Texture2D palTex;
+
+            switch (picFormat)
+            {
+                case FrameBufferObjectFormat.Indexed4:
+                case FrameBufferObjectFormat.Indexed8:
+                    if (palBuffer is null)
+                        throw new ArgumentNullException(nameof(palBuffer));
+
+                    if (palBuffer.Format is not FrameBufferObjectFormat.Direct15)
+                        throw new ArgumentOutOfRangeException(nameof(palBuffer));
+
+                    if (palRect is null)
+                        throw new ArgumentNullException(nameof(palRect));
+
+                    palTex = GetTexture(palBuffer.Format, palBuffer, palRect.Value, null, null, mode);
+                    break;
+                case FrameBufferObjectFormat.Mixed:
+                case FrameBufferObjectFormat.Direct15:
+                case FrameBufferObjectFormat.Direct24:
+                    palTex = null;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null);
+            }
+
+            var texSize = new Vector2Int(GetWidth(picRect.width, picFormat), picRect.height);
+            var texData = new Color32[texSize.x * texSize.y];
+            var picPosX = picRect.position.x;
+            var picPosY = picRect.position.y;
+            var palTint = palTex != null ? palTex.GetPixels32() : Array.Empty<Color32>();
+
+            switch (picFormat)
+            {
+                case FrameBufferObjectFormat.Indexed4:
+                    for (var y = 0; y < texSize.y; y++)
+                    {
+                        for (var x = 0; x < texSize.x; x++)
+                        {
+                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x / 4;
+                            var j = picBuffer.Pixels[i];
+                            texData[(texSize.y - 1 - y) * texSize.x + x] = palTint[(j >> (x % 4 * 4)) & 0xF];
+                        }
+                    }
+                    break;
+                case FrameBufferObjectFormat.Indexed8:
+                    for (var y = 0; y < texSize.y; y++)
+                    {
+                        for (var x = 0; x < texSize.x; x++)
+                        {
+                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x / 2;
+                            var j = picBuffer.Pixels[i];
+                            texData[(texSize.y - 1 - y) * texSize.x + x] = palTint[(j >> (x % 2 * 8)) & 0xFF];
+                        }
+                    }
+                    break;
+                case FrameBufferObjectFormat.Direct15:
+                case FrameBufferObjectFormat.Mixed:
+
+                    for (var y = 0; y < texSize.y; y++)
+                    {
+                        for (var x = 0; x < texSize.x; x++)
+                        {
+                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x;
+                            var j = picBuffer.Pixels[i];
+                            texData[(texSize.y - 1 - y) * texSize.x + x] = new TransparentColor(j).ToColor32(mode);
+                        }
+                    }
+                    break;
+                case FrameBufferObjectFormat.Direct24:
+                    for (var y = 0; y < texSize.y; y++)
+                    {
+                        for (var x = 0; x < texSize.x; x++)
+                        {
+                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x * 3 / 2;
+                            var j = picBuffer.Pixels[i];
+                            var k = picBuffer.Pixels[i + 1];
+
+                            byte r, g, b;
+
+                            if (x % 2 == 0)
+                            {
+                                r = (byte)((j >> 0) & 0xFF);
+                                g = (byte)((j >> 8) & 0xFF);
+                                b = (byte)((k >> 0) & 0xFF);
+                            }
+                            else
+                            {
+                                r = (byte)((j >> 8) & 0xFF);
+                                g = (byte)((k >> 0) & 0xFF);
+                                b = (byte)((k >> 8) & 0xFF);
+                            }
+
+                            texData[(texSize.y - 1 - y) * texSize.x + x] = new Color32(r, g, b, byte.MaxValue);
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null);
+            }
+
+            if (palTex != null)
+            {
+                if (Application.isEditor)
+                {
+                    Object.DestroyImmediate(palTex);
+                }
+                else
+                {
+                    Object.Destroy(palTex);
+                }
+            }
+
+            var texture = new Texture2D(texSize.x, texSize.y);
+
+            texture.SetPixels32(texData);
+            texture.Apply();
+
+            return texture;
+        }
+
+        public static int GetWidth(int width, FrameBufferObjectFormat format) // TODO reuse this method
+        {
+            if (width <= 0)
+                throw new ArgumentOutOfRangeException(nameof(width));
+
+            return format switch
+            {
+                FrameBufferObjectFormat.Indexed4 => width * 4,
+                FrameBufferObjectFormat.Indexed8 => width * 2,
+                FrameBufferObjectFormat.Mixed    => width,
+                FrameBufferObjectFormat.Direct15 => width,
+                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            };
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Twisted.Extensions;
 using Twisted.PS.Polygons;
 using UnityEngine;
 
@@ -44,10 +43,13 @@ namespace Twisted.PS.Texturing.New
             }
 
             {
-                using var bin = File.Create(@"C:\temp\cars.bin");
-                using var tga = File.Create(@"C:\temp\cars.tga");
+                // TODO delete this frame buffer debugging
+                var temp = Directory.CreateDirectory(Path.Combine(Application.dataPath, "../.temp")).FullName;
+
+                using var bin = File.Create(Path.Combine(temp, "cars.bin"));
+                using var tga = File.Create(Path.Combine(temp, "cars.tga"));
                 FrameBufferObject.WriteRaw(bin, psx);
-                FrameBufferObject.WriteTga(tga, psx); // TODO delete this frame buffer debugging
+                FrameBufferObject.WriteTga(tga, psx);
             }
 
             // generate the set of textures for the set of polygons
@@ -58,41 +60,20 @@ namespace Twisted.PS.Texturing.New
             {
                 if (polygon is Polygon04010B0C pt)
                 {
-                    var texture = pt.Texture;
+                    Debug.Log(pt.Texture);
 
-                    Debug.WriteLine(texture.ToString());
-
-                    var image = GetTexture(psx, texture);
-
-                    // BUG there should be no unity here
-                    var pw      = image.PixelWidth;
-                    var ph      = image.PixelHeight;
-                    var surface = new Texture2D(pw, ph);
-                    var colors  = new Color32[pw * ph];
+                    var texture = GetTexture(psx, pt.Texture, TransparentColorMode.None);
 
                     // BUG why is black shown as white?
                     // BUG semi-transparency not set
-
-                    for (var y = 0; y < ph; y++) // stupid Unity is from bottom to top
-                    {
-                        for (var x = 0; x < pw; x++)
-                        {
-                            var i = image.PixelData[(ph - 1 - y) * pw + x];
-                            colors[y * pw + x] = i.ToColor32();
-                        }
-                    }
-                    surface.SetPixels32(colors);
-                    surface.Apply();
-
-                    File.WriteAllBytes(@"C:\temp\cars.png", surface.EncodeToPNG());
-                    // new TexturePageFormatKey(texture.Page, (TexturePageFormat)texture.Page.Colors); // BUG
-
+                    File.WriteAllBytes(@"C:\temp\cars.png", texture.EncodeToPNG());
+                    // BUG new TexturePageFormatKey(texture.Page, (TexturePageFormat)texture.Page.Colors);
                     break;
                 }
             }
         }
 
-        public static TextureImage GetTexture(FrameBufferObject obj, Texture texture)
+        public static Texture2D GetTexture(FrameBufferObject obj, Texture tp, TransparentColorMode mode)
             // TODO wrong name // TODO move
         {
             if (obj is null)
@@ -101,62 +82,43 @@ namespace Twisted.PS.Texturing.New
             if (obj.Format is not FrameBufferObjectFormat.Direct15 && obj.Rectangle.Width is not 1024 && obj.Rectangle.Height is not 512)
                 throw new ArgumentOutOfRangeException(nameof(obj));
 
-            if (EqualityComparer<Texture>.Default.Equals(texture, default))
-                throw new ArgumentOutOfRangeException(nameof(texture));
+            if (EqualityComparer<Texture>.Default.Equals(tp, default))
+                throw new ArgumentOutOfRangeException(nameof(tp));
 
-            var tpc = texture.Page.Colors;
-            var tpx = texture.Palette.X;
-            var tpy = texture.Palette.Y;
+            var colors = tp.Page.Colors;
 
-            var pixels = new TransparentColor[256 * 256];
-            var offset = 0;
-            var extent = tpc switch
+            var format = colors switch
+            {
+                TexturePageColors.FourBits    => FrameBufferObjectFormat.Indexed4,
+                TexturePageColors.EightBits   => FrameBufferObjectFormat.Indexed8,
+                TexturePageColors.FifteenBits => FrameBufferObjectFormat.Direct15,
+                TexturePageColors.Reserved    => throw new NotSupportedException(colors.ToString()),
+                _                             => throw new NotSupportedException(colors.ToString())
+            };
+
+            var pageWidth = colors switch
             {
                 TexturePageColors.FourBits    => 64,
                 TexturePageColors.EightBits   => 128,
                 TexturePageColors.FifteenBits => 256,
-                TexturePageColors.Reserved    => throw new NotSupportedException(tpc.ToString()),
-                _                             => throw new NotSupportedException(tpc.ToString())
-            };
-            var colors = tpc switch
-            {
-                TexturePageColors.FourBits    => FrameBufferObject.GetPalette(obj, tpx, tpy, 16),
-                TexturePageColors.EightBits   => FrameBufferObject.GetPalette(obj, tpx, tpy, 256),
-                TexturePageColors.FifteenBits => Array.Empty<TransparentColor>(),
-                TexturePageColors.Reserved    => throw new NotSupportedException(tpc.ToString()),
-                _                             => throw new NotSupportedException(tpc.ToString())
+                TexturePageColors.Reserved    => throw new NotSupportedException(colors.ToString()),
+                _                             => throw new NotSupportedException(colors.ToString())
             };
 
-            for (var y = 0; y < 256; y++)
+            var paletteWidth = colors switch
             {
-                for (var x = 0; x < extent; x++)
-                {
-                    var s = obj.Pixels[(texture.Page.Y + y) * 1024 + texture.Page.X + x];
+                TexturePageColors.FourBits    => 16,
+                TexturePageColors.EightBits   => 256,
+                TexturePageColors.FifteenBits => 0,
+                TexturePageColors.Reserved    => throw new NotSupportedException(colors.ToString()),
+                _                             => throw new NotSupportedException(colors.ToString())
+            };
 
-                    switch (tpc)
-                    {
-                        case TexturePageColors.FourBits:
-                            pixels[offset++] = colors[s.GetNibble(0)];
-                            pixels[offset++] = colors[s.GetNibble(1)];
-                            pixels[offset++] = colors[s.GetNibble(2)];
-                            pixels[offset++] = colors[s.GetNibble(3)];
-                            break;
-                        case TexturePageColors.EightBits:
-                            pixels[offset++] = colors[s.GetByte(0)];
-                            pixels[offset++] = colors[s.GetByte(1)];
-                            break;
-                        case TexturePageColors.FifteenBits:
-                            pixels[offset++] = new TransparentColor(obj.Pixels[y * 1024 + x]);
-                            break;
-                        case TexturePageColors.Reserved:
-                            throw new NotSupportedException(tpc.ToString());
-                        default:
-                            throw new NotSupportedException(tpc.ToString());
-                    }
-                }
-            }
+            var picRect = new RectInt(tp.Page.X, tp.Page.Y, pageWidth, 256);
+            var palRect = new RectInt(tp.Palette.X, tp.Palette.Y, paletteWidth, 1);
+            var texture = FrameBufferObject.GetTexture(format, obj, picRect, palRect, obj, mode);
 
-            return new TextureImage(256, 256, pixels);
+            return texture;
         }
     }
 }
