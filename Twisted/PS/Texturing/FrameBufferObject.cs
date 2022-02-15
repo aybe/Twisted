@@ -119,6 +119,33 @@ namespace Twisted.PS.Texturing
             };
         }
 
+        public static TransparentColor[] GetPalette(FrameBufferObject obj, int x, int y, int width)
+        {
+            if (obj is null)
+                throw new ArgumentNullException(nameof(obj));
+
+            if (obj.Format is not FrameBufferObjectFormat.Direct15)
+                throw new ArgumentOutOfRangeException(nameof(obj));
+
+            if (x < 0 || x >= obj.Rectangle.Width)
+                throw new ArgumentOutOfRangeException(nameof(x));
+
+            if (y < 0 || y >= obj.Rectangle.Height)
+                throw new ArgumentOutOfRangeException(nameof(y));
+
+            if (width <= 0 || width + x >= obj.Rectangle.Width)
+                throw new ArgumentOutOfRangeException(nameof(width));
+
+            var colors = new TransparentColor[width];
+
+            for (var i = 0; i < colors.Length; i++)
+            {
+                colors[i] = new TransparentColor(obj.Pixels[y * obj.Rectangle.Width + x + i]);
+            }
+
+            return colors;
+        }
+
         public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, TransparentColorMode mode = TransparentColorMode.None)
             // http://www.paulbourke.net/dataformats/tga/
         {
@@ -309,6 +336,34 @@ namespace Twisted.PS.Texturing
                     break;
                 default:
                     throw new NotSupportedException(picture.Format.ToString());
+            }
+        }
+
+        /// <summary>
+        ///     Writes a frame buffer object instance to a stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The destination stream.
+        /// </param>
+        /// <param name="obj">
+        ///     The frame buffer object.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="stream" /> or <paramref name="obj" /> is <c>null</c>.
+        /// </exception>
+        public static void WriteRaw(Stream stream, FrameBufferObject obj)
+        {
+            if (stream is null)
+                throw new ArgumentNullException(nameof(stream));
+
+            if (obj is null)
+                throw new ArgumentNullException(nameof(obj));
+
+            using var writer = new BinaryWriter(stream, Encoding.Default, true);
+
+            foreach (var pixel in obj.Pixels)
+            {
+                writer.Write(pixel, Endianness.LE);
             }
         }
     }
