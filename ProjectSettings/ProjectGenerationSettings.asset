@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5658e55f15090a42968e392e834332a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Nullable: 1
-  NullableWarningsDisabled: 1
-  PreserveProjectStructure: 1
-  RemoveEmptyRootNamespace: 1
+  Nullable: 0
+  NullableWarningsDisabled: 0
+  PreserveProjectStructure: 0
+  RemoveEmptyRootNamespace: 0

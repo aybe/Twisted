@@ -29,3 +29,5 @@ move stuff to binary extensions
 	add package to unity
 		see if twisted can have a dependency
 do texturing
+
+- project generation settings should have a global toggle
