@@ -1,0 +1,31 @@
+- decode polygons
+ - implement frame buffer
+ - implement texturing
+
+- on restored tree view selection, the scene is not updated
+- a way to check for valid normals
+ - read whole file
+ - check that indices don't cross node
+
+ - adjust polygon position in preview
+
+ - there is an alpha mask for 16-bit TIMs
+
+ when loading a DMD, associated TMS should be loaded
+
+when generating a model, TMS should be passed
+
+generate the texture for the model with N polygons:
+	for each textured polygon, generate a texture
+			texture page, format, palette, etc
+	pack these textures into an atlas
+		there will be duplicates so use a hash set
+
+// BUG binary writer extensions: WriteEnum, overloads for byte with endianness
+
+move stuff to psx lib
+move stuff to unity lib
+move stuff to binary extensions
+	add package to unity
+		see if twisted can have a dependency
+do texturing
