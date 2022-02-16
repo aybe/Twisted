@@ -12,7 +12,7 @@ namespace Twisted.PS.Texturing
         // all existing scenarios covered: with or without palettes and/or picture (tested on +10K files)
     {
         public Tim(Stream stream)
-            // applying the FrameBufferObject paradigm everywhere possible
+            // applying the FrameBuffer paradigm everywhere possible
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
@@ -36,19 +36,19 @@ namespace Twisted.PS.Texturing
                 {
                     var rect = palBlock.Rectangle;
 
-                    var colors   = FrameBufferObject.GetColorCount(Format);
+                    var colors   = FrameBuffer.GetColorCount(Format);
                     var columns  = rect.Width / colors;
-                    var palettes = new FrameBufferObject[columns * rect.Height];
+                    var palettes = new FrameBuffer[columns * rect.Height];
 
                     for (var i = 0; i < palettes.Length; i++)
                     {
                         var palRect = new Rectangle(rect.X + i % columns * colors, rect.Y + i / columns, colors, 1);
                         var palData = palBlock.Pixels.AsSpan(i * palRect.Width, colors).ToArray();
 
-                        palettes[i] = new FrameBufferObject(FrameBufferObjectFormat.Direct15, palRect, palData);
+                        palettes[i] = new FrameBuffer(FrameBufferObjectFormat.Direct15, palRect, palData);
                     }
 
-                    Palettes = new ReadOnlyCollection<FrameBufferObject>(palettes);
+                    Palettes = new ReadOnlyCollection<FrameBuffer>(palettes);
                 }
             }
 
@@ -59,14 +59,14 @@ namespace Twisted.PS.Texturing
 
             var picData = picBlock.Pixels.AsSpan(0, picRect.Width * picRect.Height).ToArray();
 
-            Picture = new FrameBufferObject(Format, picRect, picData);
+            Picture = new FrameBuffer(Format, picRect, picData);
         }
 
         public FrameBufferObjectFormat Format { get; }
 
-        public IReadOnlyList<FrameBufferObject>? Palettes { get; }
+        public IReadOnlyList<FrameBuffer>? Palettes { get; }
 
-        public FrameBufferObject? Picture { get; }
+        public FrameBuffer? Picture { get; }
 
         private static bool TryReadBlock(BinaryReader reader, out TimBlock result)
             // some geniuses out there thought it'd be nice to have incomplete blocks

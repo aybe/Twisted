@@ -14,9 +14,9 @@ namespace Twisted.PS.Texturing
     /// <summary>
     ///     Base class for a frame buffer object.
     /// </summary>
-    public sealed class FrameBufferObject
+    public sealed class FrameBuffer
     {
-        public FrameBufferObject(FrameBufferObjectFormat format, Rectangle rectangle, IReadOnlyList<short> pixels)
+        public FrameBuffer(FrameBufferObjectFormat format, Rectangle rectangle, IReadOnlyList<short> pixels)
         {
             Format    = format;
             Rectangle = rectangle;
@@ -79,24 +79,24 @@ namespace Twisted.PS.Texturing
             }
         }
 
-        public void Blit(FrameBufferObject source)
+        public void Blit(FrameBuffer buffer)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            if (buffer == null)
+                throw new ArgumentNullException(nameof(buffer));
 
             if (Pixels is not short[] pixels)
                 throw new InvalidOperationException("This instance's pixel data cannot be written to.");
 
-            var x = source.Rectangle.Location.X;
-            var y = source.Rectangle.Location.Y;
-            var w = source.Rectangle.Size.Width;
-            var h = source.Rectangle.Size.Height;
+            var x = buffer.Rectangle.Location.X;
+            var y = buffer.Rectangle.Location.Y;
+            var w = buffer.Rectangle.Size.Width;
+            var h = buffer.Rectangle.Size.Height;
 
             for (var i = 0; i < h; i++)
             {
                 for (var j = 0; j < w; j++)
                 {
-                    pixels[(y + i) * 1024 + x + j] = source.Pixels[i * w + j];
+                    pixels[(y + i) * 1024 + x + j] = buffer.Pixels[i * w + j];
                 }
             }
         }
@@ -112,9 +112,9 @@ namespace Twisted.PS.Texturing
         /// <returns>
         ///     The created frame buffer object.
         /// </returns>
-        public static FrameBufferObject CreatePlayStationVideoMemory()
+        public static FrameBuffer CreatePlayStationVideoMemory()
         {
-            return new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
+            return new FrameBuffer(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
         }
 
         public static int GetColorCount(FrameBufferObjectFormat format)
@@ -134,34 +134,34 @@ namespace Twisted.PS.Texturing
         }
 
         [Obsolete("Use overload")]
-        public static TransparentColor[] GetPalette(FrameBufferObject obj, int x, int y, int width)
+        public static TransparentColor[] GetPalette(FrameBuffer buffer, int x, int y, int width)
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
+            if (buffer is null)
+                throw new ArgumentNullException(nameof(buffer));
 
-            if (obj.Format is not FrameBufferObjectFormat.Direct15)
-                throw new ArgumentOutOfRangeException(nameof(obj));
+            if (buffer.Format is not FrameBufferObjectFormat.Direct15)
+                throw new ArgumentOutOfRangeException(nameof(buffer));
 
-            if (x < 0 || x >= obj.Rectangle.Width)
+            if (x < 0 || x >= buffer.Rectangle.Width)
                 throw new ArgumentOutOfRangeException(nameof(x));
 
-            if (y < 0 || y >= obj.Rectangle.Height)
+            if (y < 0 || y >= buffer.Rectangle.Height)
                 throw new ArgumentOutOfRangeException(nameof(y));
 
-            if (width <= 0 || width + x >= obj.Rectangle.Width)
+            if (width <= 0 || width + x >= buffer.Rectangle.Width)
                 throw new ArgumentOutOfRangeException(nameof(width));
 
             var colors = new TransparentColor[width];
 
             for (var i = 0; i < colors.Length; i++)
             {
-                colors[i] = new TransparentColor(obj.Pixels[y * obj.Rectangle.Width + x + i]);
+                colors[i] = new TransparentColor(buffer.Pixels[y * buffer.Rectangle.Width + x + i]);
             }
 
             return colors;
         }
 
-        public static void WriteTga(Stream stream, FrameBufferObject picture, FrameBufferObject? palette = null, TransparentColorMode mode = TransparentColorMode.None)
+        public static void WriteTga(Stream stream, FrameBuffer picture, FrameBuffer? palette = null, TransparentColorMode mode = TransparentColorMode.None)
             // http://www.paulbourke.net/dataformats/tga/
         {
             if (stream is null)
@@ -360,23 +360,23 @@ namespace Twisted.PS.Texturing
         /// <param name="stream">
         ///     The destination stream.
         /// </param>
-        /// <param name="obj">
+        /// <param name="buffer">
         ///     The frame buffer object.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        ///     <paramref name="stream" /> or <paramref name="obj" /> is <c>null</c>.
+        ///     <paramref name="stream" /> or <paramref name="buffer" /> is <c>null</c>.
         /// </exception>
-        public static void WriteRaw(Stream stream, FrameBufferObject obj)
+        public static void WriteRaw(Stream stream, FrameBuffer buffer)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
 
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
+            if (buffer is null)
+                throw new ArgumentNullException(nameof(buffer));
 
             using var writer = new BinaryWriter(stream, Encoding.Default, true);
 
-            foreach (var pixel in obj.Pixels)
+            foreach (var pixel in buffer.Pixels)
             {
                 writer.Write(pixel, Endianness.LE);
             }
@@ -384,10 +384,10 @@ namespace Twisted.PS.Texturing
 
         public static Texture2D GetTexture(
             FrameBufferObjectFormat picFormat,
-            FrameBufferObject       picBuffer,
+            FrameBuffer             picBuffer,
             RectInt                 picRect,
             RectInt?                palRect   = null,
-            FrameBufferObject?      palBuffer = null,
+            FrameBuffer?            palBuffer = null,
             TransparentColorMode    mode      = TransparentColorMode.None)
         {
             if (picBuffer is null)

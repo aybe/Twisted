@@ -24,7 +24,7 @@ namespace Twisted.PS.Texturing.New
 
             var tms = new Tms(str); // TODO extract method, pass as param
 
-            var psx = FrameBufferObject.CreatePlayStationVideoMemory();
+            var psx = FrameBuffer.CreatePlayStationVideoMemory();
 
             foreach (var tim in tms)
             {
@@ -48,8 +48,8 @@ namespace Twisted.PS.Texturing.New
 
                 using var bin = File.Create(Path.Combine(temp, "cars.bin"));
                 using var tga = File.Create(Path.Combine(temp, "cars.tga"));
-                FrameBufferObject.WriteRaw(bin, psx);
-                FrameBufferObject.WriteTga(tga, psx);
+                FrameBuffer.WriteRaw(bin, psx);
+                FrameBuffer.WriteTga(tga, psx);
             }
 
             // generate the set of textures for the set of polygons
@@ -73,14 +73,14 @@ namespace Twisted.PS.Texturing.New
             }
         }
 
-        public static Texture2D GetTexture(FrameBufferObject obj, TextureInfo tp, TransparentColorMode mode)
+        public static Texture2D GetTexture(FrameBuffer buffer, TextureInfo tp, TransparentColorMode mode)
             // TODO wrong name // TODO move
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
+            if (buffer is null)
+                throw new ArgumentNullException(nameof(buffer));
 
-            if (obj.Format is not FrameBufferObjectFormat.Direct15 && obj.Rectangle.Width is not 1024 && obj.Rectangle.Height is not 512)
-                throw new ArgumentOutOfRangeException(nameof(obj));
+            if (buffer.Format is not FrameBufferObjectFormat.Direct15 && buffer.Rectangle.Width is not 1024 && buffer.Rectangle.Height is not 512)
+                throw new ArgumentOutOfRangeException(nameof(buffer));
 
             if (EqualityComparer<TextureInfo>.Default.Equals(tp, default))
                 throw new ArgumentOutOfRangeException(nameof(tp));
@@ -116,7 +116,7 @@ namespace Twisted.PS.Texturing.New
 
             var picRect = new RectInt(tp.Page.X, tp.Page.Y, pageWidth, 256);
             var palRect = new RectInt(tp.Palette.X, tp.Palette.Y, paletteWidth, 1);
-            var texture = FrameBufferObject.GetTexture(format, obj, picRect, palRect, obj, mode);
+            var texture = FrameBuffer.GetTexture(format, buffer, picRect, palRect, buffer, mode);
 
             return texture;
         }

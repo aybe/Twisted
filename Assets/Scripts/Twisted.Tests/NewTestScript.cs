@@ -72,9 +72,9 @@ namespace Twisted.Tests
 
         private static void GetTexture(string path, FrameBufferObjectFormat fmt, RectInt picRect, RectInt? palRect, TransparentColorMode mode)
         {
-            var fbo = GetFrameBufferObject(path);
+            var buffer = GetFrameBuffer(path);
 
-            var texture = FrameBufferObject.GetTexture(fmt, fbo, picRect, palRect, fbo, mode);
+            var texture = FrameBuffer.GetTexture(fmt, buffer, picRect, palRect, buffer, mode);
 
             path = Path.Combine(
                 Path.GetDirectoryName(path)!,
@@ -89,7 +89,7 @@ namespace Twisted.Tests
             Object.DestroyImmediate(texture);
         }
 
-        private static FrameBufferObject GetFrameBufferObject(string path)
+        private static FrameBuffer GetFrameBuffer(string path)
         {
             var bytes = File.ReadAllBytes(path);
 
@@ -99,7 +99,7 @@ namespace Twisted.Tests
 
             var pixels = span.ToArray();
 
-            var obj = new FrameBufferObject(FrameBufferObjectFormat.Direct15, new Rectangle(Point.Empty, new Size(1024, 512)), pixels);
+            var obj = new FrameBuffer(FrameBufferObjectFormat.Direct15, new Rectangle(Point.Empty, new Size(1024, 512)), pixels);
 
             return obj;
         }
