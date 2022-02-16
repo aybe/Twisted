@@ -79,7 +79,7 @@ namespace Twisted.PS.Texturing.New
             if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            if (buffer.Format is not FrameBufferObjectFormat.Direct15 && buffer.Rectangle.Width is not 1024 && buffer.Rectangle.Height is not 512)
+            if (buffer.Format is not FrameBufferFormat.Direct15 && buffer.Rectangle.Width is not 1024 && buffer.Rectangle.Height is not 512)
                 throw new ArgumentOutOfRangeException(nameof(buffer));
 
             if (EqualityComparer<TextureInfo>.Default.Equals(tp, default))
@@ -89,9 +89,9 @@ namespace Twisted.PS.Texturing.New
 
             var format = colors switch
             {
-                TexturePageColors.FourBits    => FrameBufferObjectFormat.Indexed4,
-                TexturePageColors.EightBits   => FrameBufferObjectFormat.Indexed8,
-                TexturePageColors.FifteenBits => FrameBufferObjectFormat.Direct15,
+                TexturePageColors.FourBits    => FrameBufferFormat.Indexed4,
+                TexturePageColors.EightBits   => FrameBufferFormat.Indexed8,
+                TexturePageColors.FifteenBits => FrameBufferFormat.Direct15,
                 TexturePageColors.Reserved    => throw new NotSupportedException(colors.ToString()),
                 _                             => throw new NotSupportedException(colors.ToString())
             };

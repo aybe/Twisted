@@ -16,7 +16,7 @@ namespace Twisted.PS.Texturing
     /// </summary>
     public sealed class FrameBuffer
     {
-        public FrameBuffer(FrameBufferObjectFormat format, Rectangle rectangle, IReadOnlyList<short> pixels)
+        public FrameBuffer(FrameBufferFormat format, Rectangle rectangle, IReadOnlyList<short> pixels)
         {
             Format    = format;
             Rectangle = rectangle;
@@ -27,7 +27,7 @@ namespace Twisted.PS.Texturing
         ///     Gets the pixel format for this instance.
         /// </summary>
         /// <seealso cref="Rectangle" />
-        public FrameBufferObjectFormat Format { get; }
+        public FrameBufferFormat Format { get; }
 
         /// <summary>
         ///     Gets the rectangle for this instance (see Remarks).
@@ -67,11 +67,11 @@ namespace Twisted.PS.Texturing
 
                 width = Format switch
                 {
-                    FrameBufferObjectFormat.Indexed4 => width * 4,
-                    FrameBufferObjectFormat.Indexed8 => width * 2,
-                    FrameBufferObjectFormat.Mixed    => width, // special case, 16-bit page with with mixed content
-                    FrameBufferObjectFormat.Direct15 => width,
-                    FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                    FrameBufferFormat.Indexed4 => width * 4,
+                    FrameBufferFormat.Indexed8 => width * 2,
+                    FrameBufferFormat.Mixed    => width, // special case, 16-bit page with with mixed content
+                    FrameBufferFormat.Direct15 => width,
+                    FrameBufferFormat.Direct24 => width * 2 / 3,
                     _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
                 };
 
@@ -114,21 +114,21 @@ namespace Twisted.PS.Texturing
         /// </returns>
         public static FrameBuffer CreatePlayStationVideoMemory()
         {
-            return new FrameBuffer(FrameBufferObjectFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
+            return new FrameBuffer(FrameBufferFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
         }
 
-        public static int GetColorCount(FrameBufferObjectFormat format)
+        public static int GetColorCount(FrameBufferFormat format)
         {
-            if (!Enum.IsDefined(typeof(FrameBufferObjectFormat), format))
-                throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(FrameBufferObjectFormat));
+            if (!Enum.IsDefined(typeof(FrameBufferFormat), format))
+                throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(FrameBufferFormat));
 
             return format switch
             {
-                FrameBufferObjectFormat.Indexed4 => 16,
-                FrameBufferObjectFormat.Indexed8 => 256,
-                FrameBufferObjectFormat.Mixed    => 65536,
-                FrameBufferObjectFormat.Direct15 => 65536,
-                FrameBufferObjectFormat.Direct24 => 16777216,
+                FrameBufferFormat.Indexed4 => 16,
+                FrameBufferFormat.Indexed8 => 256,
+                FrameBufferFormat.Mixed    => 65536,
+                FrameBufferFormat.Direct15 => 65536,
+                FrameBufferFormat.Direct24 => 16777216,
                 _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
             };
         }
@@ -139,7 +139,7 @@ namespace Twisted.PS.Texturing
             if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            if (buffer.Format is not FrameBufferObjectFormat.Direct15)
+            if (buffer.Format is not FrameBufferFormat.Direct15)
                 throw new ArgumentOutOfRangeException(nameof(buffer));
 
             if (x < 0 || x >= buffer.Rectangle.Width)
@@ -174,11 +174,11 @@ namespace Twisted.PS.Texturing
 
             switch (picture.Format)
             {
-                case FrameBufferObjectFormat.Indexed4:
-                case FrameBufferObjectFormat.Indexed8:
-                case FrameBufferObjectFormat.Direct15:
-                case FrameBufferObjectFormat.Direct24:
-                case FrameBufferObjectFormat.Mixed:
+                case FrameBufferFormat.Indexed4:
+                case FrameBufferFormat.Indexed8:
+                case FrameBufferFormat.Direct15:
+                case FrameBufferFormat.Direct24:
+                case FrameBufferFormat.Mixed:
                     break;
                 default:
                     throw new NotSupportedException(picture.Format.ToString());
@@ -186,19 +186,19 @@ namespace Twisted.PS.Texturing
 
             // check that picture, if indexed, has a palette with correct format and color count
 
-            if (picture.Format is FrameBufferObjectFormat.Indexed4 or FrameBufferObjectFormat.Indexed8)
+            if (picture.Format is FrameBufferFormat.Indexed4 or FrameBufferFormat.Indexed8)
             {
                 if (palette is null)
                 {
                     throw new ArgumentNullException(nameof(palette), $"Palette is required for picture with format {picture.Format}.");
                 }
 
-                if (palette.Format is not FrameBufferObjectFormat.Direct15)
+                if (palette.Format is not FrameBufferFormat.Direct15)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferObjectFormat.Direct15}.");
+                    throw new ArgumentOutOfRangeException(nameof(palette), $"Palette format is not {FrameBufferFormat.Direct15}.");
                 }
 
-                var colors = 1 << (picture.Format == FrameBufferObjectFormat.Indexed4 ? 4 : 8);
+                var colors = 1 << (picture.Format == FrameBufferFormat.Indexed4 ? 4 : 8);
 
                 if (palette.RenderSize.Width != colors) // TGA is strict about that
                 {
@@ -216,11 +216,11 @@ namespace Twisted.PS.Texturing
             {
                 var pixels = picture.Format switch
                 {
-                    FrameBufferObjectFormat.Indexed4 => palette?.Pixels ?? throw new ArgumentNullException(nameof(palette)),
-                    FrameBufferObjectFormat.Indexed8 => palette?.Pixels ?? throw new ArgumentNullException(nameof(palette)),
-                    FrameBufferObjectFormat.Direct15 => picture.Pixels,
-                    FrameBufferObjectFormat.Mixed    => picture.Pixels,
-                    FrameBufferObjectFormat.Direct24 => null,
+                    FrameBufferFormat.Indexed4 => palette?.Pixels ?? throw new ArgumentNullException(nameof(palette)),
+                    FrameBufferFormat.Indexed8 => palette?.Pixels ?? throw new ArgumentNullException(nameof(palette)),
+                    FrameBufferFormat.Direct15 => picture.Pixels,
+                    FrameBufferFormat.Mixed    => picture.Pixels,
+                    FrameBufferFormat.Direct24 => null,
                     _                                => throw new NotSupportedException(picture.Format.ToString())
                 };
 
@@ -233,27 +233,27 @@ namespace Twisted.PS.Texturing
 
             var imageType = picture.Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => 1,
-                FrameBufferObjectFormat.Indexed8 => 1,
-                FrameBufferObjectFormat.Mixed    => 2,
-                FrameBufferObjectFormat.Direct15 => 2,
-                FrameBufferObjectFormat.Direct24 => 2,
+                FrameBufferFormat.Indexed4 => 1,
+                FrameBufferFormat.Indexed8 => 1,
+                FrameBufferFormat.Mixed    => 2,
+                FrameBufferFormat.Direct15 => 2,
+                FrameBufferFormat.Direct24 => 2,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
 
             var pixelDepth = picture.Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => 8,
-                FrameBufferObjectFormat.Indexed8 => 8,
-                FrameBufferObjectFormat.Mixed    => transparency ? 32 : 16,
-                FrameBufferObjectFormat.Direct15 => transparency ? 32 : 16,
-                FrameBufferObjectFormat.Direct24 => 24,
+                FrameBufferFormat.Indexed4 => 8,
+                FrameBufferFormat.Indexed8 => 8,
+                FrameBufferFormat.Mixed    => transparency ? 32 : 16,
+                FrameBufferFormat.Direct15 => transparency ? 32 : 16,
+                FrameBufferFormat.Direct24 => 24,
                 _                                => throw new NotSupportedException(picture.Format.ToString())
             };
 
             var imageDescriptor = 0b00100000; // top/left
 
-            if (picture.Format is not FrameBufferObjectFormat.Direct24 && transparency)
+            if (picture.Format is not FrameBufferFormat.Direct24 && transparency)
             {
                 imageDescriptor |= 0b00000011; // alpha channel
             }
@@ -300,7 +300,7 @@ namespace Twisted.PS.Texturing
 
             switch (picture.Format)
             {
-                case FrameBufferObjectFormat.Indexed4:
+                case FrameBufferFormat.Indexed4:
                     foreach (var p in picture.Pixels)
                     {
                         writer.Write((byte)((p >> 00) & 0xF));
@@ -309,14 +309,14 @@ namespace Twisted.PS.Texturing
                         writer.Write((byte)((p >> 12) & 0xF));
                     }
                     break;
-                case FrameBufferObjectFormat.Indexed8:
+                case FrameBufferFormat.Indexed8:
                     foreach (var p in picture.Pixels)
                     {
                         writer.Write(p, Endianness.LE);
                     }
                     break;
-                case FrameBufferObjectFormat.Direct15:
-                case FrameBufferObjectFormat.Mixed:
+                case FrameBufferFormat.Direct15:
+                case FrameBufferFormat.Mixed:
                     if (transparency)
                     {
                         foreach (var p in picture.Pixels)
@@ -335,7 +335,7 @@ namespace Twisted.PS.Texturing
                         }
                     }
                     break;
-                case FrameBufferObjectFormat.Direct24:
+                case FrameBufferFormat.Direct24:
                     for (var i = 0; i < picture.Pixels.Count; i += 3) // R8G8B8 -> B8G8R8
                     {
                         var p1 = picture.Pixels[i + 0];
@@ -383,7 +383,7 @@ namespace Twisted.PS.Texturing
         }
 
         public static Texture2D GetTexture(
-            FrameBufferObjectFormat picFormat,
+            FrameBufferFormat picFormat,
             FrameBuffer             picBuffer,
             RectInt                 picRect,
             RectInt?                palRect   = null,
@@ -393,19 +393,19 @@ namespace Twisted.PS.Texturing
             if (picBuffer is null)
                 throw new ArgumentNullException(nameof(picBuffer));
 
-            if (!Enum.IsDefined(typeof(FrameBufferObjectFormat), picFormat))
-                throw new InvalidEnumArgumentException(nameof(picFormat), (int)picFormat, typeof(FrameBufferObjectFormat));
+            if (!Enum.IsDefined(typeof(FrameBufferFormat), picFormat))
+                throw new InvalidEnumArgumentException(nameof(picFormat), (int)picFormat, typeof(FrameBufferFormat));
 
             Texture2D palTex;
 
             switch (picFormat)
             {
-                case FrameBufferObjectFormat.Indexed4:
-                case FrameBufferObjectFormat.Indexed8:
+                case FrameBufferFormat.Indexed4:
+                case FrameBufferFormat.Indexed8:
                     if (palBuffer is null)
                         throw new ArgumentNullException(nameof(palBuffer));
 
-                    if (palBuffer.Format is not FrameBufferObjectFormat.Direct15)
+                    if (palBuffer.Format is not FrameBufferFormat.Direct15)
                         throw new ArgumentOutOfRangeException(nameof(palBuffer));
 
                     if (palRect is null)
@@ -413,9 +413,9 @@ namespace Twisted.PS.Texturing
 
                     palTex = GetTexture(palBuffer.Format, palBuffer, palRect.Value, null, null, mode);
                     break;
-                case FrameBufferObjectFormat.Mixed:
-                case FrameBufferObjectFormat.Direct15:
-                case FrameBufferObjectFormat.Direct24:
+                case FrameBufferFormat.Mixed:
+                case FrameBufferFormat.Direct15:
+                case FrameBufferFormat.Direct24:
                     palTex = null;
                     break;
                 default:
@@ -430,7 +430,7 @@ namespace Twisted.PS.Texturing
 
             switch (picFormat)
             {
-                case FrameBufferObjectFormat.Indexed4:
+                case FrameBufferFormat.Indexed4:
                     for (var y = 0; y < texSize.y; y++)
                     {
                         for (var x = 0; x < texSize.x; x++)
@@ -441,7 +441,7 @@ namespace Twisted.PS.Texturing
                         }
                     }
                     break;
-                case FrameBufferObjectFormat.Indexed8:
+                case FrameBufferFormat.Indexed8:
                     for (var y = 0; y < texSize.y; y++)
                     {
                         for (var x = 0; x < texSize.x; x++)
@@ -452,8 +452,8 @@ namespace Twisted.PS.Texturing
                         }
                     }
                     break;
-                case FrameBufferObjectFormat.Direct15:
-                case FrameBufferObjectFormat.Mixed:
+                case FrameBufferFormat.Direct15:
+                case FrameBufferFormat.Mixed:
 
                     for (var y = 0; y < texSize.y; y++)
                     {
@@ -465,7 +465,7 @@ namespace Twisted.PS.Texturing
                         }
                     }
                     break;
-                case FrameBufferObjectFormat.Direct24:
+                case FrameBufferFormat.Direct24:
                     for (var y = 0; y < texSize.y; y++)
                     {
                         for (var x = 0; x < texSize.x; x++)
@@ -517,18 +517,18 @@ namespace Twisted.PS.Texturing
             return texture;
         }
 
-        public static int GetWidth(int width, FrameBufferObjectFormat format) // TODO reuse this method
+        public static int GetWidth(int width, FrameBufferFormat format) // TODO reuse this method
         {
             if (width <= 0)
                 throw new ArgumentOutOfRangeException(nameof(width));
 
             return format switch
             {
-                FrameBufferObjectFormat.Indexed4 => width * 4,
-                FrameBufferObjectFormat.Indexed8 => width * 2,
-                FrameBufferObjectFormat.Mixed    => width,
-                FrameBufferObjectFormat.Direct15 => width,
-                FrameBufferObjectFormat.Direct24 => width * 2 / 3,
+                FrameBufferFormat.Indexed4 => width * 4,
+                FrameBufferFormat.Indexed8 => width * 2,
+                FrameBufferFormat.Mixed    => width,
+                FrameBufferFormat.Direct15 => width,
+                FrameBufferFormat.Direct24 => width * 2 / 3,
                 _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
             };
         }

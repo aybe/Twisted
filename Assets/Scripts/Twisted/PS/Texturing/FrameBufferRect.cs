@@ -12,9 +12,9 @@ namespace Twisted.PS.Texturing
 
         public readonly int Height;
 
-        public readonly FrameBufferObjectFormat Format;
+        public readonly FrameBufferFormat Format;
 
-        public FrameBufferRect(int x, int y, int width, int height, FrameBufferObjectFormat format)
+        public FrameBufferRect(int x, int y, int width, int height, FrameBufferFormat format)
         {
             X      = x;
             Y      = y;
@@ -27,11 +27,11 @@ namespace Twisted.PS.Texturing
         {
             return Format switch
             {
-                FrameBufferObjectFormat.Indexed4 => Width / 4,
-                FrameBufferObjectFormat.Indexed8 => Width / 2,
-                FrameBufferObjectFormat.Mixed    => Width,
-                FrameBufferObjectFormat.Direct15 => Width,
-                FrameBufferObjectFormat.Direct24 => Width / 3 * 2,
+                FrameBufferFormat.Indexed4 => Width / 4,
+                FrameBufferFormat.Indexed8 => Width / 2,
+                FrameBufferFormat.Mixed    => Width,
+                FrameBufferFormat.Direct15 => Width,
+                FrameBufferFormat.Direct24 => Width / 3 * 2,
                 _                                => throw new ArgumentOutOfRangeException(nameof(Format), Format, null)
             };
         }

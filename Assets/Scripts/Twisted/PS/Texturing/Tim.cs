@@ -28,7 +28,7 @@ namespace Twisted.PS.Texturing
 
             var flags = reader.ReadInt32(Endianness.LE);
 
-            Format = (FrameBufferObjectFormat)(flags & 0b111);
+            Format = (FrameBufferFormat)(flags & 0b111);
 
             if ((flags & 0b1000) != default)
             {
@@ -45,7 +45,7 @@ namespace Twisted.PS.Texturing
                         var palRect = new Rectangle(rect.X + i % columns * colors, rect.Y + i / columns, colors, 1);
                         var palData = palBlock.Pixels.AsSpan(i * palRect.Width, colors).ToArray();
 
-                        palettes[i] = new FrameBuffer(FrameBufferObjectFormat.Direct15, palRect, palData);
+                        palettes[i] = new FrameBuffer(FrameBufferFormat.Direct15, palRect, palData);
                     }
 
                     Palettes = new ReadOnlyCollection<FrameBuffer>(palettes);
@@ -62,7 +62,7 @@ namespace Twisted.PS.Texturing
             Picture = new FrameBuffer(Format, picRect, picData);
         }
 
-        public FrameBufferObjectFormat Format { get; }
+        public FrameBufferFormat Format { get; }
 
         public IReadOnlyList<FrameBuffer>? Palettes { get; }
 
