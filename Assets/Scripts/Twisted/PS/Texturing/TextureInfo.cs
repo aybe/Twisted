@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Twisted.PS.Texturing
 {
-    public readonly struct Texture // TODO rename because it's weird
+    public readonly struct TextureInfo // TODO rename because it's weird
         // TODO texture window?
     {
-        public Texture(TexturePage page, TexturePalette palette, IReadOnlyList<TextureUV> uvs)
+        public TextureInfo(TexturePage page, TexturePalette palette, IReadOnlyList<TextureUV> uvs)
         {
             if (uvs == null)
                 throw new ArgumentNullException(nameof(uvs));

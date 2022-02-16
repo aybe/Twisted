@@ -60,9 +60,9 @@ namespace Twisted.PS.Texturing.New
             {
                 if (polygon is Polygon04010B0C pt)
                 {
-                    Debug.Log(pt.Texture);
+                    Debug.Log(pt.TextureInfo);
 
-                    var texture = GetTexture(psx, pt.Texture, TransparentColorMode.None);
+                    var texture = GetTexture(psx, pt.TextureInfo, TransparentColorMode.None);
 
                     // BUG why is black shown as white?
                     // BUG semi-transparency not set
@@ -73,7 +73,7 @@ namespace Twisted.PS.Texturing.New
             }
         }
 
-        public static Texture2D GetTexture(FrameBufferObject obj, Texture tp, TransparentColorMode mode)
+        public static Texture2D GetTexture(FrameBufferObject obj, TextureInfo tp, TransparentColorMode mode)
             // TODO wrong name // TODO move
         {
             if (obj is null)
@@ -82,7 +82,7 @@ namespace Twisted.PS.Texturing.New
             if (obj.Format is not FrameBufferObjectFormat.Direct15 && obj.Rectangle.Width is not 1024 && obj.Rectangle.Height is not 512)
                 throw new ArgumentOutOfRangeException(nameof(obj));
 
-            if (EqualityComparer<Texture>.Default.Equals(tp, default))
+            if (EqualityComparer<TextureInfo>.Default.Equals(tp, default))
                 throw new ArgumentOutOfRangeException(nameof(tp));
 
             var colors = tp.Page.Colors;

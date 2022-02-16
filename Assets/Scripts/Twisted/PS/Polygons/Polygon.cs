@@ -137,7 +137,7 @@ namespace Twisted.PS.Polygons
                 $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
         }
 
-        protected static Texture ReadTexture(byte[] data, int indices, int index)
+        protected static TextureInfo ReadTexture(byte[] data, int indices, int index)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -162,7 +162,7 @@ namespace Twisted.PS.Polygons
 
             var palette = ReadTexturePalette(data, index + 2);
 
-            var texture = new Texture(page, palette, uvs);
+            var texture = new TextureInfo(page, palette, uvs);
 
             return texture;
         }
