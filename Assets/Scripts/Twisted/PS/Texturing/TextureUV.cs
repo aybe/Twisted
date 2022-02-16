@@ -14,12 +14,6 @@ namespace Twisted.PS.Texturing
             V = v;
         }
 
-        public void Deconstruct(out int x, out int y)
-        {
-            x = U;
-            y = V;
-        }
-
         public override string ToString()
         {
             return $"{nameof(U)}: {U}, {nameof(V)}: {V}";
