@@ -54,7 +54,7 @@ namespace Twisted.PS.Texturing.New
 
             // generate the set of textures for the set of polygons
 
-            var set = new HashSet<TexturePageFormatKey>(); // TODO add equality comparer
+            var set = new HashSet<TextureInfo>(); // TODO add equality comparer
 
             foreach (var polygon in polygons)
             {
