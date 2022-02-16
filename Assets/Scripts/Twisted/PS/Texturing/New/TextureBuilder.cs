@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUG_TEXTURES
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Twisted.PS.Polygons;
@@ -54,23 +55,57 @@ namespace Twisted.PS.Texturing.New
 
             // generate the set of textures for the set of polygons
 
-            var set = new HashSet<TextureInfo>(); // TODO add equality comparer
+            var dictionary = new SortedDictionary<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
 
             foreach (var polygon in polygons)
             {
-                if (polygon is Polygon04010B0C pt)
+                if (polygon is not Polygon04010B0C pt)
+                    continue;
+
+                var key = pt.TextureInfo;
+
+                if (dictionary.ContainsKey(key))
+                    continue;
+
+                var value = GetTexture(psx, key, TransparentColorMode.None);
+
+                dictionary.Add(key, value);
+            }
+
+#if DEBUG_TEXTURES
+
+            var directory = Directory.CreateDirectory(Path.Combine(Application.dataPath, "../.temp/TextureBuilder")).FullName;
+
+            Debug.Log($"Generated {dictionary.Count} textures in {directory}.");
+
+            foreach (var file in Directory.GetFiles(directory, "*.PNG"))
+            {
+                try
                 {
-                    Debug.Log(pt.TextureInfo);
-
-                    var texture = GetTexture(psx, pt.TextureInfo, TransparentColorMode.None);
-
-                    // BUG why is black shown as white?
-                    // BUG semi-transparency not set
-                    File.WriteAllBytes(@"C:\temp\cars.png", texture.EncodeToPNG());
-                    // BUG new TexturePageFormatKey(texture.Page, (TexturePageFormat)texture.Page.Colors);
-                    break;
+                    File.Delete(file);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
                 }
             }
+
+            var index = 0;
+
+            foreach (var (key, value) in dictionary)
+            {
+                var name = $"Index = {index++}, " +
+                           $"PageX = {key.Page.X}, " +
+                           $"PageY = {key.Page.Y}, " +
+                           $"PageColors = {key.Page.Colors}, " +
+                           $"PaletteX = {key.Palette.X}, " +
+                           $"PaletteY = {key.Palette.Y}";
+
+                var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
+
+                File.WriteAllBytes(path, value.EncodeToPNG());
+            }
+#endif
         }
 
         public static Texture2D GetTexture(FrameBuffer buffer, TextureInfo tp, TransparentColorMode mode)
