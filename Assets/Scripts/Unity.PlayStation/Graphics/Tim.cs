@@ -30,14 +30,16 @@ namespace Unity.PlayStation.Graphics
 
             var flags = reader.ReadInt32(Endianness.LE);
 
-            Format = (TimFormat)(flags & 0b111) switch
+            var format = flags & 0b111;
+
+            Format = format switch
             {
-                TimFormat.Indexed4 => FrameBufferFormat.Indexed4,
-                TimFormat.Indexed8 => FrameBufferFormat.Indexed8,
-                TimFormat.Direct15 => FrameBufferFormat.Direct15,
-                TimFormat.Direct24 => FrameBufferFormat.Direct24,
-                TimFormat.Mixed    => FrameBufferFormat.Direct15,
-                _                  => throw new ArgumentOutOfRangeException()
+                0 => FrameBufferFormat.Indexed4,
+                1 => FrameBufferFormat.Indexed8,
+                2 => FrameBufferFormat.Direct15,
+                3 => FrameBufferFormat.Direct24,
+                4 => FrameBufferFormat.Direct15,
+                _ => throw new InvalidDataException($"Invalid pixel format: 0x{format}.")
             };
 
             if ((flags & 0b1000) != default)
@@ -113,16 +115,7 @@ namespace Unity.PlayStation.Graphics
 
             return true;
         }
-
-        private enum TimFormat
-        {
-            Indexed4,
-            Indexed8,
-            Direct15,
-            Direct24,
-            Mixed
-        }
-
+        
         private sealed class TimBlock
         {
             public TimBlock(int length, short[] pixels, RectInt rect)
