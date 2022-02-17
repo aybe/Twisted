@@ -69,7 +69,10 @@ namespace Twisted.PS.Texturing.New
 #if DEBUG_TEXTURES
 
             if (dictionary.Count is 0)
+            {
+                Debug.LogWarning("No textures were generated for this model because it doesn't have any textured polygon.");
                 return;
+            }
 
             var directory = Path.GetFullPath(Path.Combine(Application.dataPath, "../.temp/TextureBuilder"));
 
