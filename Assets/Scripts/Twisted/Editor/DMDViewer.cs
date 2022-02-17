@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -28,11 +27,13 @@ namespace Twisted.Editor
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
         private void OnEnable()
         {
-            // initialize the view, reload previous DMD if any, fetch settings from UI
+            // reload previous DMD if any, initialize the view, fetch settings from UI
+
+            UpdateFactory(FactoryPath);
 
             ViewState ??= new TreeViewState();
 
-            View = new TreeNodeView(ViewState, File.Exists(ViewPath) ? OpenFile(ViewPath!) : null);
+            View = new TreeNodeView(ViewState, Factory?.DMD);
 
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
@@ -76,9 +77,9 @@ namespace Twisted.Editor
                         if (string.IsNullOrEmpty(path))
                             return;
 
-                        View.SetRoot(OpenFile(path));
+                        UpdateFactory(path);
 
-                        ViewPath = path;
+                        View.SetRoot(Factory.DMD);
                     });
 
                     menu.DropDown(rect);
@@ -121,10 +122,12 @@ namespace Twisted.Editor
 
         #region View
 
-        private TreeNodeView View = null!;
+        private DMDFactory Factory;
 
         [SerializeField]
-        private string? ViewPath;
+        private string? FactoryPath;
+
+        private TreeNodeView View = null!;
 
         [SerializeField]
         private float ViewRowHeight = 24;
@@ -136,6 +139,14 @@ namespace Twisted.Editor
 
         [SerializeField]
         private string ViewSearchString = null!;
+
+        private void UpdateFactory(string? path)
+        {
+            Factory     = File.Exists(path) ? DMDFactory.Create(path!) : null;
+            FactoryPath = path;
+
+            titleContent.text = Path.GetFileName(path);
+        }
 
         private void UpdateViewRowHeight()
         {
@@ -151,23 +162,9 @@ namespace Twisted.Editor
 
         #region Methods
 
-        private DMD OpenFile(string path)
+        private void OpenNode(DMDNode00FF? node)
         {
-            if (string.IsNullOrWhiteSpace(path))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-
-            using var reader = new BinaryReader(new MemoryStream(File.ReadAllBytes(path)));
-
-            var dmd = new DMD(reader);
-
-            titleContent.text = Path.GetFileName(path);
-
-            return dmd;
-        }
-
-        private static void OpenNode(DMDNode00FF? node)
-        {
-            Singleton<DMDPreview>.instance.SetNode(node);
+            Singleton<DMDPreview>.instance.SetNode(Factory, node);
         }
 
         #endregion

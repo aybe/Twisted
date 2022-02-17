@@ -3,21 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
+using JetBrains.Annotations;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 using Unity.PlayStation.Graphics;
 
 namespace Twisted.PS.Texturing
 {
     public sealed class Tms : IReadOnlyList<Tim>
     {
-        public Tms(Stream stream)
+        public Tms([NotNull] BinaryReader reader)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            using var reader = new BinaryReader(stream, Encoding.Default, true);
+            if (reader is null)
+                throw new ArgumentNullException(nameof(reader));
 
             var identifier = reader.ReadInt32(Endianness.LE);
 

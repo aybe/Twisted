@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Twisted.PS;
-using Twisted.PS.Polygons;
-using Twisted.PS.Texturing.New;
 using Unity.Extensions.General;
+using Unity.Extensions.Graphics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +15,7 @@ namespace Twisted
     [Singleton(Automatic = true)]
     public sealed class DMDPreview : MonoBehaviour, ISingleton
     {
-        public void SetNode(DMDNode00FF? node, bool split = true)
+        public void SetNode(DMDFactory factory, DMDNode00FF? node, bool split = true)
         {
             while (transform.childCount > 0)
             {
@@ -34,6 +33,12 @@ namespace Twisted
             if (node == null)
                 return;
 
+            var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray();
+
+            factory.GetTextureAtlas(infos, out var atlas, out var atlasTexture);
+
+            var sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = atlasTexture };
+
             var lists = split ? node.Polygons.Select(s => new[] { s }).ToArray() : new[] { node.Polygons };
 
             var index = 0;
@@ -48,6 +53,7 @@ namespace Twisted
                 {
                     var vertices = new List<Vector3>();
                     var colors   = new List<Color>();
+                    var uvs      = new List<Vector2>();
                     var indices  = new List<int>();
 
                     foreach (var polygon in list)
@@ -78,6 +84,17 @@ namespace Twisted
                                 vertices.Add(o);
                                 colors.Add(color);
                                 indices.Add(indices.Count);
+
+                                if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
+                                {
+                                    var t = polygon.TextureUVs[l];
+                                    var u = atlas.GetUV(0, t, false, TextureTransform.None); // BUG this is wrong, we need TextureInfo to Int32 map as well
+                                    uvs.Add(u);
+                                }
+                                else
+                                {
+                                    uvs.Add(Vector2.zero); // BUG this is wrong, there should be distinct sub-meshes
+                                }
                             }
                         }
                     }
@@ -90,6 +107,7 @@ namespace Twisted
                         hideFlags = HideFlags.HideAndDontSave,
                         vertices  = vertices.ToArray(),
                         colors    = colors.ToArray(),
+                        uv        = uvs.ToArray(),
                         triangles = indices.ToArray()
                     };
 
@@ -101,7 +119,7 @@ namespace Twisted
 
                     mf.sharedMesh     = mesh;
                     mc.sharedMesh     = mesh;
-                    mr.sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = GetTexture(list) };
+                    mr.sharedMaterial = sharedMaterial;
                     pb.Polygons       = list.Select(s => string.Concat(s.GetObjectData().Select(t => t.ToString("X2")))).ToList();
                 }
             }
@@ -123,21 +141,6 @@ namespace Twisted
             }
 
             view.Frame(bounds, false);
-
-            // TODO this is the wrong place
-
-            TextureBuilder.GetTexture(node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray());
-        }
-
-        private static Texture GetTexture(IReadOnlyList<Polygon> polygons)
-        {
-            if (polygons == null)
-                throw new ArgumentNullException(nameof(polygons));
-
-            if (polygons.Count == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(polygons));
-
-            return null!;
         }
     }
 }
