@@ -100,34 +100,6 @@ namespace Unity.PlayStation.Graphics
             };
         }
 
-        [Obsolete("Use overload")]
-        public static TransparentColor[] GetPalette(FrameBuffer buffer, int x, int y, int width)
-        {
-            if (buffer is null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            if (buffer.Format is not FrameBufferFormat.Direct15)
-                throw new ArgumentOutOfRangeException(nameof(buffer));
-
-            if (x < 0 || x >= buffer.Rectangle.Width)
-                throw new ArgumentOutOfRangeException(nameof(x));
-
-            if (y < 0 || y >= buffer.Rectangle.Height)
-                throw new ArgumentOutOfRangeException(nameof(y));
-
-            if (width <= 0 || width + x >= buffer.Rectangle.Width)
-                throw new ArgumentOutOfRangeException(nameof(width));
-
-            var colors = new TransparentColor[width];
-
-            for (var i = 0; i < colors.Length; i++)
-            {
-                colors[i] = new TransparentColor(buffer.Pixels[y * buffer.Rectangle.Width + x + i]);
-            }
-
-            return colors;
-        }
-
         public static Texture2D GetTexture(
             FrameBufferFormat picFormat,
             FrameBuffer             picBuffer,
