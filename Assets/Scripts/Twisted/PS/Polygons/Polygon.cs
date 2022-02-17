@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Twisted.PS.Texturing;
 using Unity.Extensions.Binary;
 using Unity.PlayStation.Graphics;
@@ -129,6 +130,8 @@ namespace Twisted.PS.Polygons
 
         public TextureInfo? TextureInfo { get; protected init; } = null;
 
+        public IReadOnlyList<Vector2Int>? TextureUVs { get; protected init; } = null;
+        
         public long Position { get; }
 
         public long Length { get; }
@@ -158,6 +161,29 @@ namespace Twisted.PS.Polygons
             if (index < 0 || index > data.Length - indices * 4)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
+            var page = ReadTexturePage(data, index + 6);
+
+            var palette = ReadTexturePalette(data, index + 2);
+
+            var texture = new TextureInfo(page, palette);
+
+            return texture;
+        }
+
+        protected static ReadOnlyCollection<Vector2Int> ReadTextureUVs(byte[] data, int indices, int index) // BUG this is wrong
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            if (data.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
+
+            if (indices is not (3 or 4))
+                throw new ArgumentOutOfRangeException(nameof(indices));
+
+            if (index < 0 || index > data.Length - indices * 4)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
             var uvs = new Vector2Int[indices];
 
             for (var i = 0; i < indices; i++)
@@ -165,13 +191,7 @@ namespace Twisted.PS.Polygons
                 uvs[i] = ReadTextureUV(data, index + i * 4);
             }
 
-            var page = ReadTexturePage(data, index + 6);
-
-            var palette = ReadTexturePalette(data, index + 2);
-
-            var texture = new TextureInfo(page, palette, new ReadOnlyCollection<Vector2Int>(uvs));
-
-            return texture;
+            return new ReadOnlyCollection<Vector2Int>(uvs);
         }
 
         private static TexturePage ReadTexturePage(byte[] data, int index)
