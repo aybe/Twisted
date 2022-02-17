@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -241,7 +236,7 @@ namespace Unity.PlayStation.Graphics
                         {
                             var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x;
                             var j = picBuffer.Pixels[i];
-                            texData[(texSize.y - 1 - y) * texSize.x + x] = new TransparentColor(j).ToColor32(mode);
+                            texData[(texSize.y - 1 - y) * texSize.x + x] = new TransparentColor(j).ToColor(mode);
                         }
                     }
                     break;

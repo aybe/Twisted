@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Drawing;
+using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
@@ -46,7 +46,7 @@ namespace Unity.PlayStation.Graphics
         /// <returns>
         ///     The converted color.
         /// </returns>
-        public Color ToColor(TransparentColorMode mode = TransparentColorMode.None)
+        public Color32 ToColor(TransparentColorMode mode = TransparentColorMode.None)
         {
             // NOTE: discrepancy about black transparency in these tables
 
@@ -133,7 +133,7 @@ namespace Unity.PlayStation.Graphics
             var g = (byte)Math.Round(G * 255.0d / 31.0d);
             var b = (byte)Math.Round(B * 255.0d / 31.0d);
 
-            return Color.FromArgb(a, r, g, b);
+            return new Color32(r, g, b, a);
         }
 
         public short ToInt16()
