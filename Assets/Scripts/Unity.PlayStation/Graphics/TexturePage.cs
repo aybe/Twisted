@@ -16,6 +16,8 @@ namespace Unity.PlayStation.Graphics
 
         public TexturePageDisable Disable { get; }
 
+        public int Index => Position.y % 256 * 16 + Position.x % 64;
+
         public TexturePage(Vector2Int position, TexturePageAlpha alpha, TexturePageColors colors, TexturePageDisable disable)
         {
             if (position.x < 0)
@@ -58,11 +60,6 @@ namespace Unity.PlayStation.Graphics
         public override string ToString()
         {
             return $"{nameof(Position)}: {Position}, {nameof(Colors)}: {Colors}";
-        }
-
-        public static int GetIndex(TexturePage page)
-        {
-            return page.Position.y % 256 * 16 + page.Position.x % 64;
         }
 
         public static int GetRenderWidth(TexturePage page)
