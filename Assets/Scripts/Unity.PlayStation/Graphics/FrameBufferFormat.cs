@@ -11,6 +11,6 @@ namespace Unity.PlayStation.Graphics
         Indexed4,
         Indexed8,
         Direct15,
-        Direct24,
+        Direct24
     }
 }

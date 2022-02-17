@@ -85,17 +85,17 @@ namespace Unity.PlayStation.Graphics
                 FrameBufferFormat.Indexed8 => 256,
                 FrameBufferFormat.Direct15 => 65536,
                 FrameBufferFormat.Direct24 => 16777216,
-                _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+                _                          => throw new ArgumentOutOfRangeException(nameof(format), format, null)
             };
         }
 
         public static Texture2D GetTexture(
-            FrameBufferFormat picFormat,
-            FrameBuffer             picBuffer,
-            RectInt                 picRect,
-            RectInt?                palRect   = null,
-            FrameBuffer?            palBuffer = null,
-            TransparentColorMode    mode      = TransparentColorMode.None)
+            FrameBufferFormat    picFormat,
+            FrameBuffer          picBuffer,
+            RectInt              picRect,
+            RectInt?             palRect   = null,
+            FrameBuffer?         palBuffer = null,
+            TransparentColorMode mode      = TransparentColorMode.None)
         {
             if (picBuffer is null)
                 throw new ArgumentNullException(nameof(picBuffer));
@@ -232,7 +232,7 @@ namespace Unity.PlayStation.Graphics
                 FrameBufferFormat.Indexed8 => width * 2,
                 FrameBufferFormat.Direct15 => width,
                 FrameBufferFormat.Direct24 => width * 2 / 3,
-                _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+                _                          => throw new ArgumentOutOfRangeException(nameof(format), format, null)
             };
         }
     }

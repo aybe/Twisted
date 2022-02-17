@@ -110,7 +110,7 @@ namespace Unity.PlayStation.Graphics
             {
                 reader.BaseStream.Position++; // skip potential junk after payload
             }
-            
+
             return true;
         }
 
