@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Twisted.PS.Polygons;
+using Unity.Extensions.Graphics;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Twisted.PS.Texturing.New
 {
@@ -104,6 +107,18 @@ namespace Twisted.PS.Texturing.New
                 var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
 
                 File.WriteAllBytes(path, value.EncodeToPNG());
+            }
+
+            var textures = dictionary.Values.ToArray();
+
+            if (textures.Any())
+            {
+                if (!TextureAtlas.TryCreate(textures, out var atlas, out var atlasTexture))
+                    throw new InvalidOperationException("Couldn't create texture atlas, try increase atlas size or reduce the number of textures.");
+
+                File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
+
+                Object.DestroyImmediate(atlas);
             }
 #endif
         }
