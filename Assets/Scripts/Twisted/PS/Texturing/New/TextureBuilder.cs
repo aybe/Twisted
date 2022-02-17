@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Twisted.PS.Polygons;
 using Unity.Extensions.Graphics;
 using UnityEngine;
@@ -46,16 +47,6 @@ namespace Twisted.PS.Texturing.New
                 }
             }
 
-            {
-                // TODO delete this frame buffer debugging
-                var temp = Directory.CreateDirectory(Path.Combine(Application.dataPath, "../.temp")).FullName;
-
-                using var bin = File.Create(Path.Combine(temp, "cars.bin"));
-                using var tga = File.Create(Path.Combine(temp, "cars.tga"));
-                FrameBuffer.WriteRaw(bin, psx);
-                FrameBuffer.WriteTga(tga, psx);
-            }
-
             // generate the set of textures for the set of polygons
 
             var dictionary = new SortedDictionary<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
@@ -92,6 +83,13 @@ namespace Twisted.PS.Texturing.New
                     Debug.LogException(e);
                 }
             }
+
+            var texture = FrameBuffer.GetTexture(psx.Format, psx, psx.Rect);
+            var png     = texture.EncodeToPNG();
+            Object.DestroyImmediate(texture);
+
+            File.WriteAllBytes(Path.Combine(directory, "TMS dump.BIN"), MemoryMarshal.Cast<short, byte>(psx.Pixels.ToArray()).ToArray());
+            File.WriteAllBytes(Path.Combine(directory, "TMS dump.PNG"), png);
 
             var index = 0;
 
