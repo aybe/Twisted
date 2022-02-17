@@ -30,6 +30,10 @@ move stuff to binary extensions
 		see if twisted can have a dependency
 do texturing
 
-- project generation settings should
- - have a global toggle
- - not rebuild structure for project asmdef, only packages
+- project generation settings should have a global toggle and not rebuild structure for project asmdef, only packages
+- FrameBufferFormat.Mixed should be removed
+- delete FrameBuffer.WriteTga
+- reorganize files
+- fix code issues
+- the texture builder logic should be on Unity.Playstation and also include texture window
+- can there be endianness extension methods directly for Span<T>?
