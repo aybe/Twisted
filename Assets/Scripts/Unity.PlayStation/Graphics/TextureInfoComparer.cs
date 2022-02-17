@@ -11,11 +11,11 @@ namespace Unity.PlayStation.Graphics
 
         public override int Compare(TextureInfo x, TextureInfo y)
         {
-            var pageX = x.Page.X.CompareTo(y.Page.X);
+            var pageX = x.Page.Position.x.CompareTo(y.Page.Position.x);
             if (pageX != 0)
                 return pageX;
 
-            var pageY = x.Page.Y.CompareTo(y.Page.Y);
+            var pageY = x.Page.Position.y.CompareTo(y.Page.Position.y);
             if (pageY != 0)
                 return pageY;
 

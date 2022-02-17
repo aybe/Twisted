@@ -184,7 +184,7 @@ namespace Twisted.PS.Polygons
             var b = (raw & 0b_00000001_10000000) / 128;
             var d = (raw & 0b_00001000_00000000) / 1024;
 
-            var page = new TexturePage(x, y, (TexturePageAlpha)a, (TexturePageColors)b, (TexturePageDisable)d);
+            var page = new TexturePage(new Vector2Int(x, y), (TexturePageAlpha)a, (TexturePageColors)b, (TexturePageDisable)d);
 
             return page;
         }

@@ -97,8 +97,8 @@ namespace Twisted.PS.Texturing.New
             foreach (var (key, value) in dictionary)
             {
                 var name = $"Index = {index++}, " +
-                           $"PageX = {key.Page.X}, " +
-                           $"PageY = {key.Page.Y}, " +
+                           $"PageX = {key.Page.Position.x}, " +
+                           $"PageY = {key.Page.Position.y}, " +
                            $"PageColors = {key.Page.Colors}, " +
                            $"PaletteX = {key.Palette.x}, " +
                            $"PaletteY = {key.Palette.y}";
@@ -160,7 +160,7 @@ namespace Twisted.PS.Texturing.New
                 _                             => throw new NotSupportedException(colors.ToString())
             };
 
-            var picRect = new RectInt(tp.Page.X, tp.Page.Y, pageWidth, 256);
+            var picRect = new RectInt(tp.Page.Position.x, tp.Page.Position.y, pageWidth, 256);
             var palRect = new RectInt(tp.Palette.x, tp.Palette.y, paletteWidth, 1);
             var texture = FrameBuffer.GetTexture(format, buffer, picRect, palRect, buffer, mode);
 

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
+using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
     public readonly struct TexturePage
     {
-        public int X { get; }
-
-        public int Y { get; }
+        public Vector2Int Position { get; }
 
         public TexturePageAlpha Alpha { get; }
 
@@ -15,19 +14,19 @@ namespace Unity.PlayStation.Graphics
 
         public TexturePageDisable Disable { get; }
 
-        public TexturePage(int x, int y, TexturePageAlpha alpha, TexturePageColors colors, TexturePageDisable disable)
+        public TexturePage(Vector2Int position, TexturePageAlpha alpha, TexturePageColors colors, TexturePageDisable disable)
         {
-            if (x < 0)
-                throw new ArgumentOutOfRangeException(nameof(x), "Must be positive.");
+            if (position.x < 0)
+                throw new ArgumentOutOfRangeException(nameof(position.x), "Must be positive.");
 
-            if (y < 0)
-                throw new ArgumentOutOfRangeException(nameof(y), "Must be positive.");
+            if (position.y < 0)
+                throw new ArgumentOutOfRangeException(nameof(position.y), "Must be positive.");
 
-            if (x % 64 != 0)
-                throw new ArgumentOutOfRangeException(nameof(x), x, "Not a multiple of 64.");
+            if (position.x % 64 != 0)
+                throw new ArgumentOutOfRangeException(nameof(position.x), position.x, "Not a multiple of 64.");
 
-            if (y % 256 != 0)
-                throw new ArgumentOutOfRangeException(nameof(x), y, "Not a multiple of 256.");
+            if (position.y % 256 != 0)
+                throw new ArgumentOutOfRangeException(nameof(position.x), position.y, "Not a multiple of 256.");
 
             if (!Enum.IsDefined(typeof(TexturePageAlpha), alpha))
                 throw new InvalidEnumArgumentException(nameof(alpha), (int)alpha, typeof(TexturePageAlpha));
@@ -38,31 +37,30 @@ namespace Unity.PlayStation.Graphics
             if (!Enum.IsDefined(typeof(TexturePageDisable), disable))
                 throw new InvalidEnumArgumentException(nameof(disable), (int)disable, typeof(TexturePageDisable));
 
-            X       = x;
-            Y       = y;
-            Alpha   = alpha;
-            Colors  = colors;
-            Disable = disable;
+            Position = position;
+            Alpha    = alpha;
+            Colors   = colors;
+            Disable  = disable;
 
             var xMax = 1024 - GetWidth(this);
 
-            if (x > xMax)
-                throw new ArgumentOutOfRangeException(nameof(x), $"Must not be greater than {xMax}.");
+            if (position.x > xMax)
+                throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
 
             var yMax = 256;
 
-            if (y > yMax)
-                throw new ArgumentOutOfRangeException(nameof(y), $"Must not be greater than {yMax}.");
+            if (position.y > yMax)
+                throw new ArgumentOutOfRangeException(nameof(position.y), $"Must not be greater than {yMax}.");
         }
 
         public override string ToString()
         {
-            return $"{nameof(X)}: {X}, {nameof(Y)}: {Y}, {nameof(Colors)}: {Colors}";
+            return $"{nameof(Position)}: {Position}, {nameof(Colors)}: {Colors}";
         }
 
         public static int GetIndex(TexturePage page)
         {
-            return page.Y % 256 * 16 + page.X % 64;
+            return page.Position.y % 256 * 16 + page.Position.x % 64;
         }
 
         public static int GetWidth(TexturePage page)
