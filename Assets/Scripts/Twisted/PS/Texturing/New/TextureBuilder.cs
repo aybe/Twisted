@@ -125,7 +125,7 @@ namespace Twisted.PS.Texturing.New
             if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            if (buffer.Format is not FrameBufferFormat.Direct15 && buffer.Rectangle.Width is not 1024 && buffer.Rectangle.Height is not 512)
+            if (buffer.Format is not FrameBufferFormat.Direct15 && buffer.Rect.width is not 1024 && buffer.Rect.height is not 512)
                 throw new ArgumentOutOfRangeException(nameof(buffer));
 
             if (EqualityComparer<TextureInfo>.Default.Equals(tp, default))

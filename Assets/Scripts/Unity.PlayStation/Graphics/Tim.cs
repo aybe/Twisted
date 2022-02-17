@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using Unity.Extensions.Binary;
 using Unity.Extensions.General;
+using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
@@ -35,16 +36,16 @@ namespace Unity.PlayStation.Graphics
             {
                 if (TryReadBlock(reader, out var palBlock))
                 {
-                    var rect = palBlock.Rectangle;
+                    var rect = palBlock.Rect;
 
                     var colors   = FrameBuffer.GetColorCount(Format);
-                    var columns  = rect.Width / colors;
-                    var palettes = new FrameBuffer[columns * rect.Height];
+                    var columns  = rect.width / colors;
+                    var palettes = new FrameBuffer[columns * rect.height];
 
                     for (var i = 0; i < palettes.Length; i++)
                     {
-                        var palRect = new Rectangle(rect.X + i % columns * colors, rect.Y + i / columns, colors, 1);
-                        var palData = palBlock.Pixels.AsSpan(i * palRect.Width, colors).ToArray();
+                        var palRect = new RectInt(rect.x + i % columns * colors, rect.y + i / columns, colors, 1);
+                        var palData = palBlock.Pixels.AsSpan(i * palRect.width, colors).ToArray();
 
                         palettes[i] = new FrameBuffer(FrameBufferFormat.Direct15, palRect, palData);
                     }
@@ -56,9 +57,9 @@ namespace Unity.PlayStation.Graphics
             if (!TryReadBlock(reader, out var picBlock))
                 return;
 
-            var picRect = picBlock.Rectangle;
+            var picRect = picBlock.Rect;
 
-            var picData = picBlock.Pixels.AsSpan(0, picRect.Width * picRect.Height).ToArray();
+            var picData = picBlock.Pixels.AsSpan(0, picRect.width * picRect.height).ToArray();
 
             Picture = new FrameBuffer(Format, picRect, picData);
         }
@@ -95,23 +96,23 @@ namespace Unity.PlayStation.Graphics
             if (!reader.TryRead(s => s.ReadInt16(Endianness.LE), out var p, (n - 12) / 2))
                 return false;
 
-            result = new TimBlock(n, p, new Rectangle(x, y, w, h));
+            result = new TimBlock(n, p, new RectInt(x, y, w, h));
 
             return true;
         }
 
         private sealed class TimBlock
         {
-            public TimBlock(int length, short[] pixels, Rectangle rectangle)
+            public TimBlock(int length, short[] pixels, RectInt rect)
             {
                 Length    = length;
                 Pixels    = pixels;
-                Rectangle = rectangle;
+                Rect = rect;
             }
 
             public int Length { get; }
 
-            public Rectangle Rectangle { get; }
+            public RectInt Rect { get; }
 
             public short[] Pixels { get; }
         }

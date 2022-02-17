@@ -100,7 +100,7 @@ namespace Twisted.Tests
 
             var pixels = span.ToArray();
 
-            var obj = new FrameBuffer(FrameBufferFormat.Direct15, new Rectangle(Point.Empty, new Size(1024, 512)), pixels);
+            var obj = new FrameBuffer(FrameBufferFormat.Direct15, new RectInt(Vector2Int.zero, new Vector2Int(1024, 512)), pixels);
 
             return obj;
         }

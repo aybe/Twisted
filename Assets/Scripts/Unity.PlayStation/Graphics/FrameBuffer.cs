@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -12,17 +11,17 @@ namespace Unity.PlayStation.Graphics
     /// </summary>
     public sealed class FrameBuffer
     {
-        public FrameBuffer(FrameBufferFormat format, Rectangle rectangle, IReadOnlyList<short> pixels)
+        public FrameBuffer(FrameBufferFormat format, RectInt rect, IReadOnlyList<short> pixels)
         {
-            Format    = format;
-            Rectangle = rectangle;
-            Pixels    = pixels;
+            Format = format;
+            Rect   = rect;
+            Pixels = pixels;
         }
 
         /// <summary>
         ///     Gets the pixel format for this instance.
         /// </summary>
-        /// <seealso cref="Rectangle" />
+        /// <seealso cref="Rect" />
         public FrameBufferFormat Format { get; }
 
         /// <summary>
@@ -31,18 +30,7 @@ namespace Unity.PlayStation.Graphics
         /// <remarks>
         ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
-        [Obsolete("Use Rect instead.")]
-        public Rectangle Rectangle { get; }
-
-        /// <summary>
-        ///     Gets the rectangle for this instance (see Remarks).
-        /// </summary>
-        /// <remarks>
-        ///     The horizontal axis is expressed as 16-bit units.
-        /// </remarks>
-#pragma warning disable CS0618
-        public RectInt Rect => new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
-#pragma warning restore CS0618
+        public RectInt Rect { get; }
 
         public IReadOnlyList<short> Pixels { get; }
 
@@ -54,10 +42,10 @@ namespace Unity.PlayStation.Graphics
             if (Pixels is not short[] pixels)
                 throw new InvalidOperationException("This instance's pixel data cannot be written to.");
 
-            var x = buffer.Rectangle.Location.X;
-            var y = buffer.Rectangle.Location.Y;
-            var w = buffer.Rectangle.Size.Width;
-            var h = buffer.Rectangle.Size.Height;
+            var x = buffer.Rect.position.x;
+            var y = buffer.Rect.position.y;
+            var w = buffer.Rect.size.x;
+            var h = buffer.Rect.size.y;
 
             for (var i = 0; i < h; i++)
             {
@@ -70,7 +58,7 @@ namespace Unity.PlayStation.Graphics
 
         public override string ToString()
         {
-            return $"{nameof(Format)}: {Format}, {nameof(Rectangle)}: {Rectangle}, {nameof(Pixels)}: {Pixels.Count}";
+            return $"{nameof(Format)}: {Format}, {nameof(Rect)}: {Rect}, {nameof(Pixels)}: {Pixels.Count}";
         }
 
         /// <summary>
@@ -81,7 +69,7 @@ namespace Unity.PlayStation.Graphics
         /// </returns>
         public static FrameBuffer CreatePlayStationVideoMemory()
         {
-            return new FrameBuffer(FrameBufferFormat.Direct15, new Rectangle(0, 0, 1024, 512), new short[1024 * 512]);
+            return new FrameBuffer(FrameBufferFormat.Direct15, new RectInt(0, 0, 1024, 512), new short[1024 * 512]);
         }
 
         public static int GetColorCount(FrameBufferFormat format)
