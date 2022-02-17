@@ -93,8 +93,8 @@ namespace Unity.PlayStation.Graphics
             FrameBufferFormat    picFormat,
             FrameBuffer          picBuffer,
             RectInt              picRect,
-            RectInt?             palRect   = null,
             FrameBuffer?         palBuffer = null,
+            RectInt?             palRect   = null,
             TransparentColorMode mode      = TransparentColorMode.None)
         {
             if (picBuffer is null)

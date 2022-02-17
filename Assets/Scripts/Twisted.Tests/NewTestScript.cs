@@ -75,7 +75,7 @@ namespace Twisted.Tests
         {
             var buffer = GetFrameBuffer(path);
 
-            var texture = FrameBuffer.GetTexture(fmt, buffer, picRect, palRect, buffer, mode);
+            var texture = FrameBuffer.GetTexture(fmt, buffer, picRect, buffer, palRect, mode);
 
             path = Path.Combine(
                 Path.GetDirectoryName(path)!,

@@ -152,7 +152,7 @@ namespace Twisted.PS.Texturing.New
 
             var picRect = new RectInt(tp.Page.Position.x, tp.Page.Position.y, pageWidth, 256);
             var palRect = new RectInt(tp.Palette.x, tp.Palette.y, paletteWidth, 1);
-            var texture = FrameBuffer.GetTexture(format, buffer, picRect, palRect, buffer, mode);
+            var texture = FrameBuffer.GetTexture(format, buffer, picRect, buffer, palRect, mode);
 
             return texture;
         }
