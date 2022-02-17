@@ -125,8 +125,8 @@ namespace Twisted
             view.Frame(bounds, false);
 
             // TODO this is the wrong place
-            
-            TextureBuilder.GetTexture(node.Polygons);
+
+            TextureBuilder.GetTexture(node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray());
         }
 
         private static Texture GetTexture(IReadOnlyList<Polygon> polygons)

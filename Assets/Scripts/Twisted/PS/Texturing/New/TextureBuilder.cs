@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Twisted.PS.Polygons;
 using Unity.Extensions.Graphics;
 using Unity.PlayStation.Graphics;
 using UnityEngine;
@@ -14,13 +13,13 @@ namespace Twisted.PS.Texturing.New
 {
     public static class TextureBuilder
     {
-        public static void GetTexture(IReadOnlyList<Polygon> polygons)
+        public static void GetTexture(TextureInfo[] infos)
         {
-            if (polygons is null)
-                throw new ArgumentNullException(nameof(polygons));
+            if (infos is null)
+                throw new ArgumentNullException(nameof(infos));
 
-            if (polygons.Count == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(polygons));
+            if (infos.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(infos));
 
             // TODO this shouldn't be hardcoded
 
@@ -48,23 +47,18 @@ namespace Twisted.PS.Texturing.New
                 }
             }
 
-            // generate the set of textures for the set of polygons
+            // generate the set of textures for the set of texture info
 
             var dictionary = new SortedDictionary<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
 
-            foreach (var polygon in polygons)
+            foreach (var info in infos)
             {
-                if (polygon is not Polygon04010B0C pt)
+                if (dictionary.ContainsKey(info))
                     continue;
 
-                var key = pt.TextureInfo;
+                var value = GetTexture(psx, info, TransparentColorMode.None);
 
-                if (dictionary.ContainsKey(key))
-                    continue;
-
-                var value = GetTexture(psx, key, TransparentColorMode.None);
-
-                dictionary.Add(key, value);
+                dictionary.Add(info, value);
             }
 
 #if DEBUG_TEXTURES

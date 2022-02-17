@@ -1,6 +1,4 @@
 using System.IO;
-using Twisted.PS.Texturing;
-using Unity.PlayStation.Graphics;
 
 namespace Twisted.PS.Polygons
 {
@@ -13,7 +11,5 @@ namespace Twisted.PS.Polygons
 
             TextureInfo = ReadTexture(data, 4, 20);
         }
-
-        public TextureInfo TextureInfo { get; }
     }
 }

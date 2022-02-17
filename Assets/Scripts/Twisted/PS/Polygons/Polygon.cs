@@ -125,6 +125,8 @@ namespace Twisted.PS.Polygons
 
         public IReadOnlyList<Vector4> Normals { get; }
 
+        public TextureInfo? TextureInfo { get; protected init; } = null;
+
         public long Position { get; }
 
         public long Length { get; }
