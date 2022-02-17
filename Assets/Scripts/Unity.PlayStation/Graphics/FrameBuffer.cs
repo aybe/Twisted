@@ -31,7 +31,6 @@ namespace Unity.PlayStation.Graphics
         /// <remarks>
         ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
-        /// <seealso cref="RenderSize" />
         [Obsolete("Use Rect instead.")]
         public Rectangle Rectangle { get; }
 
@@ -41,39 +40,11 @@ namespace Unity.PlayStation.Graphics
         /// <remarks>
         ///     The horizontal axis is expressed as 16-bit units.
         /// </remarks>
-        /// <seealso cref="RenderSize" />
 #pragma warning disable CS0618
         public RectInt Rect => new(Rectangle.X, Rectangle.Y, Rectangle.Width, Rectangle.Height);
 #pragma warning restore CS0618
 
         public IReadOnlyList<short> Pixels { get; }
-
-        /// <summary>
-        ///     Gets the render size for this instance (see Remarks).
-        /// </summary>
-        /// <remarks>
-        ///     Use this property to get the actual render size.
-        /// </remarks>
-        /// <seealso cref="Rectangle" />
-        public Size RenderSize
-        {
-            get
-            {
-                var width = Rectangle.Width;
-
-                width = Format switch
-                {
-                    FrameBufferFormat.Indexed4 => width * 4,
-                    FrameBufferFormat.Indexed8 => width * 2,
-                    FrameBufferFormat.Mixed    => width, // special case, 16-bit page with with mixed content
-                    FrameBufferFormat.Direct15 => width,
-                    FrameBufferFormat.Direct24 => width * 2 / 3,
-                    _                                => throw new InvalidOperationException($"Unknown pixel format: {Format}.")
-                };
-
-                return new Size(width, Rectangle.Height);
-            }
-        }
 
         public void Blit(FrameBuffer buffer)
         {
