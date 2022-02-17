@@ -128,7 +128,7 @@ namespace Unity.PlayStation.Graphics
                     throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null);
             }
 
-            var texSize = new Vector2Int(GetWidth(picRect.width, picFormat), picRect.height);
+            var texSize = new Vector2Int(GetRenderWidth(picRect.width, picFormat), picRect.height);
             var texData = new Color32[texSize.x * texSize.y];
             var picPosX = picRect.position.x;
             var picPosY = picRect.position.y;
@@ -221,7 +221,7 @@ namespace Unity.PlayStation.Graphics
             return texture;
         }
 
-        public static int GetWidth(int width, FrameBufferFormat format) // TODO reuse this method
+        public static int GetRenderWidth(int width, FrameBufferFormat format)
         {
             if (width <= 0)
                 throw new ArgumentOutOfRangeException(nameof(width));
