@@ -83,6 +83,7 @@ crashlytics-build.properties
 .twisted*
 *.bak
 *.cd
+*.cd.meta
 *.g.cs
 *[Tt][Ee][Mm][Pp]*
 Assets/Scenes/DMDViewer*
