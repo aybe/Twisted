@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 using Unity.Extensions.Binary;
-using UnityEngine;
+using RectInt = UnityEngine.RectInt;
 
 namespace Unity.PlayStation.Graphics
 {
@@ -55,7 +55,7 @@ namespace Unity.PlayStation.Graphics
                     for (var i = 0; i < palettes.Length; i++)
                     {
                         var palRect = new RectInt(rect.x + i % columns * colors, rect.y + i / columns, colors, 1);
-                        var palData = palBlock.Pixels.AsSpan(i * palRect.width, colors).ToArray();
+                        var palData = palBlock.Data.AsSpan(i * palRect.width, colors).ToArray();
 
                         palettes[i] = new FrameBuffer(FrameBufferFormat.Direct15, palRect, palData);
                     }
@@ -69,7 +69,7 @@ namespace Unity.PlayStation.Graphics
 
             var picRect = picBlock.Rect;
 
-            var picData = picBlock.Pixels.AsSpan(0, picRect.width * picRect.height).ToArray();
+            var picData = picBlock.Data.AsSpan(0, picRect.width * picRect.height).ToArray();
 
             Picture = new FrameBuffer(Format, picRect, picData);
         }
@@ -80,7 +80,7 @@ namespace Unity.PlayStation.Graphics
 
         public FrameBuffer? Picture { get; }
 
-        private static bool TryReadBlock(BinaryReader reader, out TimBlock result)
+        private static bool TryReadBlock(BinaryReader reader, out (int Size, short[] Data, RectInt Rect) result)
             // some geniuses out there thought it'd be nice to have incomplete blocks
         {
             if (reader == null)
@@ -106,30 +106,14 @@ namespace Unity.PlayStation.Graphics
             if (!reader.TryRead(s => s.ReadInt16(Endianness.LE), out var p, (n - 12) / 2))
                 return false;
 
-            result = new TimBlock(n, p, new RectInt(x, y, w, h));
+            result = (n, p, new RectInt(x, y, w, h));
 
-            for (var i = 0; i < result.Length - 12 - p.Length * sizeof(short); i++)
+            for (var i = 0; i < result.Size - 12 - p.Length * sizeof(short); i++)
             {
                 reader.BaseStream.Position++; // skip potential junk after payload
             }
 
             return true;
-        }
-        
-        private sealed class TimBlock
-        {
-            public TimBlock(int length, short[] pixels, RectInt rect)
-            {
-                Length = length;
-                Pixels = pixels;
-                Rect   = rect;
-            }
-
-            public int Length { get; }
-
-            public RectInt Rect { get; }
-
-            public short[] Pixels { get; }
         }
     }
 }
