@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using Twisted.PS.Texturing;
 using Unity.Extensions.Binary;
 using Unity.PlayStation.Graphics;
+using UnityEngine;
 using UnityEngine.Assertions;
+using Vector2 = UnityEngine.Vector2;
+using Vector4 = System.Numerics.Vector4;
 
 namespace Twisted.PS.Polygons
 {
@@ -156,7 +158,7 @@ namespace Twisted.PS.Polygons
             if (index < 0 || index > data.Length - indices * 4)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            var uvs = new TextureUV[indices];
+            var uvs = new Vector2Int[indices];
 
             for (var i = 0; i < indices; i++)
             {
@@ -167,7 +169,7 @@ namespace Twisted.PS.Polygons
 
             var palette = ReadTexturePalette(data, index + 2);
 
-            var texture = new TextureInfo(page, palette, uvs);
+            var texture = new TextureInfo(page, palette, new ReadOnlyCollection<Vector2Int>(uvs));
 
             return texture;
         }
@@ -205,12 +207,12 @@ namespace Twisted.PS.Polygons
             return palette;
         }
 
-        private static TextureUV ReadTextureUV(byte[] data, int index)
+        private static Vector2Int ReadTextureUV(byte[] data, int index)
         {
             var u = data.ReadByte(index + 0);
             var v = data.ReadByte(index + 1);
 
-            return new TextureUV(u, v);
+            return new Vector2Int(u, v);
         }
     }
 }

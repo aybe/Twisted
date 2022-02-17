@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
     public readonly struct TextureInfo // TODO rename because it's weird
         // TODO texture window?
     {
-        public TextureInfo(TexturePage page, TexturePalette palette, IReadOnlyList<TextureUV> uvs)
+        public TextureInfo(TexturePage page, TexturePalette palette, IReadOnlyList<Vector2Int> uvs)
         {
             if (uvs == null)
                 throw new ArgumentNullException(nameof(uvs));
@@ -23,7 +24,7 @@ namespace Unity.PlayStation.Graphics
 
         public TexturePalette Palette { get; }
 
-        public IReadOnlyList<TextureUV> UVs { get; }
+        public IReadOnlyList<Vector2Int> UVs { get; }
 
         public override string ToString()
         {
