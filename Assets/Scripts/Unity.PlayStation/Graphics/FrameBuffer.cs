@@ -81,7 +81,6 @@ namespace Unity.PlayStation.Graphics
             {
                 FrameBufferFormat.Indexed4 => 16,
                 FrameBufferFormat.Indexed8 => 256,
-                FrameBufferFormat.Mixed    => 65536,
                 FrameBufferFormat.Direct15 => 65536,
                 FrameBufferFormat.Direct24 => 16777216,
                 _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)
@@ -119,7 +118,6 @@ namespace Unity.PlayStation.Graphics
 
                     palTex = GetTexture(palBuffer.Format, palBuffer, palRect.Value, null, null, mode);
                     break;
-                case FrameBufferFormat.Mixed:
                 case FrameBufferFormat.Direct15:
                 case FrameBufferFormat.Direct24:
                     palTex = null;
@@ -159,8 +157,6 @@ namespace Unity.PlayStation.Graphics
                     }
                     break;
                 case FrameBufferFormat.Direct15:
-                case FrameBufferFormat.Mixed:
-
                     for (var y = 0; y < texSize.y; y++)
                     {
                         for (var x = 0; x < texSize.x; x++)
@@ -232,7 +228,6 @@ namespace Unity.PlayStation.Graphics
             {
                 FrameBufferFormat.Indexed4 => width * 4,
                 FrameBufferFormat.Indexed8 => width * 2,
-                FrameBufferFormat.Mixed    => width,
                 FrameBufferFormat.Direct15 => width,
                 FrameBufferFormat.Direct24 => width * 2 / 3,
                 _                                => throw new ArgumentOutOfRangeException(nameof(format), format, null)

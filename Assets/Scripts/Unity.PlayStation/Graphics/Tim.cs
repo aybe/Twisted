@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
@@ -30,7 +28,15 @@ namespace Unity.PlayStation.Graphics
 
             var flags = reader.ReadInt32(Endianness.LE);
 
-            Format = (FrameBufferFormat)(flags & 0b111);
+            Format = (TimFormat)(flags & 0b111) switch
+            {
+                TimFormat.Indexed4 => FrameBufferFormat.Indexed4,
+                TimFormat.Indexed8 => FrameBufferFormat.Indexed8,
+                TimFormat.Direct15 => FrameBufferFormat.Direct15,
+                TimFormat.Direct24 => FrameBufferFormat.Direct24,
+                TimFormat.Mixed    => FrameBufferFormat.Direct15,
+                _                  => throw new ArgumentOutOfRangeException()
+            };
 
             if ((flags & 0b1000) != default)
             {
@@ -101,13 +107,22 @@ namespace Unity.PlayStation.Graphics
             return true;
         }
 
+        private enum TimFormat
+        {
+            Indexed4,
+            Indexed8,
+            Direct15,
+            Direct24,
+            Mixed
+        }
+
         private sealed class TimBlock
         {
             public TimBlock(int length, short[] pixels, RectInt rect)
             {
-                Length    = length;
-                Pixels    = pixels;
-                Rect = rect;
+                Length = length;
+                Pixels = pixels;
+                Rect   = rect;
             }
 
             public int Length { get; }

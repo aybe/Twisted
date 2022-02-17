@@ -9,6 +9,5 @@
         Indexed8,
         Direct15,
         Direct24,
-        Mixed
     }
 }
