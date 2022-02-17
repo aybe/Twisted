@@ -162,34 +162,6 @@ namespace Unity.PlayStation.Graphics
             return colors;
         }
 
-        /// <summary>
-        ///     Writes a frame buffer object instance to a stream.
-        /// </summary>
-        /// <param name="stream">
-        ///     The destination stream.
-        /// </param>
-        /// <param name="buffer">
-        ///     The frame buffer object.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="stream" /> or <paramref name="buffer" /> is <c>null</c>.
-        /// </exception>
-        public static void WriteRaw(Stream stream, FrameBuffer buffer)
-        {
-            if (stream is null)
-                throw new ArgumentNullException(nameof(stream));
-
-            if (buffer is null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            using var writer = new BinaryWriter(stream, Encoding.Default, true);
-
-            foreach (var pixel in buffer.Pixels)
-            {
-                writer.Write(pixel, Endianness.LE);
-            }
-        }
-
         public static Texture2D GetTexture(
             FrameBufferFormat picFormat,
             FrameBuffer             picBuffer,
