@@ -48,8 +48,17 @@ namespace Unity.PlayStation.Graphics
                 {
                     var rect = palBlock.Rect;
 
-                    var colors   = FrameBuffer.GetColorCount(Format);
-                    var columns  = rect.width / colors;
+                    var colors = Format switch
+                    {
+                        FrameBufferFormat.Indexed4 => 16,
+                        FrameBufferFormat.Indexed8 => 256,
+                        FrameBufferFormat.Direct15 => throw new InvalidDataException($"Invalid palette block found for pixel format: {Format}."),
+                        FrameBufferFormat.Direct24 => throw new InvalidDataException($"Invalid palette block found for pixel format: {Format}."),
+                        _                          => throw new InvalidDataException($"Invalid palette block found for pixel format: {Format}.")
+                    };
+
+                    var columns = rect.width / colors;
+
                     var palettes = new FrameBuffer[columns * rect.height];
 
                     for (var i = 0; i < palettes.Length; i++)

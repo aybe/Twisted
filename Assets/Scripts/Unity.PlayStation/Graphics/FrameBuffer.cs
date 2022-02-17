@@ -74,21 +74,6 @@ namespace Unity.PlayStation.Graphics
             return new FrameBuffer(FrameBufferFormat.Direct15, new RectInt(0, 0, 1024, 512), new short[1024 * 512]);
         }
 
-        public static int GetColorCount(FrameBufferFormat format)
-        {
-            if (!Enum.IsDefined(typeof(FrameBufferFormat), format))
-                throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(FrameBufferFormat));
-
-            return format switch
-            {
-                FrameBufferFormat.Indexed4 => 16,
-                FrameBufferFormat.Indexed8 => 256,
-                FrameBufferFormat.Direct15 => 65536,
-                FrameBufferFormat.Direct24 => 16777216,
-                _                          => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-            };
-        }
-
         public static Texture2D GetTexture(
             FrameBufferFormat    picFormat,
             FrameBuffer          picBuffer,
