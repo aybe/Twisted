@@ -189,7 +189,7 @@ namespace Twisted.PS.Polygons
             return page;
         }
 
-        private static TexturePalette ReadTexturePalette(byte[] data, int index)
+        private static Vector2Int ReadTexturePalette(byte[] data, int index)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -202,7 +202,7 @@ namespace Twisted.PS.Polygons
             var x = (raw & 0b00000000_00111111) * 16;
             var y = (raw & 0b01111111_11000000) / 64;
 
-            var palette = new TexturePalette(x, y);
+            var palette = new Vector2Int(x, y);
 
             return palette;
         }

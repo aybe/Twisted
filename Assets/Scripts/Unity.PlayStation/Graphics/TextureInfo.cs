@@ -7,7 +7,7 @@ namespace Unity.PlayStation.Graphics
     public readonly struct TextureInfo // TODO rename because it's weird
         // TODO texture window?
     {
-        public TextureInfo(TexturePage page, TexturePalette palette, IReadOnlyList<Vector2Int> uvs)
+        public TextureInfo(TexturePage page, Vector2Int palette, IReadOnlyList<Vector2Int> uvs)
         {
             if (uvs == null)
                 throw new ArgumentNullException(nameof(uvs));
@@ -22,7 +22,7 @@ namespace Unity.PlayStation.Graphics
 
         public TexturePage Page { get; }
 
-        public TexturePalette Palette { get; }
+        public Vector2Int Palette { get; }
 
         public IReadOnlyList<Vector2Int> UVs { get; }
 

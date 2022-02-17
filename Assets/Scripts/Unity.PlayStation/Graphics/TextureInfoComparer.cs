@@ -23,11 +23,11 @@ namespace Unity.PlayStation.Graphics
             if (pageColors != 0)
                 return pageColors;
 
-            var paletteX = x.Palette.X.CompareTo(y.Palette.X);
+            var paletteX = x.Palette.x.CompareTo(y.Palette.x);
             if (paletteX != 0)
                 return paletteX;
 
-            var paletteY = x.Palette.Y.CompareTo(y.Palette.Y);
+            var paletteY = x.Palette.y.CompareTo(y.Palette.y);
             if (paletteY != 0)
                 return paletteY;
 

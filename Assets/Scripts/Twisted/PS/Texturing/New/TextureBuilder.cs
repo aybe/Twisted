@@ -100,8 +100,8 @@ namespace Twisted.PS.Texturing.New
                            $"PageX = {key.Page.X}, " +
                            $"PageY = {key.Page.Y}, " +
                            $"PageColors = {key.Page.Colors}, " +
-                           $"PaletteX = {key.Palette.X}, " +
-                           $"PaletteY = {key.Palette.Y}";
+                           $"PaletteX = {key.Palette.x}, " +
+                           $"PaletteY = {key.Palette.y}";
 
                 var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
 
@@ -161,7 +161,7 @@ namespace Twisted.PS.Texturing.New
             };
 
             var picRect = new RectInt(tp.Page.X, tp.Page.Y, pageWidth, 256);
-            var palRect = new RectInt(tp.Palette.X, tp.Palette.Y, paletteWidth, 1);
+            var palRect = new RectInt(tp.Palette.x, tp.Palette.y, paletteWidth, 1);
             var texture = FrameBuffer.GetTexture(format, buffer, picRect, palRect, buffer, mode);
 
             return texture;
