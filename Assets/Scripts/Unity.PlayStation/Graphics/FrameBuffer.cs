@@ -113,7 +113,16 @@ namespace Unity.PlayStation.Graphics
                     throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null);
             }
 
-            var texSize = new Vector2Int(GetRenderWidth(picRect.width, picFormat), picRect.height);
+            var picWidth = picFormat switch
+            {
+                FrameBufferFormat.Indexed4 => picRect.width * 4,
+                FrameBufferFormat.Indexed8 => picRect.width * 2,
+                FrameBufferFormat.Direct15 => picRect.width,
+                FrameBufferFormat.Direct24 => picRect.width * 2 / 3,
+                _                          => throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null)
+            };
+
+            var texSize = new Vector2Int(picWidth, picRect.height);
             var texData = new Color32[texSize.x * texSize.y];
             var picPosX = picRect.position.x;
             var picPosY = picRect.position.y;
@@ -204,21 +213,6 @@ namespace Unity.PlayStation.Graphics
             texture.Apply();
 
             return texture;
-        }
-
-        public static int GetRenderWidth(int width, FrameBufferFormat format)
-        {
-            if (width <= 0)
-                throw new ArgumentOutOfRangeException(nameof(width));
-
-            return format switch
-            {
-                FrameBufferFormat.Indexed4 => width * 4,
-                FrameBufferFormat.Indexed8 => width * 2,
-                FrameBufferFormat.Direct15 => width,
-                FrameBufferFormat.Direct24 => width * 2 / 3,
-                _                          => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-            };
         }
     }
 }
