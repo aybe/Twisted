@@ -9,9 +9,9 @@ namespace Twisted.PS.Polygons
         {
             var data = GetObjectData();
 
-            TextureInfo = ReadTexture(data, 4, 20);
+            TextureInfo = ReadTexture(data, 20);
 
-            TextureUVs = ReadTextureUVs(data, 4, 20);
+            TextureUVs = ReadTextureUVs(data, 20, 4);
         }
     }
 }

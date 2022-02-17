@@ -147,7 +147,7 @@ namespace Twisted.PS.Polygons
                 $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
         }
 
-        protected static TextureInfo ReadTexture(byte[] data, int indices, int index)
+        protected static TextureInfo ReadTexture(byte[] data, int index)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -155,43 +155,16 @@ namespace Twisted.PS.Polygons
             if (data.Length == 0)
                 throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
 
-            if (indices is not (3 or 4))
-                throw new ArgumentOutOfRangeException(nameof(indices));
-
-            if (index < 0 || index > data.Length - indices * 4)
+            if (index < 0 || index > data.Length - 16)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            var page = ReadTexturePage(data, index + 6);
-
             var palette = ReadTexturePalette(data, index + 2);
+
+            var page = ReadTexturePage(data, index + 6);
 
             var texture = new TextureInfo(page, palette);
 
             return texture;
-        }
-
-        protected static ReadOnlyCollection<Vector2Int> ReadTextureUVs(byte[] data, int indices, int index) // BUG this is wrong
-        {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            if (data.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
-
-            if (indices is not (3 or 4))
-                throw new ArgumentOutOfRangeException(nameof(indices));
-
-            if (index < 0 || index > data.Length - indices * 4)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var uvs = new Vector2Int[indices];
-
-            for (var i = 0; i < indices; i++)
-            {
-                uvs[i] = ReadTextureUV(data, index + i * 4);
-            }
-
-            return new ReadOnlyCollection<Vector2Int>(uvs);
         }
 
         private static TexturePage ReadTexturePage(byte[] data, int index)
@@ -233,6 +206,35 @@ namespace Twisted.PS.Polygons
             var v = data.ReadByte(index + 1);
 
             return new Vector2Int(u, v);
+        }
+
+        protected static ReadOnlyCollection<Vector2Int> ReadTextureUVs(byte[] data, int index, int indices)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            if (data.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
+
+            if (indices is not (3 or 4))
+                throw new ArgumentOutOfRangeException(nameof(indices));
+
+            if (index < 0 || index > data.Length - 16)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            var uv1 = ReadTextureUV(data, index + 0);
+            var uv2 = ReadTextureUV(data, index + 4);
+            var uv3 = ReadTextureUV(data, index + 8);
+            var uv4 = ReadTextureUV(data, index + 12);
+
+            var uvs = indices switch
+            {
+                3 => new[] { uv1, uv2, uv3, uv4 },
+                4 => new[] { uv1, uv2, uv3 },
+                _ => throw new ArgumentOutOfRangeException(nameof(indices), indices, null)
+            };
+
+            return new ReadOnlyCollection<Vector2Int>(uvs);
         }
     }
 }
