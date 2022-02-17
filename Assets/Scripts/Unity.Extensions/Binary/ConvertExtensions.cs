@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Binary
 {
     public static partial class ConvertExtensions
     {

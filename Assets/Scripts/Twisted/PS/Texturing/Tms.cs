@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
+using Unity.Extensions.Binary;
 using Unity.Extensions.General;
 using Unity.PlayStation.Graphics;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Binary
 {
     public readonly struct BinaryReaderPositionScope : IDisposable
     {

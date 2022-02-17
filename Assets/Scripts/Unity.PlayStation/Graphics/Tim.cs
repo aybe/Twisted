@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using Unity.Extensions.Binary;
 using Unity.Extensions.General;
 
 namespace Unity.PlayStation.Graphics

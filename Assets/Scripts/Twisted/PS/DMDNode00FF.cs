@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Twisted.PS.Polygons;
+using Unity.Extensions.Binary;
 using Unity.Extensions.General;
 
 namespace Twisted.PS

@@ -1,4 +1,4 @@
-﻿namespace Unity.Extensions.General
+﻿namespace Unity.Extensions.Binary
 {
     public interface IBinaryObject
     {

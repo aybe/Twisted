@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using Unity.Extensions.Binary;
 using Unity.Extensions.General;
 
 namespace Twisted.PS

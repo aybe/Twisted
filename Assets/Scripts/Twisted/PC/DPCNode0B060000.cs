@@ -1,4 +1,5 @@
-﻿using Unity.Extensions.General;
+﻿using Unity.Extensions.Binary;
+using Unity.Extensions.General;
 
 namespace Twisted.PC
 {

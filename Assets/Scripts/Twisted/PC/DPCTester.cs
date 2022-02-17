@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Unity.Extensions.Binary;
 using Unity.Extensions.General;
 
 namespace Twisted.PC

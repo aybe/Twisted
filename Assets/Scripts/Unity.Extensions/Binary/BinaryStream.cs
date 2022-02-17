@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Binary
 {
     public partial class BinaryStream : Stream
     {

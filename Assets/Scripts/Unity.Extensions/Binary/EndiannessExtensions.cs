@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Globalization;
 using System.IO;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Binary
 {
     public static class EndiannessExtensions
     {
