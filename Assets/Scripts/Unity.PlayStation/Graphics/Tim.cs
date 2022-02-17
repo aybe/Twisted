@@ -106,6 +106,11 @@ namespace Unity.PlayStation.Graphics
 
             result = new TimBlock(n, p, new RectInt(x, y, w, h));
 
+            for (var i = 0; i < result.Length - 12 - p.Length * sizeof(short); i++)
+            {
+                reader.BaseStream.Position++; // skip potential junk after payload
+            }
+            
             return true;
         }
 
