@@ -122,7 +122,7 @@ namespace Unity.PlayStation.Graphics
                     break;
                 case FrameBufferFormat.Direct15:
                 case FrameBufferFormat.Direct24:
-                    palTex = null;
+                    palTex = null!;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(picFormat), picFormat, null);
