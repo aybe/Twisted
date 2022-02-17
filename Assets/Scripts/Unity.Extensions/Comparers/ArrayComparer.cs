@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Comparers
 {
     /// <summary>
     ///     Compares arrays by length and by content.

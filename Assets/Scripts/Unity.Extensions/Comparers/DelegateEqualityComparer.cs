@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Unity.Extensions.General
+namespace Unity.Extensions.Comparers
 {
     public sealed class DelegateEqualityComparer<T> : EqualityComparer<T>
     {
