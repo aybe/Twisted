@@ -15,20 +15,6 @@ namespace Unity.PlayStation.Graphics
             Value = value;
         }
 
-        public TransparentColor(byte r, byte g, byte b, bool a)
-        {
-            if (r > 31)
-                throw new ArgumentOutOfRangeException(nameof(r));
-
-            if (g > 31)
-                throw new ArgumentOutOfRangeException(nameof(g));
-
-            if (b > 31)
-                throw new ArgumentOutOfRangeException(nameof(b));
-
-            Value = (short)(((a ? 1 : 0) << 11) | (b << 10) | (g << 5) | r);
-        }
-
         public byte R => (byte)(Value & 0b11111);
 
         public byte G => (byte)((Value >> 5) & 0b11111);
@@ -134,11 +120,6 @@ namespace Unity.PlayStation.Graphics
             var b = (byte)Math.Round(B * 255.0d / 31.0d);
 
             return new Color32(r, g, b, a);
-        }
-
-        public short ToInt16()
-        {
-            return Value;
         }
 
         public override string ToString()
