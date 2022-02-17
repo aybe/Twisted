@@ -46,7 +46,7 @@ namespace Unity.PlayStation.Graphics
             Colors   = colors;
             Disable  = disable;
 
-            var xMax = 1024 - GetRenderWidth(this);
+            var xMax = 1024 - GetPixelWidth(this);
 
             if (position.x > xMax)
                 throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
@@ -62,7 +62,7 @@ namespace Unity.PlayStation.Graphics
             return $"{nameof(Position)}: {Position}, {nameof(Colors)}: {Colors}";
         }
 
-        public static int GetRenderWidth(TexturePage page)
+        public static int GetPixelWidth(TexturePage page)
         {
             var colors = page.Colors;
 

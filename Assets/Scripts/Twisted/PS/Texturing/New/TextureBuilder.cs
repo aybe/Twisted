@@ -139,7 +139,7 @@ namespace Twisted.PS.Texturing.New
                 _                             => throw new NotSupportedException(colors.ToString())
             };
 
-            var pageWidth = TexturePage.GetRenderWidth(tp.Page);
+            var pageWidth = TexturePage.GetPixelWidth(tp.Page);
 
             var paletteWidth = colors switch
             {
