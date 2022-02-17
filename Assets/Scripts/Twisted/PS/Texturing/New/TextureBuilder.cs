@@ -18,8 +18,11 @@ namespace Twisted.PS.Texturing.New
             if (infos is null)
                 throw new ArgumentNullException(nameof(infos));
 
-            if (infos.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(infos));
+            if (infos.Length is 0)
+            {
+                Debug.LogWarning("No textures were generated for this model because it doesn't have any textured polygon.");
+                return;
+            }
 
             // TODO this shouldn't be hardcoded
 
@@ -62,12 +65,6 @@ namespace Twisted.PS.Texturing.New
             }
 
 #if DEBUG_TEXTURES
-
-            if (dictionary.Count is 0)
-            {
-                Debug.LogWarning("No textures were generated for this model because it doesn't have any textured polygon.");
-                return;
-            }
 
             var directory = Path.GetFullPath(Path.Combine(Application.dataPath, "../.temp/TextureBuilder"));
 
