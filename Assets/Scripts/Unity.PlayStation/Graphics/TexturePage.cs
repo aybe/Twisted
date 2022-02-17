@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
+    [PublicAPI]
     public readonly struct TexturePage
     {
         public Vector2Int Position { get; }

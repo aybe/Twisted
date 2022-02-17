@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
     public readonly struct TextureInfo // TODO rename because it's weird
         // TODO texture window?
+    [PublicAPI]
     {
         public TextureInfo(TexturePage page, Vector2Int palette, IReadOnlyList<Vector2Int> uvs)
         {

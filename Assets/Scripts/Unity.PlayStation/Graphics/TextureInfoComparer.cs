@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Unity.PlayStation.Graphics
 {
     /// <summary>
     ///     Compares by page position, page colors, palette position.
     /// </summary>
+    [PublicAPI]
     public sealed class TextureInfoComparer : Comparer<TextureInfo>
     {
         public static TextureInfoComparer Instance { get; } = new();

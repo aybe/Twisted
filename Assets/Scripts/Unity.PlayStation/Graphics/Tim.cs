@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
+using JetBrains.Annotations;
 using Unity.Extensions.Binary;
 using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
+    [PublicAPI]
     public sealed class Tim
         // all existing scenarios covered: with or without palettes and/or picture (tested on +10K files)
     {

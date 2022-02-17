@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
@@ -6,6 +7,7 @@ namespace Unity.PlayStation.Graphics
     /// <summary>
     ///     PlayStation 16-bit semi-transparent color.
     /// </summary>
+    [PublicAPI]
     public readonly struct TransparentColor : IEquatable<TransparentColor>
     {
         private readonly short Value;

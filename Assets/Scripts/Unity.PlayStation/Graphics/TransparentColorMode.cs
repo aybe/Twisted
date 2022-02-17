@@ -1,8 +1,10 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Unity.PlayStation.Graphics
 {
     [Flags]
+    [PublicAPI]
     public enum TransparentColorMode
     {
         /// <summary>

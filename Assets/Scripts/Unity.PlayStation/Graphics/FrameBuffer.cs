@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,6 +10,7 @@ namespace Unity.PlayStation.Graphics
     /// <summary>
     ///     Base class for a frame buffer object.
     /// </summary>
+    [PublicAPI]
     public sealed class FrameBuffer
     {
         public FrameBuffer(FrameBufferFormat format, RectInt rect, IReadOnlyList<short> pixels)

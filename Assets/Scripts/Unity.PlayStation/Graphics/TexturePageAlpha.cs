@@ -1,5 +1,8 @@
-﻿namespace Unity.PlayStation.Graphics
+﻿using JetBrains.Annotations;
+
+namespace Unity.PlayStation.Graphics
 {
+    [PublicAPI]
     public enum TexturePageAlpha
     {
         HalfBackPlusHalfFront = 0,
