@@ -68,21 +68,24 @@ namespace Twisted.PS.Texturing.New
 
 #if DEBUG_TEXTURES
 
-            var directory = Directory.CreateDirectory(Path.Combine(Application.dataPath, "../.temp/TextureBuilder")).FullName;
+            if (dictionary.Count is 0)
+                return;
 
-            Debug.Log($"Generated {dictionary.Count} textures in {directory}.");
+            var directory = Path.GetFullPath(Path.Combine(Application.dataPath, "../.temp/TextureBuilder"));
 
-            foreach (var file in Directory.GetFiles(directory, "*.PNG"))
+            if (Directory.Exists(directory))
             {
                 try
                 {
-                    File.Delete(file);
+                    Directory.Delete(directory, true);
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
                 }
             }
+
+            Directory.CreateDirectory(directory);
 
             var texture = FrameBuffer.GetTexture(psx.Format, psx, psx.Rect);
             var png     = texture.EncodeToPNG();
@@ -107,17 +110,14 @@ namespace Twisted.PS.Texturing.New
                 File.WriteAllBytes(path, value.EncodeToPNG());
             }
 
-            var textures = dictionary.Values.ToArray();
+            Debug.Log($"Generated {dictionary.Count} textures in {directory}.");
 
-            if (textures.Any())
-            {
-                if (!TextureAtlas.TryCreate(textures, out var atlas, out var atlasTexture))
-                    throw new InvalidOperationException("Couldn't create texture atlas, try increase atlas size or reduce the number of textures.");
+            if (!TextureAtlas.TryCreate(dictionary.Values.ToArray(), out var atlas, out var atlasTexture))
+                throw new InvalidOperationException("Couldn't create texture atlas, try increase atlas size or reduce the number of textures.");
 
-                File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
+            File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
 
-                Object.DestroyImmediate(atlas);
-            }
+            Object.DestroyImmediate(atlas);
 #endif
         }
 
