@@ -5,9 +5,8 @@ using UnityEngine;
 
 namespace Unity.PlayStation.Graphics
 {
-    public readonly struct TextureInfo // TODO rename because it's weird
-        // TODO texture window?
     [PublicAPI]
+    public readonly struct TextureInfo
     {
         public TextureInfo(TexturePage page, Vector2Int palette, IReadOnlyList<Vector2Int> uvs)
         {
@@ -26,7 +25,7 @@ namespace Unity.PlayStation.Graphics
 
         public Vector2Int Palette { get; }
 
-        public IReadOnlyList<Vector2Int> UVs { get; }
+        public IReadOnlyList<Vector2Int> UVs { get; } // BUG this has nothing to do in here
 
         public override string ToString()
         {
