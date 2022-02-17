@@ -73,7 +73,7 @@ namespace Twisted
                                 var k = i * 3 + j;
                                 var l = winding[k];
                                 var m = polygon.Vertices[l];
-                                var n = m.ToVector3();
+                                var n = new Vector3(m.X, m.Y, m.Z);
                                 var o = matrix.MultiplyPoint(n);
                                 vertices.Add(o);
                                 colors.Add(color);
