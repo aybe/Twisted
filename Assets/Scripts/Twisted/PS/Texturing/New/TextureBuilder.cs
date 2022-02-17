@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Twisted.PS.Polygons;
 using Unity.Extensions.Graphics;
+using Unity.PlayStation.Graphics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

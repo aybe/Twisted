@@ -1,5 +1,6 @@
 using System.IO;
 using Twisted.PS.Texturing;
+using Unity.PlayStation.Graphics;
 
 namespace Twisted.PS.Polygons
 {
