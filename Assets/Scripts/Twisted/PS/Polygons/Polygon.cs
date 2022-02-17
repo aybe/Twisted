@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -76,7 +77,7 @@ namespace Twisted.PS.Polygons
                 vertices[i] = reader.ReadObject(s => ReadVector4Int16(s, Endianness.LE), positionVertices + verticesIndices[i] * 8);
             }
 
-            Vertices = vertices.Take(polygonFaces).AsReadOnly();
+            Vertices = new ReadOnlyCollection<Vector4>(vertices.Take(polygonFaces).ToArray());
 
             // read polygon normals if any
 
@@ -99,7 +100,7 @@ namespace Twisted.PS.Polygons
                 normals[i] = reader.ReadObject(s => ReadVector4Int16(s, Endianness.LE), positionNormals + normalsIndices[i] * 8);
             }
 
-            Normals = normals.Take(polygonFaces).AsReadOnly();
+            Normals = new ReadOnlyCollection<Vector4>(normals.Take(polygonFaces).ToArray());
 
             static Vector4 ReadVector4Int16(BinaryReader reader, Endianness endianness)
             {
