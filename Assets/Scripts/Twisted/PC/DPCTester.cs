@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
+using UnityEngine.Assertions;
 
 namespace Twisted.PC
 {

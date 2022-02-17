@@ -1,4 +1,6 @@
-﻿namespace Twisted.PC
+﻿using UnityEngine.Assertions;
+
+namespace Twisted.PC
 {
     public sealed class DPCNode0905XXXX : DPCNode
     {
@@ -16,9 +18,9 @@
 
             // Assert.AreEqual(0, b1, reader.Position.ToString());
 
-            Assert.AreEqual(0, B2, reader.Position.ToString());
+            Assert.AreEqual((byte)0, B2, reader.Position.ToString());
 
-            Assert.AreEqual(0, B4, reader.Position.ToString());
+            Assert.AreEqual((byte)0, B4, reader.Position.ToString());
 
             var addresses = reader.ReadAddresses(ChildrenCount);
 

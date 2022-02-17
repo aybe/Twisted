@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine.Assertions;
 
 namespace Twisted.PS
 {
@@ -18,11 +19,11 @@ namespace Twisted.PS
 
             // Assert.AreEqual(0, b1);
 
-            Assert.AreEqual(0, b2);
+            Assert.AreEqual((byte)0, b2);
 
-            Assert.AreNotEqual(0, b3);
+            Assert.AreNotEqual((byte)0, b3);
 
-            Assert.AreEqual(0, b4);
+            Assert.AreEqual((byte)0, b4);
 
             var addresses = ReadAddresses(reader, b3);
 

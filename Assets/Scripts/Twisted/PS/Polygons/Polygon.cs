@@ -6,8 +6,8 @@ using System.Linq;
 using System.Numerics;
 using Twisted.PS.Texturing;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 using Unity.PlayStation.Graphics;
+using UnityEngine.Assertions;
 
 namespace Twisted.PS.Polygons
 {

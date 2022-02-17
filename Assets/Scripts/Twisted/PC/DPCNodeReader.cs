@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
+using UnityEngine.Assertions;
 
 namespace Twisted.PC
 {

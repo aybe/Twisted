@@ -1,5 +1,5 @@
 ﻿using Unity.Extensions.Binary;
-using Unity.Extensions.General;
+using UnityEngine.Assertions;
 
 namespace Twisted.PC
 {
@@ -40,7 +40,7 @@ namespace Twisted.PC
             var b3 = reader.ReadByte();
             var b4 = reader.ReadByte();
 
-            Assert.AreEqual(1, b3, nameof(b3));
+            Assert.AreEqual((byte)1, b3, nameof(b3));
             // Assert.AreEqual(1, b4, nameof(b4));
 
             var addresses = reader.ReadAddresses(b3);

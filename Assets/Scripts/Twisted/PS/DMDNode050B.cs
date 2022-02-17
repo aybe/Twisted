@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine.Assertions;
 
 namespace Twisted.PS
 {
@@ -17,7 +18,7 @@ namespace Twisted.PS
 
             // Assert.AreEqual(0, bytes[32]);
 
-            Assert.AreEqual(0, bytes[33]);
+            Assert.AreEqual((byte)0, bytes[33]);
 
             var count = bytes[34];
 

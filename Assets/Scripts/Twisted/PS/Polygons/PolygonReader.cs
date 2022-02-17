@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Unity.Extensions.Binary;
 using Unity.Extensions.General;
+using UnityEngine.Assertions;
 
 namespace Twisted.PS.Polygons
 {
@@ -38,7 +39,7 @@ namespace Twisted.PS.Polygons
 
             if (vertices >= reader.BaseStream.Length) // TODO delete once useless
             {
-                Assert.Fail();
+                throw new AssertionException(null, "Offset to vertices points outside stream.");
             }
 
             if (normals >= reader.BaseStream.Length) // TODO delete once useless
@@ -60,9 +61,8 @@ namespace Twisted.PS.Polygons
                 case 0x84010A09: break;
                 case 0x84040D0C: break;
                 default:
-                    Assert.Fail($"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
-                    break;
-                    // @formatter:on
+                    throw new AssertionException(null, $"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
+                // @formatter:on
                 }
             }
 

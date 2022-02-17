@@ -1,5 +1,5 @@
 ﻿using Unity.Extensions.Binary;
-using Unity.Extensions.General;
+using UnityEngine.Assertions;
 
 namespace Twisted.PC
 {
@@ -14,11 +14,11 @@ namespace Twisted.PC
             var b3 = reader.ReadByte();
             var b4 = reader.ReadByte();
 
-            Assert.AreEqual(0, b1, Position.ToString());
+            Assert.AreEqual((byte)0, b1, Position.ToString());
 
             Assert.IsTrue(b2 is 1 or 2, Position.ToString());
 
-            Assert.AreEqual(0, b3, Position.ToString());
+            Assert.AreEqual((byte)0, b3, Position.ToString());
 
             Assert.IsTrue(b4 is 1 or 2 or 3, Position.ToString());
 
