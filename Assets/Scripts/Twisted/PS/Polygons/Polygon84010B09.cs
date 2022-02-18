@@ -16,7 +16,7 @@ namespace Twisted.PS.Polygons
         {
         }
 
-        protected override int? ColorElements { get; } = 3;
+        protected override int? ColorElements { get; } = 1;
 
         protected override int? ColorPosition { get; } = 16;
 
