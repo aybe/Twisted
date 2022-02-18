@@ -22,5 +22,9 @@ namespace Twisted.PS.Polygons
         protected override int? ColorPosition { get; } = 16;
 
         protected override int? ColorType { get; } = 0x3C;
+
+        protected override int? TextureElements { get; } = 4;
+
+        protected override int? TexturePosition { get; } = 32;
     }
 }

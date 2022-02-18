@@ -15,15 +15,16 @@ namespace Twisted.PS.Polygons
         public Polygon04010B0C(BinaryReader reader, int positionVertices, int positionNormals)
             : base(reader, 44, 4, positionVertices, positionNormals, 36)
         {
-            var data = GetObjectData();
+        }
 
-            TextureInfo = ReadTexture(data, 20);
         protected override int? ColorElements { get; } = 1;
 
-            TextureUVs = ReadTextureUVs(data, 20, 4);
-        }
         protected override int? ColorPosition { get; } = 16;
 
         protected override int? ColorType { get; } = 0x3C;
+
+        protected override int? TextureElements { get; } = 4;
+
+        protected override int? TexturePosition { get; } = 20;
     }
 }
