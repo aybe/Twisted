@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Twisted.PS.Polygons;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 
 namespace Twisted.PS
 {
@@ -62,7 +62,7 @@ namespace Twisted.PS
                    $"{nameof(PositionVertices)}: {PositionVertices}, " +
                    $"{nameof(PositionNormals)}: {PositionNormals}, " +
                    $"{nameof(PositionPolygons)}: {PositionPolygons}, " +
-                   $"{nameof(Polygons)}: {Polygons.Count}";
+                   $"{nameof(Polygons)}: {Polygons.Count}, {string.Join(", ", Polygons.Select(s => s.GetType().Name.Replace("Polygon", string.Empty)).Distinct().OrderBy(s => s))}";
         }
     }
 }
