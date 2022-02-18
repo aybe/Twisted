@@ -36,7 +36,7 @@ namespace Twisted
 
             var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray();
 
-            factory.GetTextureAtlas(infos, out var atlas, out var atlasTexture);
+            factory.GetTextureAtlas(infos, out var atlas, out var atlasTexture, out var atlasIndices);
 
             Assert.AreEqual(atlasTexture != null, atlasTexture is not null);
 
@@ -81,6 +81,9 @@ namespace Twisted
                             dictionary.Add(type, color);
                         }
 
+                        var textureInfo = polygon.TextureInfo;
+                        var textureUVs  = polygon.TextureUVs;
+
                         for (var i = 0; i < polygon.Vertices.Count / 2; i++)
                         {
                             for (var j = 0; j < 3; j++)
@@ -94,10 +97,11 @@ namespace Twisted
                                 colors.Add(color);
                                 indices.Add(indices.Count);
 
-                                if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
+                                if (textureInfo is not null && textureUVs is not null)
                                 {
-                                    var t = polygon.TextureUVs[l];
-                                    var u = atlas.GetUV(atlas.Count == 2 ? 1 : 0, t, false, TextureTransform.FlipY); // BUG this is wrong, we need TextureInfo to Int32 map as well
+                                    var t = textureUVs[l];
+                                    var z = atlasIndices[textureInfo.Value];
+                                    var u = atlas.GetUV(z, t, false, TextureTransform.FlipY);
                                     uvs.Add(u);
                                 }
                                 else

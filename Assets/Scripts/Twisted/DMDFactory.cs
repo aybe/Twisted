@@ -1,6 +1,7 @@
 ﻿#define DEBUG_TEXTURES
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -42,10 +43,11 @@ namespace Twisted
             return new DMDFactory(dmd, tms);
         }
 
-        public void GetTextureAtlas(TextureInfo[] infos, out TextureAtlas atlas, out Texture2D atlasTexture)
+        public void GetTextureAtlas(TextureInfo[] infos, out TextureAtlas atlas, out Texture2D atlasTexture, out IReadOnlyDictionary<TextureInfo, int> atlasIndices)
         {
             atlas        = default;
             atlasTexture = default;
+            atlasIndices = default;
 
             if (infos is null)
                 throw new ArgumentNullException(nameof(infos));
@@ -60,20 +62,24 @@ namespace Twisted
 
             var buffer = FrameBuffer ??= GetBuffer();
 
-            var dictionary = new SortedDictionary<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
+            var list = new SortedList<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
 
             foreach (var info in infos)
             {
-                if (dictionary.ContainsKey(info))
+                if (list.ContainsKey(info))
                     continue;
 
                 var value = GetTexture(buffer, info, TransparentColorMode.None);
 
-                dictionary.Add(info, value);
+                list.Add(info, value);
             }
 
-            if (!TextureAtlas.TryCreate(dictionary.Values.ToArray(), out atlas, out atlasTexture))
+            var textures = list.Values.ToArray();
+
+            if (!TextureAtlas.TryCreate(textures, out atlas, out atlasTexture))
                 throw new InvalidOperationException("Couldn't create texture atlas, try increase atlas size or reduce the number of textures.");
+
+            atlasIndices = new ReadOnlyDictionary<TextureInfo, int>(list.ToDictionary(s => s.Key, s => list.IndexOfKey(s.Key)));
 
 #if DEBUG_TEXTURES // TODO delete this texture debugging code
 
@@ -102,7 +108,7 @@ namespace Twisted
 
             var index = 0;
 
-            foreach (var (key, value) in dictionary)
+            foreach (var (key, value) in list)
             {
                 var name = $"Index = {index++}, " +
                            $"PageX = {key.Page.Position.x}, " +
@@ -116,7 +122,7 @@ namespace Twisted
                 File.WriteAllBytes(path, value.EncodeToPNG());
             }
 
-            Debug.Log($"Generated {dictionary.Count} textures in {directory}.");
+            Debug.Log($"Generated {list.Count} textures in {directory}.");
 
             File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
 #endif
