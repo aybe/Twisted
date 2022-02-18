@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
-using Twisted.PS.Texturing;
 using Unity.Extensions.Binary;
 using Unity.PlayStation.Graphics;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Vector2 = UnityEngine.Vector2;
 using Vector4 = System.Numerics.Vector4;
 
 namespace Twisted.PS.Polygons
@@ -128,10 +125,6 @@ namespace Twisted.PS.Polygons
 
         public IReadOnlyList<Vector4> Normals { get; }
 
-        public TextureInfo? TextureInfo { get; protected init; } = null;
-
-        public IReadOnlyList<Vector2Int>? TextureUVs { get; protected init; } = null;
-        
         public long Position { get; }
 
         public long Length { get; }
@@ -147,95 +140,6 @@ namespace Twisted.PS.Polygons
                 $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
         }
 
-        protected static TextureInfo ReadTexture(byte[] data, int index)
-        {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            if (data.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
-
-            if (index < 0 || index > data.Length - 16)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var palette = ReadTexturePalette(data, index + 2);
-
-            var page = ReadTexturePage(data, index + 6);
-
-            var texture = new TextureInfo(page, palette);
-
-            return texture;
-        }
-
-        private static TexturePage ReadTexturePage(byte[] data, int index)
-        {
-            var raw = data.ReadInt32(index, Endianness.LE);
-
-            var x = (raw & 0b_00000000_00001111) * 64;
-            var y = (raw & 0b_00000000_00010000) / 16 * 256;
-            var a = (raw & 0b_00000000_01100000) / 32;
-            var b = (raw & 0b_00000001_10000000) / 128;
-            var d = (raw & 0b_00001000_00000000) / 1024;
-
-            var page = new TexturePage(new Vector2Int(x, y), (TexturePageAlpha)a, (TexturePageColors)b, (TexturePageDisable)d);
-
-            return page;
-        }
-
-        private static Vector2Int ReadTexturePalette(byte[] data, int index)
-        {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            if (index < 0 || index > data.Length - sizeof(short))
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var raw = data.ReadInt16(index, Endianness.LE);
-
-            var x = (raw & 0b00000000_00111111) * 16;
-            var y = (raw & 0b01111111_11000000) / 64;
-
-            var palette = new Vector2Int(x, y);
-
-            return palette;
-        }
-
-        private static Vector2Int ReadTextureUV(byte[] data, int index)
-        {
-            var u = data.ReadByte(index + 0);
-            var v = data.ReadByte(index + 1);
-
-            return new Vector2Int(u, v);
-        }
-
-        protected static ReadOnlyCollection<Vector2Int> ReadTextureUVs(byte[] data, int index, int indices)
-        {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            if (data.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(data));
-
-            if (indices is not (3 or 4))
-                throw new ArgumentOutOfRangeException(nameof(indices));
-
-            if (index < 0 || index > data.Length - 16)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var uv1 = ReadTextureUV(data, index + 0);
-            var uv2 = ReadTextureUV(data, index + 4);
-            var uv3 = ReadTextureUV(data, index + 8);
-            var uv4 = ReadTextureUV(data, index + 12);
-
-            var uvs = indices switch
-            {
-                3 => new[] { uv1, uv2, uv3, uv4 },
-                4 => new[] { uv1, uv2, uv3 },
-                _ => throw new ArgumentOutOfRangeException(nameof(indices), indices, null)
-            };
-
-            return new ReadOnlyCollection<Vector2Int>(uvs);
-        }
         #region Color
 
         protected virtual int? ColorElements => null;
@@ -278,6 +182,87 @@ namespace Twisted.PS.Polygons
             }
 
             return colors;
+        }
+
+        #endregion
+
+        #region Texture
+
+        protected virtual int? TextureElements { get; } = null;
+
+        protected virtual int? TexturePosition { get; } = null;
+
+        public TextureInfo? TextureInfo => TryReadTextureInfo();
+
+        public IReadOnlyList<Vector2Int>? TextureUVs => TryReadTextureUVs();
+
+        private TextureInfo? TryReadTextureInfo()
+        {
+            var elements = TextureElements;
+            var position = TexturePosition;
+
+            if (elements is null && position is null)
+                return null;
+
+            if (elements is null != position is null)
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+
+            if (elements.Value is not (3 or 4))
+                throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
+
+            var data    = GetObjectData();
+            var dataMax = data.Length - 8;
+
+            if (position.Value > dataMax)
+                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+
+            var paletteRaw = data.ReadInt16(position.Value + 2, Endianness.LE);
+            var paletteX   = (paletteRaw & 0b00000000_00111111) * 16;
+            var paletteY   = (paletteRaw & 0b01111111_11000000) / 64;
+            var palette    = new Vector2Int(paletteX, paletteY);
+
+            var pageRaw     = data.ReadInt32(position.Value + 6, Endianness.LE);
+            var pageX       = (pageRaw & 0b_00000000_00001111) * 64;
+            var pageY       = (pageRaw & 0b_00000000_00010000) / 16 * 256;
+            var pageAlpha   = (pageRaw & 0b_00000000_01100000) / 32;
+            var pageColors  = (pageRaw & 0b_00000001_10000000) / 128;
+            var pageDisable = (pageRaw & 0b_00001000_00000000) / 1024;
+            var page        = new TexturePage(new Vector2Int(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
+
+            return new TextureInfo(page, palette);
+        }
+
+        private IReadOnlyList<Vector2Int>? TryReadTextureUVs()
+        {
+            var elements = TextureElements;
+            var position = TexturePosition;
+
+            if (elements is null && position is null)
+                return null;
+
+            if (elements is null != position is null)
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+
+            if (elements.Value is not (3 or 4))
+                throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
+
+            var data    = GetObjectData();
+            var dataMax = data.Length - elements.Value * 4;
+
+            if (position.Value > dataMax)
+                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+
+            var uvs = new Vector2Int[elements.Value];
+
+            for (var i = 0; i < uvs.Length; i++)
+            {
+                var j = i * 4;
+                var u = data.ReadByte(j + 0);
+                var v = data.ReadByte(j + 1);
+                uvs[i] = new Vector2Int(u, v);
+            }
+
+            return uvs;
         }
 
         #endregion
