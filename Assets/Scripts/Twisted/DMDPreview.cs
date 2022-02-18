@@ -15,7 +15,7 @@ namespace Twisted
     [Singleton(Automatic = true)]
     public sealed class DMDPreview : MonoBehaviour, ISingleton
     {
-        public void SetNode(DMDFactory factory, DMDNode00FF? node, bool split = true)
+        public void SetNode(DMDFactory factory, DMDNode00FF? node, bool split = true, bool frame = true)
         {
             while (transform.childCount > 0)
             {
@@ -125,6 +125,9 @@ namespace Twisted
             }
 
             // frame the object but unlike Unity, make it pleasant
+            
+            if (frame is false)
+                return;
 
             var view = SceneView.lastActiveSceneView;
 

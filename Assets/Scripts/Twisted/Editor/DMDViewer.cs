@@ -162,9 +162,9 @@ namespace Twisted.Editor
 
         #region Methods
 
-        private void OpenNode(DMDNode00FF? node)
+        private void OpenNode(DMDNode00FF? node, bool frame = true)
         {
-            Singleton<DMDPreview>.instance.SetNode(Factory, node);
+            Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
         }
 
         #endregion
@@ -180,7 +180,7 @@ namespace Twisted.Editor
 
                 if (e.Node is DMDNode00FF node)
                 {
-                    menu.AddItem(content, false, s => OpenNode(s as DMDNode00FF), node);
+                    menu.AddItem(content, false, s => OpenNode(s as DMDNode00FF, false), node);
                 }
                 else
                 {
