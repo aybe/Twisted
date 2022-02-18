@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Twisted.PS;
 using Unity.Extensions.General;
@@ -63,6 +64,7 @@ namespace Twisted
                     var vertices = new List<Vector3>();
                     var colors   = new List<Color>();
                     var uvs      = new List<Vector2>();
+                    var colors2  = new List<Vector4>();
                     var indices  = new List<int>();
 
                     foreach (var polygon in list)
@@ -81,6 +83,8 @@ namespace Twisted
                             dictionary.Add(type, color);
                         }
 
+                        var polygonColors = polygon.Colors;
+
                         var textureInfo = polygon.TextureInfo;
                         var textureUVs  = polygon.TextureUVs;
 
@@ -94,7 +98,27 @@ namespace Twisted
                                 var n = new Vector3(m.X, m.Y, m.Z);
                                 var o = matrix.MultiplyPoint(n);
                                 vertices.Add(o);
-                                colors.Add(color);
+
+                                if (polygonColors != null)
+                                {
+                                    switch (polygonColors.Count)
+                                    {
+                                        case 0:
+                                            throw new InvalidDataException();
+                                        case 1:
+                                            colors.Add(polygonColors[0]);
+                                            break;
+                                        default:
+                                            colors.Add(polygonColors[l]);
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    colors.Add(Color.magenta); // BUG there should be distinct meshes
+                                }
+
+                                colors2.Add(color);
                                 indices.Add(indices.Count);
 
                                 if (textureInfo is not null && textureUVs is not null)
@@ -123,6 +147,8 @@ namespace Twisted
                         uv        = uvs.ToArray(),
                         triangles = indices.ToArray()
                     };
+                    
+                    mesh.SetUVs(1, colors2);
 
                     var go = gameObject.CreateChild(meshName);
                     var mf = go.AddComponent<MeshFilter>();
