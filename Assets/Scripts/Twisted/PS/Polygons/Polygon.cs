@@ -174,7 +174,12 @@ namespace Twisted.PS.Polygons
 
                 if (ColorType != null)
                 {
-                    Assert.AreEqual(ColorType.Value, span[3]);
+                    var a = span[3];
+
+                    if (a != ColorType.Value)
+                    {
+                        Debug.LogWarning($"{GetType().Name}: {nameof(ColorType)} is 0x{ColorType.Value:X2} but color type data is 0x{a:X2}.");
+                    }
                 }
 
                 colors[i] = new Color32(r, g, b, byte.MaxValue);
