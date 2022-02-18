@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Unity.Extensions.Binary;
-using Unity.Extensions.General;
 using UnityEngine.Assertions;
 
 namespace Twisted.PS.Polygons
@@ -30,8 +29,8 @@ namespace Twisted.PS.Polygons
             return polygons;
         }
 
-        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
-        [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
+        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
+        [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
         private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
         {
             if (reader == null)
@@ -62,7 +61,7 @@ namespace Twisted.PS.Polygons
                 case 0x84040D0C: break;
                 default:
                     throw new AssertionException(null, $"Missing normals for 0x{type:X8} @ {reader.BaseStream.Position}");
-                // @formatter:on
+                    // @formatter:on
                 }
             }
 

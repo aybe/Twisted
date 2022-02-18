@@ -15,11 +15,11 @@ namespace Twisted.PS.Polygons
     {
         protected Polygon(
             BinaryReader reader,
-            int polygonSize = -1,
-            int polygonFaces = -1,
-            int positionVertices = -1,
-            int positionNormals = -1,
-            int offsetNormals = -1)
+            int          polygonSize      = -1,
+            int          polygonFaces     = -1,
+            int          positionVertices = -1,
+            int          positionNormals  = -1,
+            int          offsetNormals    = -1)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -136,8 +136,7 @@ namespace Twisted.PS.Polygons
 
         public override string ToString()
         {
-            return
-                $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
+            return $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
         }
 
         #region Color
