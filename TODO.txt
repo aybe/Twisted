@@ -39,3 +39,13 @@ do texturing
 - MeshCollider on degenerate triangles: mesh must have at least three distinct vertices to be a valid collision mesh
 - when another DMD is loaded, preview should be reset
 - the clown head is probably something like GsSPRITE
+- fix this "Polygon 20 @ 46316 (Polygon00010605)" mesh must have at least three distinct vertices to be a valid collision mesh.
+- fix this [Physics.PhysX] cleaning the mesh failed
+
+# Rendering
+
+- are texture flipped horizontally?
+- the wheels contour are not transparent, see if there's some flag about STP on polygons, check with no$psx's polygon type
+- the highest poly models appear to have their wheel in previous node
+- park1 dome texturing is wrong (03030a09)
+- [SOLVED] the bottom of the cars is complete garbage (texture)
