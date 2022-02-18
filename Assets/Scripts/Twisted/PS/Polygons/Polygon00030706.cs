@@ -9,5 +9,11 @@ namespace Twisted.PS.Polygons
         {
             // TODO int32 + rgba * 4?
         }
+
+        protected override int? ColorElements { get; } = 3;
+
+        protected override int? ColorPosition { get; } = 16;
+
+        protected override int? ColorType { get; } = 0x30;
     }
 }

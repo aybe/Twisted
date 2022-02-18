@@ -8,5 +8,11 @@ namespace Twisted.PS.Polygons
             : base(reader, 20, 4, positionVertices)
         {
         }
+
+        protected override int? ColorElements { get; } = 1;
+
+        protected override int? ColorPosition { get; } = 16;
+
+        protected override int? ColorType { get; } = 0x28;
     }
 }

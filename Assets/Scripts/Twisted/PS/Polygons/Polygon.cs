@@ -236,5 +236,50 @@ namespace Twisted.PS.Polygons
 
             return new ReadOnlyCollection<Vector2Int>(uvs);
         }
+        #region Color
+
+        protected virtual int? ColorElements => null;
+
+        protected virtual int? ColorPosition => null;
+
+        protected virtual int? ColorType { get; } = null;
+
+        public IReadOnlyList<Color32>? Colors => TryReadColors();
+
+        private IReadOnlyList<Color32>? TryReadColors()
+        {
+            var elements = ColorElements;
+            var position = ColorPosition;
+
+            if (elements is null && position is null)
+                return null;
+
+            if (elements is null != position is null)
+                throw new InvalidOperationException($"Both {nameof(ColorElements)} and {nameof(ColorPosition)} must be overridden.");
+
+            var colors = new Color32[elements.Value];
+
+            var data = GetObjectData();
+
+            for (var i = 0; i < colors.Length; i++)
+            {
+                var span = data.AsSpan(position.Value + i * 4);
+
+                var r = span[0];
+                var g = span[1];
+                var b = span[2];
+
+                if (ColorType != null)
+                {
+                    Assert.AreEqual(ColorType.Value, span[3]);
+                }
+
+                colors[i] = new Color32(r, g, b, byte.MaxValue);
+            }
+
+            return colors;
+        }
+
+        #endregion
     }
 }
