@@ -37,3 +37,4 @@ do texturing
 - the texture builder logic should be on Unity.Playstation and also include texture window
 - can there be endianness extension methods directly for Span<T>?
 - MeshCollider on degenerate triangles: mesh must have at least three distinct vertices to be a valid collision mesh
+- when another DMD is loaded, preview should be reset
