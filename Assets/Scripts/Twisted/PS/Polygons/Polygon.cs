@@ -255,7 +255,7 @@ namespace Twisted.PS.Polygons
 
             for (var i = 0; i < uvs.Length; i++)
             {
-                var j = i * 4;
+                var j = position.Value + i * 4;
                 var u = data.ReadByte(j + 0);
                 var v = data.ReadByte(j + 1);
                 uvs[i] = new Vector2Int(u, v);
