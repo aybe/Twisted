@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Twisted.PS.Polygons
 {
-    internal sealed class Polygon04010B0C : PolygonF4
+    internal sealed class Polygon04010B0C : PolygonFT4
         // TODO unknown int32 @ 12
         // TODO unknown int32 @ 36
         // TODO unknown int32 @ 40
