@@ -1,6 +1,6 @@
 ﻿namespace Twisted.PS.Polygons
 {
-    internal interface IPolygonG4C3C
+    public interface IPolygonG4C3C : IPolygon
     {
     }
 }
