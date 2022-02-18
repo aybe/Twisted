@@ -119,8 +119,6 @@ namespace Twisted
             Debug.Log($"Generated {dictionary.Count} textures in {directory}.");
 
             File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
-
-            Object.DestroyImmediate(atlas);
 #endif
         }
 
