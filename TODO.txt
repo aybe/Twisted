@@ -38,3 +38,4 @@ do texturing
 - can there be endianness extension methods directly for Span<T>?
 - MeshCollider on degenerate triangles: mesh must have at least three distinct vertices to be a valid collision mesh
 - when another DMD is loaded, preview should be reset
+- the clown head is probably something like GsSPRITE
