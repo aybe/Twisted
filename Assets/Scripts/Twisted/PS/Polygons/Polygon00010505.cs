@@ -2,7 +2,7 @@
 
 namespace Twisted.PS.Polygons
 {
-    internal sealed class Polygon00010505 : Polygon, IPolygonF4
+    internal sealed class Polygon00010505 : PolygonF4
         // TODO unknown int32 @ 12
     {
         public Polygon00010505(BinaryReader reader, int positionVertices)

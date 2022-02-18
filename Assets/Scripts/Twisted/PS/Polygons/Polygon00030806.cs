@@ -2,7 +2,7 @@
 
 namespace Twisted.PS.Polygons
 {
-    internal sealed class Polygon00030806 : Polygon, IPolygonG3
+    internal sealed class Polygon00030806 : PolygonG3
         // TODO unknown int32 @ 12
         // TODO unknown int32 @ 28
     {
