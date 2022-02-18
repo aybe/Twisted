@@ -73,6 +73,9 @@ namespace Unity.Extensions.Graphics
             return true;
         }
 
+        [Obsolete("This is plain wrong")] // TODO remove
+        public int Count => Rects.Length;
+
         /// <summary>
         ///     Gets UV coordinates for a texture.
         /// </summary>

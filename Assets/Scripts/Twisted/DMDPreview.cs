@@ -7,6 +7,7 @@ using Unity.Extensions.Graphics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Random = UnityEngine.Random;
 
 namespace Twisted
@@ -36,6 +37,14 @@ namespace Twisted
             var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray();
 
             factory.GetTextureAtlas(infos, out var atlas, out var atlasTexture);
+
+            Assert.AreEqual(atlasTexture != null, atlasTexture is not null);
+
+            if (atlasTexture is not null)
+            {
+                atlasTexture.filterMode = FilterMode.Point;
+                atlasTexture.hideFlags  = HideFlags.HideAndDontSave;
+            }
 
             var sharedMaterial = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = atlasTexture };
 
@@ -88,7 +97,7 @@ namespace Twisted
                                 if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
                                 {
                                     var t = polygon.TextureUVs[l];
-                                    var u = atlas.GetUV(0, t, false, TextureTransform.None); // BUG this is wrong, we need TextureInfo to Int32 map as well
+                                    var u = atlas.GetUV(atlas.Count == 2 ? 1 : 0, t, false, TextureTransform.FlipY); // BUG this is wrong, we need TextureInfo to Int32 map as well
                                     uvs.Add(u);
                                 }
                                 else
@@ -124,8 +133,10 @@ namespace Twisted
                 }
             }
 
+            DestroyImmediate(atlas);
+
             // frame the object but unlike Unity, make it pleasant
-            
+
             if (frame is false)
                 return;
 
