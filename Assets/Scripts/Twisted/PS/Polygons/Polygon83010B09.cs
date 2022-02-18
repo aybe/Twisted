@@ -4,10 +4,7 @@ namespace Twisted.PS.Polygons
 {
     internal sealed class Polygon83010B09 : PolygonF3
         // TODO unknown int32 @ 12
-        // TODO unknown int32 @ 20
-        // TODO unknown int32 @ 24
-        // TODO unknown int32 @ 28
-        // TODO unknown int32 @ 32
+        // TODO unknown int32 @ 32 with E2
         // TODO unknown int32 @ 36
         // TODO unknown int32 @ 40
     {

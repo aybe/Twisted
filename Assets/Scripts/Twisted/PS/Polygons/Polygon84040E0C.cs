@@ -4,11 +4,7 @@ namespace Twisted.PS.Polygons
 {
     internal sealed class Polygon84040E0C : PolygonG4
         // TODO unknown int32 @ 12
-        // TODO unknown int32 @ 32
-        // TODO unknown int32 @ 36
-        // TODO unknown int32 @ 40
-        // TODO unknown int32 @ 44
-        // TODO unknown int32 @ 48 ends with E2
+        // TODO unknown int32 @ 48 with E2
         // TODO unknown int32 @ 52
     {
         public Polygon84040E0C(BinaryReader reader, int positionVertices)

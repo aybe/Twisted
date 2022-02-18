@@ -4,10 +4,6 @@ namespace Twisted.PS.Polygons
 {
     internal sealed class Polygon03010907 : PolygonF3
         // TODO unknown int32 @ 12
-        // TODO unknown int32 @ 20
-        // TODO unknown int32 @ 24
-        // TODO unknown int32 @ 28
-        // TODO unknown int32 @ 32
     {
         public Polygon03010907(BinaryReader reader, int positionVertices)
             : base(reader, 36, 3, positionVertices)
