@@ -62,8 +62,8 @@ namespace Twisted
                 foreach (var list in lists)
                 {
                     var vertices = new List<Vector3>();
-                    var colors   = new List<Color>();
                     var uvs      = new List<Vector2>();
+                    var colors1  = new List<Vector4>();
                     var colors2  = new List<Vector4>();
                     var indices  = new List<int>();
 
@@ -106,16 +106,16 @@ namespace Twisted
                                         case 0:
                                             throw new InvalidDataException();
                                         case 1:
-                                            colors.Add(polygonColors[0]);
+                                            colors1.Add((Color)polygonColors[0]);
                                             break;
                                         default:
-                                            colors.Add(polygonColors[l]);
+                                            colors1.Add((Color)polygonColors[l]);
                                             break;
                                     }
                                 }
                                 else
                                 {
-                                    colors.Add(Color.magenta); // BUG there should be distinct meshes
+                                    colors1.Add(Color.magenta); // BUG there should be distinct meshes
                                 }
 
                                 colors2.Add(color);
@@ -142,13 +142,13 @@ namespace Twisted
                     {
                         name      = meshName,
                         hideFlags = HideFlags.HideAndDontSave,
-                        vertices  = vertices.ToArray(),
-                        colors    = colors.ToArray(),
-                        uv        = uvs.ToArray(),
-                        triangles = indices.ToArray()
                     };
-                    
-                    mesh.SetUVs(1, colors2);
+
+                    mesh.SetVertices(vertices);
+                    mesh.SetUVs(0, uvs);
+                    mesh.SetUVs(1, colors1);
+                    mesh.SetUVs(2, colors2);
+                    mesh.SetTriangles(indices, 0);
 
                     var go = gameObject.CreateChild(meshName);
                     var mf = go.AddComponent<MeshFilter>();

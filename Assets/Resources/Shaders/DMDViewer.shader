@@ -18,26 +18,39 @@ Shader "Twisted/DMDViewer"
 		Pass
 		{
 			CGPROGRAM
+
+			// #pragma enable_d3d11_debug_symbols
+
 			#pragma vertex vert
 			#pragma fragment frag
-			// make fog work
-			#pragma multi_compile_fog
+
+			#pragma multi_compile _ DMD_VIEWER_COLOR_VERTEX
+			#pragma multi_compile _ DMD_VIEWER_COLOR_POLYGON
 
 			#include "UnityCG.cginc"
 
 			struct appdata
 			{
 				float4 vertex : POSITION;
-				float2 uv : TEXCOORD0;
-				float4 color : COLOR;
+				float2 uv0 : TEXCOORD0;
+#if DMD_VIEWER_COLOR_VERTEX
+				float4 uv1 : TEXCOORD1;
+#endif
+#if DMD_VIEWER_COLOR_POLYGON
+				float4 uv2 : TEXCOORD2;
+#endif
 			};
 
 			struct v2f
 			{
-				float2 uv : TEXCOORD0;
-				UNITY_FOG_COORDS(1)
 				float4 vertex : SV_POSITION;
-				float4 color : COLOR;
+				float2 uv0 : TEXCOORD0;
+#if DMD_VIEWER_COLOR_VERTEX
+				float4 uv1 : TEXCOORD1;
+#endif
+#if DMD_VIEWER_COLOR_POLYGON
+				float4 uv2 : TEXCOORD2;
+#endif
 			};
 
 			sampler2D _MainTex;
@@ -47,21 +60,28 @@ Shader "Twisted/DMDViewer"
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				o.color = v.color;
-				UNITY_TRANSFER_FOG(o, o.vertex);
+				o.uv0 = TRANSFORM_TEX(v.uv0, _MainTex);
+#if DMD_VIEWER_COLOR_VERTEX
+				o.uv1 = v.uv1;
+#endif
+#if DMD_VIEWER_COLOR_POLYGON
+				o.uv2 = v.uv2;
+#endif
 				return o;
 			}
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				// sample the texture
-				fixed4 col = tex2D(_MainTex, i.uv);
+				fixed4 col = tex2D(_MainTex, i.uv0);
 
-				col *= i.color;
+#if DMD_VIEWER_COLOR_VERTEX
+				col *= i.uv1;
+#endif
 
-				// apply fog
-				UNITY_APPLY_FOG(i.fogCoord, col);
+#if DMD_VIEWER_COLOR_POLYGON
+				col *= i.uv2;
+#endif
+
 				return col;
 			}
 			ENDCG
