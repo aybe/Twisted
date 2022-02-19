@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -5,7 +6,9 @@ using Twisted.PS;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Twisted.Editor
 {
@@ -83,6 +86,17 @@ namespace Twisted.Editor
                     });
 
                     menu.DropDown(rect);
+                }
+
+                EditorGUILayout.Space();
+
+                using (new EditorGUIUtility.IconSizeScope(new Vector2(16.0f, 16.0f)))
+                {
+                    DrawGlobalKeywordToggle(Styles.ColorVertexKeyword, Styles.ColorVertexContent, EditorStyles.toolbarButton);
+
+                    EditorGUILayout.Space();
+
+                    DrawGlobalKeywordToggle(Styles.ColorPolygonKeyword, Styles.ColorPolygonContent, EditorStyles.toolbarButton);
                 }
 
                 GUILayout.FlexibleSpace();
@@ -241,9 +255,53 @@ namespace Twisted.Editor
             }
         }
 
+        private static void DrawGlobalKeywordToggle(GlobalKeyword keyword, GUIContent content, GUIStyle? style = null)
+        {
+            var enabled = Shader.IsKeywordEnabled(keyword);
+
+            using var scope = new EditorGUI.ChangeCheckScope();
+
+            var value = Styles.ToggleButton(enabled, content, style ?? GUI.skin.button);
+
+            if (!scope.changed)
+                return;
+
+            Shader.SetKeyword(keyword, value);
+
+            InternalEditorUtility.RepaintAllViews();
+        }
+
         private static class Styles
         {
             public static GUIContent Help { get; } = EditorGUIUtility.TrIconContent("_Help", "Open help for DMD Viewer.");
+
+            public static GUIContent ColorVertexContent { get; } = EditorGUIUtility.TrIconContent("Material Icon", "Toggle vertex color tinting.");
+
+            public static GlobalKeyword ColorVertexKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX");
+
+            public static GUIContent ColorPolygonContent { get; } = EditorGUIUtility.TrIconContent("Grid.FillTool", "Toggle polygon color tinting.");
+
+            public static GlobalKeyword ColorPolygonKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON");
+
+            public static bool ToggleButton(bool value, GUIContent content, GUIStyle style, params GUILayoutOption[] options)
+            {
+                if (content is null)
+                    throw new ArgumentNullException(nameof(content));
+
+                if (style is null)
+                    throw new ArgumentNullException(nameof(style));
+
+                using var scope = new EditorGUI.ChangeCheckScope();
+
+                var toggle = GUILayout.Toggle(value, content, style, options);
+
+                if (!scope.changed)
+                {
+                    return false;
+                }
+
+                return toggle;
+            }
         }
 
         #endregion
