@@ -1,7 +1,9 @@
 {
     "name": "Unity.Extensions.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:37ea4f7e0c6cffe41838b326efc76aab"
+    ],
     "includePlatforms": [
         "Editor"
     ],

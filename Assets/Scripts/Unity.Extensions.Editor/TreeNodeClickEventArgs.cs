@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Twisted.Editor
+namespace Unity.Extensions.Editor
 {
     public sealed class TreeNodeClickEventArgs : EventArgs
     {

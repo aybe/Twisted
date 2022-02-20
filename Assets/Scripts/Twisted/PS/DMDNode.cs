@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using Unity.Extensions;
 using Unity.Extensions.Binary;
 using UnityEngine.Assertions;
 

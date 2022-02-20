@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Twisted
+namespace Unity.Extensions
 {
     public static class TreeNodeExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEditor.IMGUI.Controls;
 
-namespace Twisted.Editor
+namespace Unity.Extensions.Editor
 {
     public sealed class TreeViewItem<T> : TreeViewItem
     {

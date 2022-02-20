@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Twisted.Editor
+namespace Unity.Extensions.Editor
 {
     public class TreeNodeSelectionEventArgs : EventArgs
     {
