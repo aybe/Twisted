@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -83,6 +84,10 @@ namespace Twisted.Editor
                         UpdateFactory(path);
 
                         View.SetRoot(Factory!.DMD);
+
+                        View.CollapseAll();
+                        
+                        View.SetSelection(Array.Empty<int>(), TreeViewSelectionOptions.FireSelectionChanged);
                     }
 
                     EditorGUILayout.Space();
