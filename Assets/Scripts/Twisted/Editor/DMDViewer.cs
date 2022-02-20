@@ -141,6 +141,14 @@ namespace Twisted.Editor
             View.OnGUI(GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true)));
         }
 
+        private void ShowButton(Rect rect)
+        {
+            if (GUI.Button(rect, Styles.Help, EditorStyles.iconButton))
+            {
+                EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
+            }
+        }
+
         #endregion
 
         #region View
@@ -260,14 +268,6 @@ namespace Twisted.Editor
         #endregion
 
         #region Help
-
-        private void ShowButton(Rect rect)
-        {
-            if (GUI.Button(rect, Styles.Help, EditorStyles.iconButton))
-            {
-                EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
-            }
-        }
 
         private static void DrawGlobalKeywordToggle(GlobalKeyword keyword, GUIContent content, GUIStyle? style = null)
         {
