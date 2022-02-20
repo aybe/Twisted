@@ -101,11 +101,11 @@ namespace Twisted.Editor
 
                 using (new EditorGUIUtility.IconSizeScope(new Vector2(16.0f, 16.0f)))
                 {
-                    DrawGlobalKeywordToggle(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
+                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
 
                     EditorGUILayout.Space();
 
-                    DrawGlobalKeywordToggle(DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent, EditorStyles.toolbarButton);
+                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent, EditorStyles.toolbarButton);
                 }
 
                 GUILayout.FlexibleSpace();
@@ -262,26 +262,6 @@ namespace Twisted.Editor
         private void OnViewSearchKeyPressed()
         {
             View.SetFocusAndEnsureSelectedItem();
-        }
-
-        #endregion
-
-        #region Help
-
-        private static void DrawGlobalKeywordToggle(GlobalKeyword keyword, GUIContent content, GUIStyle? style = null)
-        {
-            var enabled = Shader.IsKeywordEnabled(keyword);
-
-            using var scope = new EditorGUI.ChangeCheckScope();
-
-            var value = DMDViewerStyles.ToggleButton(enabled, content, style ?? GUI.skin.button);
-
-            if (!scope.changed)
-                return;
-
-            Shader.SetKeyword(keyword, value);
-
-            InternalEditorUtility.RepaintAllViews();
         }
 
         #endregion
