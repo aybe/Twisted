@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.CodeEditor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Twisted.Editor
+namespace Unity.Extensions.Editor
 {
     internal sealed class ProjectGenerationSettingsProvider : SettingsProvider
     {
@@ -66,7 +65,7 @@ namespace Twisted.Editor
 
                 if (GUILayout.Button("Regenerate Project Files", GUILayout.Width(width)))
                 {
-                    CodeEditor.CurrentEditor.SyncAll();
+                    CodeEditor.CodeEditor.CurrentEditor.SyncAll();
                 }
             }
         }
