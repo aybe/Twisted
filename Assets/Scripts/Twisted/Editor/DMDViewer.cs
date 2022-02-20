@@ -128,12 +128,11 @@ namespace Twisted.Editor
 
                     using (var scope = new EditorGUI.ChangeCheckScope())
                     {
-                        var value = ViewSearch.OnToolbarGUI(ViewSearchString, GUILayout.Width(125.0f));
+                        var value = ViewSearch.OnToolbarGUI(View.searchString, GUILayout.Width(125.0f));
 
                         if (scope.changed)
                         {
-                            ViewSearchString = value;
-                            UpdateViewSearchString();
+                            View.searchString = value;
                         }
                     }
                 }
@@ -161,9 +160,6 @@ namespace Twisted.Editor
 
         private SearchField ViewSearch = null!;
 
-        [SerializeField]
-        private string ViewSearchString = null!;
-
         private void UpdateFactory(string? path) 
         {
             if (File.Exists(path))
@@ -187,7 +183,7 @@ namespace Twisted.Editor
 
         private void UpdateViewSearchString()
         {
-            View.searchString = ViewSearchString;
+            View.searchString = ViewState.searchString;
         }
 
         #endregion
