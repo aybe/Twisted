@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Twisted.Editor
+namespace Unity.Extensions.Editor
 {
     public static class EditorGUIExtensions
     {
