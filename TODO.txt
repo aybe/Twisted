@@ -1,38 +1,11 @@
-- decode polygons
- - implement frame buffer
- - implement texturing
-
 - on restored tree view selection, the scene is not updated
 - a way to check for valid normals
  - read whole file
  - check that indices don't cross node
-
- - adjust polygon position in preview
-
- - there is an alpha mask for 16-bit TIMs
-
- when loading a DMD, associated TMS should be loaded
-
-when generating a model, TMS should be passed
-
-generate the texture for the model with N polygons:
-	for each textured polygon, generate a texture
-			texture page, format, palette, etc
-	pack these textures into an atlas
-		there will be duplicates so use a hash set
-
-// BUG binary writer extensions: WriteEnum, overloads for byte with endianness
-
-move stuff to psx lib
-move stuff to unity lib
-move stuff to binary extensions
-	add package to unity
-		see if twisted can have a dependency
-do texturing
-
+- adjust polygon position in preview
+- there is an alpha mask for 16-bit TIMs
+- binary writer extensions: WriteEnum, overloads for byte with endianness
 - project generation settings should have a global toggle and not rebuild structure for project asmdef, only packages
-- FrameBufferFormat.Mixed should be removed
-- delete FrameBuffer.WriteTga
 - fix code issues
 - the texture builder logic should be on Unity.Playstation and also include texture window
 - can there be endianness extension methods directly for Span<T>?
@@ -41,25 +14,17 @@ do texturing
 - the clown head is probably something like GsSPRITE
 - fix this "Polygon 20 @ 46316 (Polygon00010605)" mesh must have at least three distinct vertices to be a valid collision mesh.
 - fix this [Physics.PhysX] cleaning the mesh failed
-
-# Rendering
-
 - are texture flipped horizontally?
 - the wheels contour are not transparent, see if there's some flag about STP on polygons, check with no$psx's polygon type
 - the highest poly models appear to have their wheel in previous node
 - park1 dome texturing is wrong (03030a09)
-- [SOLVED] the bottom of the cars is complete garbage (texture)
-
-
-
-
-
 - add texture window
 - add render full scene
 - add print parent hierarchy
 - get sprites up
 - fix black transparency
 - fix new loaded dmd cleanup
+
 ArgumentOutOfRangeException: Must not be greater than 896.
 Parameter name: x
 Unity.PlayStation.Graphics.TexturePage..ctor (UnityEngine.Vector2Int position, Unity.PlayStation.Graphics.TexturePageAlpha alpha, Unity.PlayStation.Graphics.TexturePageColors colors, Unity.PlayStation.Graphics.TexturePageDisable disable) (at Assets/Scripts/Unity.PlayStation/Graphics/TexturePage.cs:52)
