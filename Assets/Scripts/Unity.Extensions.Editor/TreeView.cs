@@ -7,9 +7,9 @@ using UnityEngine.Assertions;
 
 namespace Unity.Extensions.Editor
 {
-    public sealed class TreeNodeView<T> : TreeView where T : TreeNode
+    public sealed class TreeView<T> : TreeView where T : TreeNode
     {
-        public TreeNodeView(TreeViewState state, T? root = default) : base(state)
+        public TreeView(TreeViewState state, T? root = default) : base(state)
         {
             enableItemHovering            = true;
             showAlternatingRowBackgrounds = true;
@@ -22,7 +22,7 @@ namespace Unity.Extensions.Editor
 
         public bool HasRoot => Root != null;
 
-        public TreeNodeViewSearchFilterHandler<T>? SearchFilter { get; set; }
+        public TreeViewSearchFilterHandler<T>? SearchFilter { get; set; }
 
         private List<int> GetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
         {
@@ -138,17 +138,17 @@ namespace Unity.Extensions.Editor
 
         protected override void SingleClickedItem(int id)
         {
-            NodeMouseSingleClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
+            NodeMouseSingleClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
         }
 
         protected override void DoubleClickedItem(int id)
         {
-            NodeMouseDoubleClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
+            NodeMouseDoubleClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
         }
 
         protected override void ContextClickedItem(int id)
         {
-            NodeMouseContextClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
+            NodeMouseContextClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
         }
 
         private T GetNode(int id)
@@ -156,11 +156,11 @@ namespace Unity.Extensions.Editor
             return ((TreeViewItem<T>)FindItem(id, rootItem)).Data!;
         }
 
-        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseContextClick;
+        public event EventHandler<TreeViewClickEventArgs>? NodeMouseContextClick;
 
-        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseDoubleClick;
+        public event EventHandler<TreeViewClickEventArgs>? NodeMouseDoubleClick;
 
-        public event EventHandler<TreeNodeClickEventArgs>? NodeMouseSingleClick;
+        public event EventHandler<TreeViewClickEventArgs>? NodeMouseSingleClick;
 
         public event EventHandler<TreeViewSelectionEventArgs<T>>? NodeSelectionChanged;
     }

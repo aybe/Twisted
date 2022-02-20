@@ -37,7 +37,7 @@ namespace Twisted.Editor
 
             ViewState ??= new TreeViewState();
 
-            View = new TreeNodeView<DMDNode>(ViewState, Factory?.DMD);
+            View = new TreeView<DMDNode>(ViewState, Factory?.DMD);
 
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
@@ -158,7 +158,7 @@ namespace Twisted.Editor
         [SerializeField]
         private string? FactoryPath;
 
-        private TreeNodeView<DMDNode> View = null!;
+        private TreeView<DMDNode> View = null!;
 
         [SerializeField]
         private float ViewRowHeight = 24;
@@ -207,7 +207,7 @@ namespace Twisted.Editor
 
         #region Handlers
 
-        private void OnViewNodeMouseContextClick(object sender, TreeNodeClickEventArgs e)
+        private void OnViewNodeMouseContextClick(object sender, TreeViewClickEventArgs e)
         {
             var menu = new GenericMenu();
 
