@@ -1,10 +1,8 @@
 using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
-using Twisted.PS.Texturing;
 using Unity.PlayStation.Graphics;
 using UnityEngine;
 using Object = UnityEngine.Object;
