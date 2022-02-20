@@ -7,7 +7,7 @@ namespace Twisted.Editor
 {
     internal static class DMDViewerStyles
     {
-        public static GUIContent Help { get; } = EditorGUIUtility.TrIconContent("_Help", "Open help for DMD Viewer.");
+        public static GUIContent HelpContent { get; } = EditorGUIUtility.TrIconContent("_Help", "Open help for DMD Viewer.");
 
         public static GUIContent ColorVertexContent { get; } = EditorGUIUtility.TrIconContent("Material Icon", "Toggle vertex color tinting.");
 

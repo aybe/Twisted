@@ -142,7 +142,7 @@ namespace Twisted.Editor
 
         private void ShowButton(Rect rect)
         {
-            if (GUI.Button(rect, DMDViewerStyles.Help, EditorStyles.iconButton))
+            if (GUI.Button(rect, DMDViewerStyles.HelpContent, EditorStyles.iconButton))
             {
                 EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
             }
