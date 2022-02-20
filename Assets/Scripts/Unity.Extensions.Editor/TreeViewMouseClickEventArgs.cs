@@ -2,9 +2,9 @@
 
 namespace Unity.Extensions.Editor
 {
-    public sealed class TreeViewClickEventArgs : EventArgs
+    public sealed class TreeViewMouseClickEventArgs : EventArgs
     {
-        internal TreeViewClickEventArgs(TreeNode node)
+        internal TreeViewMouseClickEventArgs(TreeNode node)
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
         }

@@ -207,7 +207,7 @@ namespace Twisted.Editor
 
         #region Handlers
 
-        private void OnViewNodeMouseContextClick(object sender, TreeViewClickEventArgs e)
+        private void OnViewNodeMouseContextClick(object sender, TreeViewMouseClickEventArgs e)
         {
             var menu = new GenericMenu();
 

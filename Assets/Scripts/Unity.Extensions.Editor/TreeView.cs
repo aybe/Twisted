@@ -138,17 +138,17 @@ namespace Unity.Extensions.Editor
 
         protected override void SingleClickedItem(int id)
         {
-            NodeMouseSingleClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
+            NodeMouseSingleClick?.Invoke(this, new TreeViewMouseClickEventArgs(GetNode(id)));
         }
 
         protected override void DoubleClickedItem(int id)
         {
-            NodeMouseDoubleClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
+            NodeMouseDoubleClick?.Invoke(this, new TreeViewMouseClickEventArgs(GetNode(id)));
         }
 
         protected override void ContextClickedItem(int id)
         {
-            NodeMouseContextClick?.Invoke(this, new TreeViewClickEventArgs(GetNode(id)));
+            NodeMouseContextClick?.Invoke(this, new TreeViewMouseClickEventArgs(GetNode(id)));
         }
 
         private T GetNode(int id)
@@ -156,11 +156,11 @@ namespace Unity.Extensions.Editor
             return ((TreeViewItem<T>)FindItem(id, rootItem)).Data!;
         }
 
-        public event EventHandler<TreeViewClickEventArgs>? NodeMouseContextClick;
+        public event EventHandler<TreeViewMouseClickEventArgs>? NodeMouseContextClick;
 
-        public event EventHandler<TreeViewClickEventArgs>? NodeMouseDoubleClick;
+        public event EventHandler<TreeViewMouseClickEventArgs>? NodeMouseDoubleClick;
 
-        public event EventHandler<TreeViewClickEventArgs>? NodeMouseSingleClick;
+        public event EventHandler<TreeViewMouseClickEventArgs>? NodeMouseSingleClick;
 
         public event EventHandler<TreeViewSelectionEventArgs<T>>? NodeSelectionChanged;
     }
