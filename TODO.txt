@@ -49,3 +49,67 @@ do texturing
 - the highest poly models appear to have their wheel in previous node
 - park1 dome texturing is wrong (03030a09)
 - [SOLVED] the bottom of the cars is complete garbage (texture)
+
+
+
+
+
+- add texture window
+- add render full scene
+- add print parent hierarchy
+- get sprites up
+- fix black transparency
+- fix new loaded dmd cleanup
+ArgumentOutOfRangeException: Must not be greater than 896.
+Parameter name: x
+Unity.PlayStation.Graphics.TexturePage..ctor (UnityEngine.Vector2Int position, Unity.PlayStation.Graphics.TexturePageAlpha alpha, Unity.PlayStation.Graphics.TexturePageColors colors, Unity.PlayStation.Graphics.TexturePageDisable disable) (at Assets/Scripts/Unity.PlayStation/Graphics/TexturePage.cs:52)
+Twisted.PS.Polygons.Polygon.TryReadTextureInfo () (at Assets/Scripts/Twisted/PS/Polygons/Polygon.cs:234)
+Twisted.PS.Polygons.Polygon.get_TextureInfo () (at Assets/Scripts/Twisted/PS/Polygons/Polygon.cs:199)
+Twisted.DMDPreview+<>c.<SetNode>b__0_0 (Twisted.PS.Polygons.Polygon s) (at Assets/Scripts/Twisted/DMDPreview.cs:38)
+System.Linq.Enumerable+WhereSelectArrayIterator`2[TSource,TResult].ToArray () (at <4d028692861e4a979c4fee3bc09e9376>:0)
+System.Linq.Enumerable.ToArray[TSource] (System.Collections.Generic.IEnumerable`1[T] source) (at <4d028692861e4a979c4fee3bc09e9376>:0)
+Twisted.DMDPreview.SetNode (Twisted.DMDFactory factory, Twisted.PS.DMDNode00FF node, System.Boolean split, System.Boolean frame) (at Assets/Scripts/Twisted/DMDPreview.cs:38)
+Twisted.Editor.DMDViewer.OpenNode (Twisted.PS.DMDNode00FF node, System.Boolean frame) (at Assets/Scripts/Twisted/Editor/DMDViewer.cs:167)
+Twisted.Editor.DMDViewer.OnViewNodeSelectionChanged (System.Object sender, Twisted.Editor.TreeNodeSelectionEventArgs e) (at Assets/Scripts/Twisted/Editor/DMDViewer.cs:224)
+Twisted.Editor.TreeNodeView.SelectionChanged (System.Collections.Generic.IList`1[T] selectedIds) (at Assets/Scripts/Twisted/Editor/TreeNodeView.cs:117)
+UnityEditor.IMGUI.Controls.TreeViewController.NotifyListenersThatSelectionChanged () (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.NewSelectionFromUserInteraction (System.Collections.Generic.List`1[T] newSelection, System.Int32 itemID) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.SelectionClick (UnityEditor.IMGUI.Controls.TreeViewItem itemClicked, System.Boolean keepMultiSelection) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.HandleUnusedMouseEventsForItem (UnityEngine.Rect rect, UnityEditor.IMGUI.Controls.TreeViewItem item, System.Int32 row) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.DoItemGUI (UnityEditor.IMGUI.Controls.TreeViewItem item, System.Int32 row, System.Single rowWidth, System.Boolean hasFocus) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.IterateVisibleItems (System.Int32 firstRow, System.Int32 numVisibleRows, System.Single rowWidth, System.Boolean hasFocus) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeViewController.OnGUI (UnityEngine.Rect rect, System.Int32 keyboardControlID) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.IMGUI.Controls.TreeView.OnGUI (UnityEngine.Rect rect) (at <9818991d79ec4437bcb28429e46862ef>:0)
+Twisted.Editor.DMDViewer.OnGUI () (at Assets/Scripts/Twisted/Editor/DMDViewer.cs:118)
+UnityEditor.HostView.InvokeOnGUI (UnityEngine.Rect onGUIPosition) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.DockArea.DrawView (UnityEngine.Rect dockAreaRect) (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEditor.DockArea.OldOnGUI () (at <9818991d79ec4437bcb28429e46862ef>:0)
+UnityEngine.UIElements.IMGUIContainer.DoOnGUI (UnityEngine.Event evt, UnityEngine.Matrix4x4 parentTransform, UnityEngine.Rect clippingRect, System.Boolean isComputingLayout, UnityEngine.Rect layoutSize, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, UnityEngine.Matrix4x4 worldTransform, UnityEngine.Rect clippingRect, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, System.Boolean canAffectFocus) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.SendEventToIMGUIRaw (UnityEngine.UIElements.EventBase evt, System.Boolean canAffectFocus, System.Boolean verifyBounds) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.SendEventToIMGUI (UnityEngine.UIElements.EventBase evt, System.Boolean canAffectFocus, System.Boolean verifyBounds) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.ProcessEvent (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.IMGUIContainer.ExecuteDefaultActionAtTarget (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.CallbackEventHandler.HandleEvent (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.CallbackEventHandler.HandleEventAtCurrentTargetAndPhase (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.CallbackEventHandler.UnityEngine.UIElements.IEventHandler.HandleEvent (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatchUtilities.HandleEventAcrossPropagationPath (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatchUtilities.PropagateEvent (UnityEngine.UIElements.EventBase evt) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.SendEventToRegularTarget (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.BaseVisualElementPanel panel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.SendEventToTarget (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.BaseVisualElementPanel panel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.DispatchEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel iPanel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.ApplyDispatchingStrategies (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel, System.Boolean imguiEventIsInitiallyUsed) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEventQueue () (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.OpenGate () (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcherGate.Dispose () (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.EventDispatcher.Dispatch (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel, UnityEngine.UIElements.DispatchMode dispatchMode) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.BaseVisualElementPanel.SendEvent (UnityEngine.UIElements.EventBase e, UnityEngine.UIElements.DispatchMode dispatchMode) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.UIElementsUtility.DoDispatch (UnityEngine.UIElements.BaseVisualElementPanel panel) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.UIElementsUtility.UnityEngine.UIElements.IUIElementsUtility.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr, System.Boolean& eventHandled) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.UIEventRegistration.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.UIElements.UIEventRegistration+<>c.<.cctor>b__1_2 (System.Int32 i, System.IntPtr ptr) (at <9fb9706855a847a1926259ab0baf1b3c>:0)
+UnityEngine.GUIUtility.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr, System.Boolean& result) (at <0cba142ae88440a08daa9ceb190ca61e>:0)
