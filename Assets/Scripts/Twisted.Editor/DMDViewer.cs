@@ -18,8 +18,9 @@ namespace Twisted.Editor
         [MenuItem("Twisted/DMD Viewer")]
         private static void Initialize()
         {
-            var window = GetWindow<DMDViewer>();
-
+            var type   = typeof(EditorWindow).Assembly.GetType("UnityEditor.ProjectBrowser");
+            var types  = type != null ? new[] { type } : Array.Empty<Type>();
+            var window = GetWindow<DMDViewer>(types);
             window.titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
             {
                 text = "DMD Viewer"
