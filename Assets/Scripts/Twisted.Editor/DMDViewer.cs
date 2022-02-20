@@ -71,6 +71,11 @@ namespace Twisted.Editor
             ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
         }
 
+        private void OnDestroy()
+        {
+            DestroyImmediate(Singleton<DMDPreview>.instance.gameObject); // clear scene on close
+        }
+
         private void OnGUI()
         {
             // main toolbar
