@@ -142,6 +142,7 @@ namespace Twisted.Editor
             View.OnGUI(GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true)));
         }
 
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private void ShowButton(Rect rect)
         {
             if (GUI.Button(rect, DMDViewerStyles.HelpContent, EditorStyles.iconButton))
