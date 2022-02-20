@@ -154,11 +154,6 @@ namespace Twisted.Editor
             return ((TreeViewItem<TreeNode>)FindItem(id, rootItem)).Data!;
         }
 
-        private IList<TreeNode> GetNodes(IEnumerable<int> ids)
-        {
-            return ids.Select(GetNode).ToList();
-        }
-
         private IList<TreeNode> GetNodes(params int[] ids)
         {
             return ids.Select(GetNode).ToList();
