@@ -50,10 +50,16 @@ namespace Unity.Extensions.Editor
 
                     DrawBoolProperty(NullableWarningsDisabled, Styles.NullableWarningsDisabled);
 
-                    DrawBoolProperty(PreserveProjectStructure, Styles.PreserveProjectStructure);
+                    if (false)
+#pragma warning disable CS0162
+                        // ReSharper disable once HeuristicUnreachableCode
+                    {
+                        DrawBoolProperty(PreserveProjectStructure, Styles.PreserveProjectStructure);
 
-                    DrawBoolProperty(RemoveRootNamespace, Styles.RemoveRootNamespace);
-
+                        DrawBoolProperty(RemoveRootNamespace, Styles.RemoveRootNamespace);
+                    }
+#pragma warning restore CS0162
+                    
                     if (cs.changed)
                     {
                         SerializedObject.ApplyModifiedProperties();
