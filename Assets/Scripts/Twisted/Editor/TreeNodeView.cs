@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -21,6 +22,8 @@ namespace Twisted.Editor
         private TreeNode? Root { get; set; }
 
         public bool HasRoot => Root != null;
+
+        public TreeNodeViewSearchFilterHandler? SearchFilter { get; set; }
 
         public TreeNode? SelectedNode => FindItem(state.lastClickedID, rootItem) is TreeViewItem<TreeNode> item ? item.Data : null;
 
@@ -99,6 +102,22 @@ namespace Twisted.Editor
             SetupDepthsFromParentsAndChildren(root);
 
             return root;
+        }
+
+        protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
+        {
+            var rows = base.BuildRows(root);
+
+            if (SearchFilter is null)
+                return rows;
+
+            var list = SearchFilter(searchString, rows);
+
+            rows.Clear();
+
+            rows.AddRange(list);
+
+            return rows;
         }
 
         protected override void RowGUI(RowGUIArgs args)
