@@ -29,7 +29,9 @@ namespace Twisted.Editor
 
         private void Awake()
         {
-            Shader.SetKeyword(DMDViewerStyles.TextureKeyword, true); // enable texturing once so as to not drive user crazy
+            // enable both texture and vertex color once to make it look like it's intended
+            Shader.SetKeyword(DMDViewerStyles.TextureKeyword,     true);
+            Shader.SetKeyword(DMDViewerStyles.ColorVertexKeyword, true);
         }
 
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
