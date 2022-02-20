@@ -131,7 +131,7 @@ namespace Twisted.Editor
 
         protected override void SelectionChanged(IList<int> selectedIds)
         {
-            NodeSelectionChanged?.Invoke(this, new TreeNodeSelectionEventArgs(GetNodes(selectedIds.ToArray())));
+            NodeSelectionChanged?.Invoke(this, new TreeNodeSelectionEventArgs(selectedIds.Select(GetNode).ToList()));
         }
 
         protected override void SingleClickedItem(int id)
@@ -152,11 +152,6 @@ namespace Twisted.Editor
         private TreeNode GetNode(int id)
         {
             return ((TreeViewItem<TreeNode>)FindItem(id, rootItem)).Data!;
-        }
-
-        private IList<TreeNode> GetNodes(params int[] ids)
-        {
-            return ids.Select(GetNode).ToList();
         }
 
         public event EventHandler<TreeNodeClickEventArgs>? NodeMouseContextClick;
