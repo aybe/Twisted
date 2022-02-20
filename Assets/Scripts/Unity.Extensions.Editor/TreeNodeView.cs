@@ -7,9 +7,9 @@ using UnityEngine.Assertions;
 
 namespace Unity.Extensions.Editor
 {
-    public sealed class TreeNodeView : TreeView
+    public sealed class TreeNodeView<T> : TreeView where T : TreeNode
     {
-        public TreeNodeView(TreeViewState state, TreeNode? root = default) : base(state)
+        public TreeNodeView(TreeViewState state, T? root = default) : base(state)
         {
             enableItemHovering            = true;
             showAlternatingRowBackgrounds = true;
@@ -18,11 +18,11 @@ namespace Unity.Extensions.Editor
             SetRoot(root);
         }
 
-        private TreeNode? Root { get; set; }
+        private T? Root { get; set; }
 
         public bool HasRoot => Root != null;
 
-        public TreeNodeViewSearchFilterHandler? SearchFilter { get; set; }
+        public TreeNodeViewSearchFilterHandler<T>? SearchFilter { get; set; }
 
         private List<int> GetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
         {
@@ -55,7 +55,7 @@ namespace Unity.Extensions.Editor
             return selection;
         }
 
-        public void SetRoot(TreeNode? root)
+        public void SetRoot(T? root)
         {
             Root = root;
             Reload();
@@ -73,15 +73,15 @@ namespace Unity.Extensions.Editor
 
         protected override TreeViewItem BuildRoot()
         {
-            var root = new TreeViewItem<TreeNode>(-1, -1, null!) { children = new List<TreeViewItem>() };
+            var root = new TreeViewItem<T>(-1, -1, null!) { children = new List<TreeViewItem>() };
 
             if (Root != null)
             {
                 var index = 0;
 
-                var stack = new Stack<TreeViewItem<TreeNode>>();
+                var stack = new Stack<TreeViewItem<T>>();
 
-                stack.Push(new TreeViewItem<TreeNode>(index++, 0, Root.ToString(), Root) { parent = root });
+                stack.Push(new TreeViewItem<T>(index++, 0, Root.ToString(), Root) { parent = root });
 
                 while (stack.Any())
                 {
@@ -91,7 +91,7 @@ namespace Unity.Extensions.Editor
 
                     foreach (var child in current.Data!.Reverse())
                     {
-                        stack.Push(new TreeViewItem<TreeNode>(index++, 0, child.ToString(), child) { parent = current });
+                        stack.Push(new TreeViewItem<T>(index++, 0, child.ToString(), child as T) { parent = current });
                     }
                 }
             }
@@ -108,7 +108,7 @@ namespace Unity.Extensions.Editor
             if (SearchFilter is null)
                 return rows;
 
-            var list = SearchFilter(searchString, rows);
+            var list = SearchFilter(searchString, rows.Cast<TreeViewItem<T>>());
 
             rows.Clear();
 
@@ -133,7 +133,7 @@ namespace Unity.Extensions.Editor
 
         protected override void SelectionChanged(IList<int> selectedIds)
         {
-            NodeSelectionChanged?.Invoke(this, new TreeNodeSelectionEventArgs(selectedIds.Select(GetNode).ToList()));
+            NodeSelectionChanged?.Invoke(this, new TreeViewSelectionEventArgs<T>(selectedIds.Select(GetNode).ToList()));
         }
 
         protected override void SingleClickedItem(int id)
@@ -151,9 +151,9 @@ namespace Unity.Extensions.Editor
             NodeMouseContextClick?.Invoke(this, new TreeNodeClickEventArgs(GetNode(id)));
         }
 
-        private TreeNode GetNode(int id)
+        private T GetNode(int id)
         {
-            return ((TreeViewItem<TreeNode>)FindItem(id, rootItem)).Data!;
+            return ((TreeViewItem<T>)FindItem(id, rootItem)).Data!;
         }
 
         public event EventHandler<TreeNodeClickEventArgs>? NodeMouseContextClick;
@@ -162,6 +162,6 @@ namespace Unity.Extensions.Editor
 
         public event EventHandler<TreeNodeClickEventArgs>? NodeMouseSingleClick;
 
-        public event EventHandler<TreeNodeSelectionEventArgs>? NodeSelectionChanged;
+        public event EventHandler<TreeViewSelectionEventArgs<T>>? NodeSelectionChanged;
     }
 }

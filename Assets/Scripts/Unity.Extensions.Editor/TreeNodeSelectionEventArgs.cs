@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Unity.Extensions.Editor
 {
-    public class TreeNodeSelectionEventArgs : EventArgs
+    public class TreeViewSelectionEventArgs<T> : EventArgs where T : TreeNode
     {
-        internal TreeNodeSelectionEventArgs(IList<TreeNode> nodes)
+        internal TreeViewSelectionEventArgs(IList<T> nodes)
         {
             Nodes = nodes ?? throw new ArgumentNullException(nameof(nodes));
         }
 
-        public IList<TreeNode> Nodes { get; }
+        public IList<T> Nodes { get; }
     }
 }

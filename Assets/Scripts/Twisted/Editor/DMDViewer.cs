@@ -37,7 +37,7 @@ namespace Twisted.Editor
 
             ViewState ??= new TreeViewState();
 
-            View = new TreeNodeView(ViewState, Factory?.DMD);
+            View = new TreeNodeView<DMDNode>(ViewState, Factory?.DMD);
 
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
@@ -46,10 +46,8 @@ namespace Twisted.Editor
             View.SearchFilter = (_, items) =>
             {
                 return items // filter dupe nodes during filtering
-                    .Cast<TreeViewItem<TreeNode>>()
                     .GroupBy(s => s.Data, DMDViewerNodePositionComparer.Instance)
                     .Select(s => s.First())
-                    .Cast<TreeViewItem>()
                     .ToList();
             };
 
@@ -160,7 +158,7 @@ namespace Twisted.Editor
         [SerializeField]
         private string? FactoryPath;
 
-        private TreeNodeView View = null!;
+        private TreeNodeView<DMDNode> View = null!;
 
         [SerializeField]
         private float ViewRowHeight = 24;
@@ -249,7 +247,7 @@ namespace Twisted.Editor
             Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
         }
 
-        private void OnViewNodeSelectionChanged(object sender, TreeNodeSelectionEventArgs e)
+        private void OnViewNodeSelectionChanged(object sender, TreeViewSelectionEventArgs<DMDNode> e)
         {
             // animations and context menus combined don't play well at all, the former will get paused by the latter when it opens
             // furthermore, it's rather sadistic from end-user perspective to lose his actual selection for a simple context click
