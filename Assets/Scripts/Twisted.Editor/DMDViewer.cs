@@ -71,15 +71,9 @@ namespace Twisted.Editor
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                var content = EditorGUIUtility.TrTextContent("File");
-                var style   = EditorStyles.toolbarDropDown;
-                var rect    = GUILayoutUtility.GetRect(content, style);
-
-                if (EditorGUI.DropdownButton(rect, content, FocusType.Passive, style))
+                using (new EditorGUIUtility.IconSizeScope(new Vector2(16.0f, 16.0f)))
                 {
-                    var menu = new GenericMenu();
-
-                    menu.AddItem(new GUIContent("Open..."), false, () =>
+                    if (GUILayout.Button(DMDViewerStyles.OpenContent, EditorStyles.toolbarButton))
                     {
                         var path = EditorUtility.OpenFilePanel(null, null, "DMD");
 
@@ -89,15 +83,10 @@ namespace Twisted.Editor
                         UpdateFactory(path);
 
                         View.SetRoot(Factory.DMD);
-                    });
+                    }
 
-                    menu.DropDown(rect);
-                }
+                    EditorGUILayout.Space();
 
-                EditorGUILayout.Space();
-
-                using (new EditorGUIUtility.IconSizeScope(new Vector2(16.0f, 16.0f)))
-                {
                     EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
 
                     EditorGUILayout.Space();
