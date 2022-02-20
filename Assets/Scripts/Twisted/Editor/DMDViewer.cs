@@ -42,6 +42,16 @@ namespace Twisted.Editor
 
             View.NodeSelectionChanged += OnViewNodeSelectionChanged;
 
+            View.SearchFilter = (_, items) =>
+            {
+                return items // filter dupe nodes during filtering
+                    .Cast<TreeViewItem<TreeNode>>()
+                    .GroupBy(s => s.Data, DMDViewerNodePositionComparer.Instance)
+                    .Select(s => s.First())
+                    .Cast<TreeViewItem>()
+                    .ToList();
+            };
+
             ViewSearch = new SearchField();
 
             ViewSearch.downOrUpArrowKeyPressed += OnViewSearchKeyPressed;
