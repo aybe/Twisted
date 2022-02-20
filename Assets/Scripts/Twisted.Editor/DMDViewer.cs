@@ -43,7 +43,7 @@ namespace Twisted.Editor
             View.SearchFilter = (_, items) =>
             {
                 return items // filter dupe nodes during filtering
-                    .GroupBy(s => s.Data, DMDViewerNodePositionComparer.Instance)
+                    .GroupBy(s => s.Data!, DMDViewerNodePositionComparer.Instance)
                     .Select(s => s.First())
                     .ToList();
             };
@@ -82,7 +82,7 @@ namespace Twisted.Editor
 
                         UpdateFactory(path);
 
-                        View.SetRoot(Factory.DMD);
+                        View.SetRoot(Factory!.DMD);
                     }
 
                     EditorGUILayout.Space();
@@ -139,7 +139,7 @@ namespace Twisted.Editor
 
         #region View
 
-        private DMDFactory Factory;
+        private DMDFactory? Factory;
 
         [SerializeField]
         private string? FactoryPath;
