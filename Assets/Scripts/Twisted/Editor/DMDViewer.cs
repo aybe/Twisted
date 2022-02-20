@@ -164,12 +164,20 @@ namespace Twisted.Editor
         [SerializeField]
         private string ViewSearchString = null!;
 
-        private void UpdateFactory(string? path)
+        private void UpdateFactory(string? path) 
         {
-            Factory     = File.Exists(path) ? DMDFactory.Create(path!) : null;
-            FactoryPath = path;
-
-            titleContent.text = Path.GetFileName(path);
+            if (File.Exists(path))
+            {
+                Factory           = DMDFactory.Create(path!);
+                FactoryPath       = path;
+                titleContent.text = Path.GetFileName(path);
+            }
+            else
+            {
+                Factory           = null;
+                FactoryPath       = null;
+                titleContent.text = "DMD Viewer";
+            }
         }
 
         private void UpdateViewRowHeight()
