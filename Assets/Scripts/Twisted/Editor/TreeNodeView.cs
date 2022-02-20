@@ -154,15 +154,5 @@ namespace Twisted.Editor
         public event EventHandler<TreeNodeClickEventArgs>? NodeMouseSingleClick;
 
         public event EventHandler<TreeNodeSelectionEventArgs>? NodeSelectionChanged;
-
-        private sealed class TreeViewItem<T> : TreeViewItem
-        {
-            public TreeViewItem(int id, int depth, string displayName, T? data = default) : base(id, depth, displayName)
-            {
-                Data = data;
-            }
-
-            public T? Data { get; }
-        }
     }
 }
