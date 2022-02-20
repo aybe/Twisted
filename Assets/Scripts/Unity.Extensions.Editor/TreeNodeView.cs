@@ -112,7 +112,10 @@ namespace Unity.Extensions.Editor
 
             rows.Clear();
 
-            rows.AddRange(list);
+            foreach (var item in list)
+            {
+                rows.Add(item);
+            }
 
             return rows;
         }
