@@ -25,8 +25,6 @@ namespace Twisted.Editor
 
         public TreeNodeViewSearchFilterHandler? SearchFilter { get; set; }
 
-        public TreeNode? SelectedNode => FindItem(state.lastClickedID, rootItem) is TreeViewItem<TreeNode> item ? item.Data : null;
-
         private List<int> GetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
         {
             // multi-selection isn't implemented for this method, throw if it's the case
