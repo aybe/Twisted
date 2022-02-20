@@ -17,7 +17,7 @@ namespace Twisted
 {
     public sealed class DMDFactory
     {
-        private DMDFactory([NotNull] DMD dmd, [NotNull] Tms tms)
+        private DMDFactory([NotNull] DMD dmd, [NotNull] TMS tms)
         {
             DMD = dmd ?? throw new ArgumentNullException(nameof(dmd));
             TMS = tms ?? throw new ArgumentNullException(nameof(tms));
@@ -25,7 +25,7 @@ namespace Twisted
 
         public DMD DMD { get; }
 
-        public Tms TMS { get; }
+        public TMS TMS { get; }
 
         public FrameBuffer FrameBuffer { get; set; }
 
@@ -38,7 +38,7 @@ namespace Twisted
             using var reader2 = new BinaryReader(new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, ".TMS"))));
 
             var dmd = new DMD(reader1);
-            var tms = new Tms(reader2);
+            var tms = new TMS(reader2);
 
             return new DMDFactory(dmd, tms);
         }

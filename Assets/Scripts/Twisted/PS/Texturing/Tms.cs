@@ -9,9 +9,9 @@ using Unity.PlayStation.Graphics;
 
 namespace Twisted.PS.Texturing
 {
-    public sealed class Tms : IReadOnlyList<Tim>
+    public sealed class TMS : IReadOnlyList<Tim>
     {
-        public Tms([NotNull] BinaryReader reader)
+        public TMS([NotNull] BinaryReader reader)
         {
             if (reader is null)
                 throw new ArgumentNullException(nameof(reader));
