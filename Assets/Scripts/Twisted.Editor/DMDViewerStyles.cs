@@ -17,5 +17,9 @@ namespace Twisted.Editor
         public static GUIContent ColorPolygonContent { get; } = EditorGUIUtility.TrIconContent("Grid.FillTool", "Toggle polygon color tinting.");
 
         public static GlobalKeyword ColorPolygonKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON");
+        
+        public static GUIContent TextureContent { get; } = EditorGUIUtility.TrIconContent("Texture2D Icon", "Toggle texture.");
+        
+        public static GlobalKeyword TextureKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_TEXTURE");
     }
 }

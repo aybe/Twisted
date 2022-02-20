@@ -24,6 +24,7 @@ Shader "Twisted/DMDViewer"
 			#pragma vertex vert
 			#pragma fragment frag
 
+			#pragma multi_compile _ DMD_VIEWER_TEXTURE
 			#pragma multi_compile _ DMD_VIEWER_COLOR_VERTEX
 			#pragma multi_compile _ DMD_VIEWER_COLOR_POLYGON
 
@@ -32,7 +33,9 @@ Shader "Twisted/DMDViewer"
 			struct appdata
 			{
 				float4 vertex : POSITION;
+#if DMD_VIEWER_TEXTURE
 				float2 uv0 : TEXCOORD0;
+#endif
 #if DMD_VIEWER_COLOR_VERTEX
 				float4 uv1 : TEXCOORD1;
 #endif
@@ -44,7 +47,9 @@ Shader "Twisted/DMDViewer"
 			struct v2f
 			{
 				float4 vertex : SV_POSITION;
+#if DMD_VIEWER_TEXTURE
 				float2 uv0 : TEXCOORD0;
+#endif
 #if DMD_VIEWER_COLOR_VERTEX
 				float4 uv1 : TEXCOORD1;
 #endif
@@ -60,7 +65,9 @@ Shader "Twisted/DMDViewer"
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
+#if DMD_VIEWER_TEXTURE
 				o.uv0 = TRANSFORM_TEX(v.uv0, _MainTex);
+#endif
 #if DMD_VIEWER_COLOR_VERTEX
 				o.uv1 = v.uv1;
 #endif
@@ -72,7 +79,11 @@ Shader "Twisted/DMDViewer"
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				fixed4 col = tex2D(_MainTex, i.uv0);
+				fixed4 col = fixed4(1, 1, 1, 1);
+
+#if DMD_VIEWER_TEXTURE
+				col = tex2D(_MainTex, i.uv0);
+#endif
 
 #if DMD_VIEWER_COLOR_VERTEX
 				col *= i.uv1;

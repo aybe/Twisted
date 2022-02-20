@@ -26,6 +26,11 @@ namespace Twisted.Editor
             };
         }
 
+        private void Awake()
+        {
+            Shader.SetKeyword(DMDViewerStyles.TextureKeyword, true); // enable texturing once so as to not drive user crazy
+        }
+
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
         private void OnEnable()
         {
@@ -90,6 +95,10 @@ namespace Twisted.Editor
                         View.SetSelection(Array.Empty<int>(), TreeViewSelectionOptions.FireSelectionChanged);
                     }
 
+                    EditorGUILayout.Space();
+
+                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent, EditorStyles.toolbarButton);
+                    
                     EditorGUILayout.Space();
 
                     EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
