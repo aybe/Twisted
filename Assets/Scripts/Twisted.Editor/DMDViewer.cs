@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,88 @@ namespace Twisted.Editor
 {
     internal sealed class DMDViewer : EditorWindow
     {
+        #region Methods
+
+        private void OpenNode(DMDNode00FF? node, bool frame = true)
+        {
+            Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+        }
+
+        #endregion
+
+        private static MultiColumnHeaderState.Column[] GetColumns()
+        {
+            var columns = new MultiColumnHeaderState.Column[]
+            {
+                new TreeViewColumn<DMDNode>(s => s.GetType().Name)
+                {
+                    headerContent   = EditorGUIUtility.TrTextContent("Name"),
+                    width           = 350.0f,
+                    minWidth        = 200.0f,
+                    maxWidth        = 500.0f,
+                    TextAnchor      = TextAnchor.MiddleLeft,
+                    IsPrimaryColumn = true
+                },
+                new TreeViewColumn<DMDNode>(s => $"0x{(s.NodeType >> 16) & 0xFFFF:X4}")
+                {
+                    headerContent = EditorGUIUtility.TrTextContent("Type 1"),
+                    width         = 75.0f,
+                    minWidth      = 75.0f,
+                    maxWidth      = 75.0f,
+                    TextAnchor    = TextAnchor.MiddleRight
+                },
+                new TreeViewColumn<DMDNode>(s => $"0x{(s.NodeType >> 00) & 0xFFFF:X4}")
+                {
+                    headerContent = EditorGUIUtility.TrTextContent("Type 2"),
+                    width         = 75.0f,
+                    minWidth      = 75.0f,
+                    maxWidth      = 75.0f,
+                    TextAnchor    = TextAnchor.MiddleRight
+                },
+                new TreeViewColumn<DMDNode>(s => s.Position)
+                {
+                    headerContent = EditorGUIUtility.TrTextContent("Position"),
+                    width         = 75.0f,
+                    minWidth      = 75.0f,
+                    maxWidth      = 75.0f,
+                    TextAnchor    = TextAnchor.MiddleRight
+                },
+                new TreeViewColumn<DMDNode>(s => s.Length)
+                {
+                    headerContent = EditorGUIUtility.TrTextContent("Length"),
+                    minWidth      = 75.0f,
+                    maxWidth      = 75.0f,
+                    width         = 75.0f,
+                    TextAnchor    = TextAnchor.MiddleRight
+                },
+                new TreeViewColumn<DMDNode>(s => (s as DMDNode00FF)?.GetPolygonsString() ?? "N/A")
+                {
+                    headerContent = EditorGUIUtility.TrTextContent("Polygons"),
+                    width         = 500.0f,
+                    minWidth      = 100.0f,
+                    maxWidth      = 999.0f,
+                    TextAnchor    = TextAnchor.MiddleLeft
+                }
+            };
+
+            foreach (var column in columns)
+            {
+                column.allowToggleVisibility = true;
+                column.autoResize            = false; // BUG control is fucked up, horizontal scrollbar keeps flickering otherwise
+                column.canSort               = true;
+            }
+
+            return columns;
+        }
+
+        private static class Styles
+        {
+            public static GUIStyle MiniLabelCentered { get; } = new(EditorStyles.miniLabel)
+            {
+                alignment = TextAnchor.MiddleLeft
+            };
+        }
+
         #region Unity
 
         [MenuItem("Twisted/DMD Viewer")]
@@ -43,19 +126,31 @@ namespace Twisted.Editor
 
             ViewState ??= new TreeViewState();
 
-            View = new TreeView<DMDNode>(ViewState, Factory?.DMD);
+            var headerState = new TreeViewColumnHeaderState(GetColumns());
+            var header      = new TreeViewColumnHeader(headerState);
+
+            headerState.maximumNumberOfSortedColumns = 1;
+
+            if (MultiColumnHeaderState.CanOverwriteSerializedFields(ViewHeaderState, headerState))
+                MultiColumnHeaderState.OverwriteSerializedFields(ViewHeaderState, headerState);
+
+            if (ViewHeaderState is null)
+            {
+                header.ResizeToFit();
+            }
+
+            ViewHeaderState ??= headerState;
+
+            View = new TreeView<DMDNode>(ViewState, header)
+            {
+                OnCanMultiSelect  = _ => false,
+                OnGetNewSelection = ViewGetNewSelectionOverride,
+                Root              = Factory?.DMD
+            };
 
             View.NodeMouseContextClick += OnViewNodeMouseContextClick;
 
             View.NodeSelectionChanged += OnViewNodeSelectionChanged;
-
-            View.SearchFilter = (_, items) =>
-            {
-                return items // filter dupe nodes during filtering
-                    .GroupBy(s => s.Data!, DMDViewerNodePositionComparer.Instance)
-                    .Select(s => s.First())
-                    .ToList();
-            };
 
             ViewSearch = new SearchField();
 
@@ -63,6 +158,24 @@ namespace Twisted.Editor
 
             UpdateViewRowHeight();
             UpdateViewSearchString();
+        }
+
+        private List<int> ViewGetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
+        {
+            // we want a user-friendly context click behavior, i.e. one that doesn't sadistically changes actual selection
+
+            var selection = new List<int>();
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 1)
+            {
+                selection.AddRange(View.GetSelection());
+            }
+            else
+            {
+                selection.Add(clickedItem.id);
+            }
+
+            return selection;
         }
 
         private void OnDisable()
@@ -81,6 +194,8 @@ namespace Twisted.Editor
 
         private void OnGUI()
         {
+            var disabled = Factory is null; // for enabling relevant UI only when a file has been loaded
+
             // main toolbar
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
@@ -96,56 +211,72 @@ namespace Twisted.Editor
 
                         UpdateFactory(path);
 
-                        View.SetRoot(Factory!.DMD);
+                        // View.SetRoot(Factory!.DMD); // BUG in fact there should be no need to reload at this point because View.OnGUI does
+
+                        View.Root = Factory!.DMD;
 
                         View.CollapseAll();
-                        
+
                         View.SetSelection(Array.Empty<int>(), TreeViewSelectionOptions.FireSelectionChanged);
+
+                        View.Reload();
                     }
 
                     EditorGUILayout.Space();
 
-                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent, EditorStyles.toolbarButton);
-                    
-                    EditorGUILayout.Space();
-
-                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
-
-                    EditorGUILayout.Space();
-
-                    EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent, EditorStyles.toolbarButton);
-                }
-
-                GUILayout.FlexibleSpace();
-
-                using (new EditorGUI.DisabledScope(!View.HasRoot))
-                {
-                    using (var scope = new EditorGUI.ChangeCheckScope())
+                    using (new EditorGUI.DisabledScope(disabled))
                     {
-                        var value = GUILayout.HorizontalSlider(ViewRowHeight, 16, 32, GUILayout.Width(50.0f));
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent, EditorStyles.toolbarButton);
 
-                        if (scope.changed)
+                        EditorGUILayout.Space();
+
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
+
+                        EditorGUILayout.Space();
+
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent, EditorStyles.toolbarButton);
+
+                        GUILayout.FlexibleSpace();
+
+                        if (!string.IsNullOrWhiteSpace(View.searchString))
                         {
-                            ViewRowHeight = value;
-                            UpdateViewRowHeight();
+                            GUILayout.Label(
+                                EditorGUIUtility.TrTempContent($"{View.GetRows().Count} items found"),
+                                Styles.MiniLabelCentered,
+                                GUILayout.Height(EditorGUIUtility.singleLineHeight)
+                            ); // already forgot how painful it was to center a label...    
                         }
-                    }
 
-                    EditorGUILayout.Space();
-
-                    using (var scope = new EditorGUI.ChangeCheckScope())
-                    {
-                        var value = ViewSearch.OnToolbarGUI(View.searchString, GUILayout.Width(125.0f));
-
-                        if (scope.changed)
+                        using (var scope = new EditorGUI.ChangeCheckScope())
                         {
-                            View.searchString = value;
+                            var value = GUILayout.HorizontalSlider(ViewRowHeight, 16, 32, GUILayout.Width(50.0f));
+
+                            if (scope.changed)
+                            {
+                                ViewRowHeight = value;
+                                UpdateViewRowHeight();
+                            }
+                        }
+
+                        EditorGUILayout.Space();
+
+                        using (var scope = new EditorGUI.ChangeCheckScope())
+                        {
+                            var value = ViewSearch.OnToolbarGUI(View.searchString, GUILayout.Width(125.0f));
+
+                            if (scope.changed)
+                            {
+                                View.searchString = value;
+                            }
                         }
                     }
                 }
             }
 
-            View.OnGUI(GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true)));
+            if (disabled is false)
+            {
+                View.OnGUI(GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandHeight(true)));
+            }
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
@@ -172,11 +303,14 @@ namespace Twisted.Editor
         private float ViewRowHeight = 24;
 
         [SerializeField]
-        private TreeViewState ViewState = null!;
+        private TreeViewState? ViewState;
+
+        [SerializeField]
+        private MultiColumnHeaderState? ViewHeaderState;
 
         private SearchField ViewSearch = null!;
 
-        private void UpdateFactory(string? path) 
+        private void UpdateFactory(string? path)
         {
             if (File.Exists(path))
             {
@@ -194,21 +328,12 @@ namespace Twisted.Editor
 
         private void UpdateViewRowHeight()
         {
-            View.SetRowHeight(ViewRowHeight);
+            View.RowHeight = ViewRowHeight;
         }
 
         private void UpdateViewSearchString()
         {
-            View.searchString = ViewState.searchString;
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void OpenNode(DMDNode00FF? node, bool frame = true)
-        {
-            Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+            View.searchString = ViewState!.searchString;
         }
 
         #endregion

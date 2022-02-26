@@ -55,13 +55,9 @@ namespace Twisted.Graphics
 
         public byte Flags { get; }
 
-        public override string ToString()
+        public string GetPolygonsString()
         {
-            return $"{base.ToString()}, " +
-                   $"{nameof(PositionVertices)}: {PositionVertices}, " +
-                   $"{nameof(PositionNormals)}: {PositionNormals}, " +
-                   $"{nameof(PositionPolygons)}: {PositionPolygons}, " +
-                   $"{nameof(Polygons)}: {Polygons.Count}, {string.Join(", ", Polygons.Select(s => s.GetType().Name.Replace("Polygon", string.Empty)).Distinct().OrderBy(s => s))}";
+            return string.Join(", ", Polygons.Select(s => s.GetType().Name.Replace("Polygon", string.Empty)).Distinct().OrderBy(s => s));
         }
     }
 }
