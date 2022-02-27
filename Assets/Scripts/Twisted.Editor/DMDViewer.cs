@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Graphics;
 using Unity.Extensions.Editor;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -16,15 +14,78 @@ namespace Twisted.Editor
     {
         #region Methods
 
-        private void OpenNode(DMDNode00FF? node, bool frame = true)
+        private void InitializeFactory(string? path)
         {
-            Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+            if (File.Exists(path))
+            {
+                Factory           = DMDFactory.Create(path!);
+                FactoryPath       = path;
+                titleContent.text = Path.GetFileName(path);
+            }
+            else
+            {
+                Factory           = null;
+                FactoryPath       = null;
+                titleContent.text = "DMD Viewer";
+            }
+        }
+
+        [MenuItem("Twisted/DMD Viewer")]
+        private static void InitializeWindow()
+        {
+            var type   = typeof(EditorWindow).Assembly.GetType("UnityEditor.ProjectBrowser");
+            var types  = type != null ? new[] { type } : Array.Empty<Type>();
+            var window = GetWindow<DMDViewer>(types);
+            window.titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
+            {
+                text = "DMD Viewer"
+            };
         }
 
         #endregion
 
-        private static MultiColumnHeaderState.Column[] GetColumns()
+        #region Fields
+
+        private DMDFactory? Factory;
+
+        [SerializeField]
+        private string? FactoryPath;
+
+        private TreeView<DMDNode> View = null!;
+
+        [SerializeField]
+        private float ViewHeight = 24;
+
+        private SearchField ViewSearch = null!;
+
+        [SerializeField]
+        private TreeViewState? ViewState;
+
+        [SerializeField]
+        private MultiColumnHeaderState? ViewStateHeader;
+
+        #endregion
+
+        #region Unity
+
+        private void Awake()
         {
+            // initialize the shader once with sensible defaults that looks as intended
+
+            Shader.SetKeyword(DMDViewerStyles.TextureKeyword,     true);
+            Shader.SetKeyword(DMDViewerStyles.ColorVertexKeyword, true);
+        }
+
+        private void OnEnable()
+        {
+            // initialize factory from last opened file if any
+
+            InitializeFactory(FactoryPath);
+
+            // initialize the view and search field
+
+            ViewState ??= new TreeViewState();
+
             var columns = new MultiColumnHeaderState.Column[]
             {
                 new TreeViewColumn<DMDNode>(s => s.GetType().Name)
@@ -81,122 +142,94 @@ namespace Twisted.Editor
             foreach (var column in columns)
             {
                 column.allowToggleVisibility = true;
-                column.autoResize            = false; // BUG control is fucked up, horizontal scrollbar keeps flickering otherwise
+                column.autoResize            = false; // BUG disable column auto-resize otherwise stupid control horizontal scrollbar will constantly flicker
                 column.canSort               = true;
             }
 
-            return columns;
-        }
-
-        private static class Styles
-        {
-            public static GUIStyle MiniLabelCentered { get; } = new(EditorStyles.miniLabel)
-            {
-                alignment = TextAnchor.MiddleLeft
-            };
-        }
-
-        #region Unity
-
-        [MenuItem("Twisted/DMD Viewer")]
-        private static void Initialize()
-        {
-            var type   = typeof(EditorWindow).Assembly.GetType("UnityEditor.ProjectBrowser");
-            var types  = type != null ? new[] { type } : Array.Empty<Type>();
-            var window = GetWindow<DMDViewer>(types);
-            window.titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
-            {
-                text = "DMD Viewer"
-            };
-        }
-
-        private void Awake()
-        {
-            // enable both texture and vertex color once to make it look like it's intended
-            Shader.SetKeyword(DMDViewerStyles.TextureKeyword,     true);
-            Shader.SetKeyword(DMDViewerStyles.ColorVertexKeyword, true);
-        }
-
-        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        private void OnEnable()
-        {
-            // reload previous DMD if any, initialize the view, fetch settings from UI
-
-            UpdateFactory(FactoryPath);
-
-            ViewState ??= new TreeViewState();
-
-            var headerState = new TreeViewColumnHeaderState(GetColumns());
+            var headerState = new TreeViewColumnHeaderState(columns);
             var header      = new TreeViewColumnHeader(headerState);
 
             headerState.maximumNumberOfSortedColumns = 1;
 
-            if (MultiColumnHeaderState.CanOverwriteSerializedFields(ViewHeaderState, headerState))
-                MultiColumnHeaderState.OverwriteSerializedFields(ViewHeaderState, headerState);
+            if (MultiColumnHeaderState.CanOverwriteSerializedFields(ViewStateHeader, headerState))
+                MultiColumnHeaderState.OverwriteSerializedFields(ViewStateHeader, headerState);
 
-            if (ViewHeaderState is null)
+            if (ViewStateHeader is null)
             {
                 header.ResizeToFit();
             }
 
-            ViewHeaderState ??= headerState;
+            ViewStateHeader ??= headerState;
 
             View = new TreeView<DMDNode>(ViewState, header)
             {
-                OnCanMultiSelect  = _ => false,
-                OnGetNewSelection = ViewGetNewSelectionOverride,
-                Root              = Factory?.DMD
+                OnCanMultiSelect = _ => false,
+                Root             = Factory?.DMD,
+                RowHeight        = ViewHeight,
+                searchString     = ViewState!.searchString
             };
 
-            View.NodeMouseContextClick += OnViewNodeMouseContextClick;
+            View.NodeMouseContextClick += (_, e) =>
+            {
+                var menu = new GenericMenu();
 
-            View.NodeSelectionChanged += OnViewNodeSelectionChanged;
+                menu.AddItem(
+                    e.Node is DMDNode00FF, EditorGUIUtility.TrTextContent("Refresh"),
+                    false,
+                    s =>
+                    {
+                        DMDPreview.Instance.SetNode(Factory, s as DMDNode00FF, frame: false); // don't frame now or it'll be choppy
+                    },
+                    e.Node
+                );
+
+                menu.AddSeparator("/");
+
+                var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
+
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Hex Dump/Clipboard"),
+                    false,
+                    s =>
+                    {
+                        EditorGUIUtility.systemCopyBuffer = s as string;
+                    },
+                    data
+                );
+
+                menu.AddItem(
+                    EditorGUIUtility.TrTextContent("Hex Dump/Console"),
+                    false,
+                    s =>
+                    {
+                        Debug.Log(s.ToString());
+                    },
+                    data
+                );
+
+                menu.ShowAsContext();
+
+                EditorApplication.delayCall += () => DMDPreview.Instance.FrameSelection(); // frame now, it won't be choppy
+            };
+
+            View.NodeSelectionChanged += (_, e) =>
+            {
+                DMDPreview.Instance.SetNode(Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), frame: Event.current.button == 0); // above will frame
+            };
 
             ViewSearch = new SearchField();
 
-            ViewSearch.downOrUpArrowKeyPressed += OnViewSearchKeyPressed;
-
-            UpdateViewRowHeight();
-            UpdateViewSearchString();
-        }
-
-        private List<int> ViewGetNewSelectionOverride(TreeViewItem clickedItem, bool keepMultiSelection, bool useActionKeyAsShift)
-        {
-            // we want a user-friendly context click behavior, i.e. one that doesn't sadistically changes actual selection
-
-            var selection = new List<int>();
-
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 1)
-            {
-                selection.AddRange(View.GetSelection());
-            }
-            else
-            {
-                selection.Add(clickedItem.id);
-            }
-
-            return selection;
-        }
-
-        private void OnDisable()
-        {
-            View.NodeMouseContextClick -= OnViewNodeMouseContextClick;
-
-            View.NodeSelectionChanged -= OnViewNodeSelectionChanged;
-
-            ViewSearch.downOrUpArrowKeyPressed -= OnViewSearchKeyPressed;
+            ViewSearch.downOrUpArrowKeyPressed += () => View.SetFocusAndEnsureSelectedItem();
         }
 
         private void OnDestroy()
         {
-            DestroyImmediate(Singleton<DMDPreview>.instance.gameObject); // clear scene on close
+            DestroyImmediate(DMDPreview.Instance.gameObject); // leave scene clear after we close
         }
 
         private void OnGUI()
         {
-            var disabled = Factory is null; // for enabling relevant UI only when a file has been loaded
-
-            // main toolbar
+            var disabled = Factory is null; // enable relevant UI only when a file has been loaded
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -209,11 +242,11 @@ namespace Twisted.Editor
                         if (string.IsNullOrEmpty(path))
                             return;
 
-                        UpdateFactory(path);
-
-                        // View.SetRoot(Factory!.DMD); // BUG in fact there should be no need to reload at this point because View.OnGUI does
+                        InitializeFactory(path);
 
                         View.Root = Factory!.DMD;
+
+                        // before reloading, clear active state so that handlers may perform some cleanup too
 
                         View.CollapseAll();
 
@@ -226,15 +259,24 @@ namespace Twisted.Editor
 
                     using (new EditorGUI.DisabledScope(disabled))
                     {
-                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent, EditorStyles.toolbarButton);
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(
+                            DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent,
+                            EditorStyles.toolbarButton
+                        );
 
                         EditorGUILayout.Space();
 
-                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent, EditorStyles.toolbarButton);
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(
+                            DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent,
+                            EditorStyles.toolbarButton
+                        );
 
                         EditorGUILayout.Space();
 
-                        EditorGUIExtensions.ToggleButtonShaderKeyword(DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent, EditorStyles.toolbarButton);
+                        EditorGUIExtensions.ToggleButtonShaderKeyword(
+                            DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent,
+                            EditorStyles.toolbarButton
+                        );
 
                         GUILayout.FlexibleSpace();
 
@@ -242,19 +284,18 @@ namespace Twisted.Editor
                         {
                             GUILayout.Label(
                                 EditorGUIUtility.TrTempContent($"{View.GetRows().Count} items found"),
-                                Styles.MiniLabelCentered,
+                                GenericStyles.LabelMiniCentered,
                                 GUILayout.Height(EditorGUIUtility.singleLineHeight)
-                            ); // already forgot how painful it was to center a label...    
+                            );
                         }
 
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
-                            var value = GUILayout.HorizontalSlider(ViewRowHeight, 16, 32, GUILayout.Width(50.0f));
+                            var value = GUILayout.HorizontalSlider(ViewHeight, 16, 32, GUILayout.Width(75.0f));
 
                             if (scope.changed)
                             {
-                                ViewRowHeight = value;
-                                UpdateViewRowHeight();
+                                View.RowHeight = ViewHeight = value;
                             }
                         }
 
@@ -279,123 +320,13 @@ namespace Twisted.Editor
             }
         }
 
-        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members")]
         private void ShowButton(Rect rect)
         {
             if (GUI.Button(rect, DMDViewerStyles.HelpContent, EditorStyles.iconButton))
             {
                 EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
             }
-        }
-
-        #endregion
-
-        #region View
-
-        private DMDFactory? Factory;
-
-        [SerializeField]
-        private string? FactoryPath;
-
-        private TreeView<DMDNode> View = null!;
-
-        [SerializeField]
-        private float ViewRowHeight = 24;
-
-        [SerializeField]
-        private TreeViewState? ViewState;
-
-        [SerializeField]
-        private MultiColumnHeaderState? ViewHeaderState;
-
-        private SearchField ViewSearch = null!;
-
-        private void UpdateFactory(string? path)
-        {
-            if (File.Exists(path))
-            {
-                Factory           = DMDFactory.Create(path!);
-                FactoryPath       = path;
-                titleContent.text = Path.GetFileName(path);
-            }
-            else
-            {
-                Factory           = null;
-                FactoryPath       = null;
-                titleContent.text = "DMD Viewer";
-            }
-        }
-
-        private void UpdateViewRowHeight()
-        {
-            View.RowHeight = ViewRowHeight;
-        }
-
-        private void UpdateViewSearchString()
-        {
-            View.searchString = ViewState!.searchString;
-        }
-
-        #endregion
-
-        #region Handlers
-
-        private void OnViewNodeMouseContextClick(object sender, TreeViewMouseClickEventArgs e)
-        {
-            var menu = new GenericMenu();
-
-            {
-                var content = EditorGUIUtility.TrTextContent("Refresh");
-
-                if (e.Node is DMDNode00FF node)
-                {
-                    menu.AddItem(content, false, s => OpenNode(s as DMDNode00FF, false), node);
-                }
-                else
-                {
-                    menu.AddDisabledItem(content);
-                }
-            }
-
-            menu.AddSeparator("/");
-
-            var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
-
-            menu.AddItem(
-                EditorGUIUtility.TrTextContent("Hex Dump/Clipboard"),
-                false,
-                s => { EditorGUIUtility.systemCopyBuffer = s as string; },
-                data
-            );
-
-            menu.AddItem(
-                EditorGUIUtility.TrTextContent("Hex Dump/Console"),
-                false,
-                Debug.Log,
-                data
-            );
-
-            menu.ShowAsContext();
-
-            Repaint(); // coz' totally fucked up Unity may not show menu if one stays still...
-        }
-
-        private void OnViewNodeSelectionChanged(object sender, TreeViewSelectionEventArgs<DMDNode> e)
-        {
-            // animations and context menus combined don't play well at all, the former will get paused by the latter when it opens
-            // furthermore, it's rather sadistic from end-user perspective to lose his actual selection for a simple context click
-
-            var current = Event.current;
-
-            if (current.type == EventType.MouseDown && current.button == 1)
-                return;
-
-            OpenNode(e.Nodes.OfType<DMDNode00FF>().FirstOrDefault());
-        }
-
-        private void OnViewSearchKeyPressed()
-        {
-            View.SetFocusAndEnsureSelectedItem();
         }
 
         #endregion

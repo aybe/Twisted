@@ -17,6 +17,29 @@ namespace Twisted
     [Singleton(Automatic = true)]
     public sealed class DMDPreview : MonoBehaviour, ISingleton
     {
+        public static DMDPreview Instance => Singleton<DMDPreview>.instance;
+
+        public void FrameSelection()
+        {
+            // this is a consistent framing experience unlike Unity's which may or may not further zoom in/out
+
+            var view = SceneView.lastActiveSceneView;
+
+            if (view == null)
+                return;
+
+            var renderers = gameObject.GetComponentsInChildren<Renderer>();
+            var renderer1 = renderers.FirstOrDefault();
+            var bounds    = renderer1 != null ? renderer1.bounds : new Bounds();
+
+            foreach (var current in renderers)
+            {
+                bounds.Encapsulate(current.bounds);
+            }
+
+            view.Frame(bounds, false);
+        }
+
         public void SetNode(DMDFactory factory, DMDNode00FF? node, bool split = true, bool frame = true)
         {
             while (transform.childCount > 0)
@@ -141,7 +164,7 @@ namespace Twisted
                     var mesh = new Mesh
                     {
                         name      = meshName,
-                        hideFlags = HideFlags.HideAndDontSave,
+                        hideFlags = HideFlags.HideAndDontSave
                     };
 
                     mesh.SetVertices(vertices);
@@ -165,26 +188,10 @@ namespace Twisted
 
             DestroyImmediate(atlas);
 
-            // frame the object but unlike Unity, make it pleasant
-
-            if (frame is false)
-                return;
-
-            var view = SceneView.lastActiveSceneView;
-
-            if (view == null)
-                return;
-
-            var renderers = gameObject.GetComponentsInChildren<Renderer>();
-            var renderer1 = renderers.FirstOrDefault();
-            var bounds    = renderer1 != null ? renderer1.bounds : new Bounds();
-
-            foreach (var current in renderers)
+            if (frame)
             {
-                bounds.Encapsulate(current.bounds);
+                FrameSelection();
             }
-
-            view.Frame(bounds, false);
         }
     }
 }
