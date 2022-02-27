@@ -19,6 +19,7 @@ resharper_int_align_variables = true
 resharper_keep_existing_embedded_arrangement = false
 resharper_place_accessorholder_attribute_on_same_line = false
 resharper_place_field_attribute_on_same_line = false
+resharper_place_simple_anonymousmethod_on_single_line = false
 resharper_place_simple_embedded_statement_on_same_line = false
 resharper_xmldoc_max_line_length = 180
 
@@ -30,4 +31,4 @@ dotnet_diagnostic.ide0052.severity = none
 dotnet_style_prefer_is_null_check_over_reference_equality_method = false
 
 # IDE0079: Remove unnecessary suppression
-dotnet_diagnostic.IDE0079.severity = none
+dotnet_diagnostic.ide0079.severity = none
