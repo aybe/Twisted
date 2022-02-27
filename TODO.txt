@@ -1,3 +1,32 @@
+- when unity loads, last selected item is not rendered
+- try remove that dependency on visual scripting crap with tons of extension methods
+    Search Target
+      Unity.VisualScripting.Antlr3.Runtime, 3.1.3.22795
+      Unity.VisualScripting.Core, 0.0.0.0
+      Unity.VisualScripting.Core.Editor, 1.0.0.0
+      Unity.VisualScripting.IonicZip, 1.9.1.8
+      Unity.VisualScripting.TextureAssets, 1.0.0.0
+      Unity.VisualScripting.YamlDotNet, 4.1.0.0
+    Found 9 usages 
+      <Twisted.Editor>
+        Assets
+          Scripts
+            Twisted.Editor
+              DMDViewer.cs
+                (79,30) DestroyImmediate(Singleton<DMDPreview>.instance.gameObject); // clear scene on close
+                (79,40) DestroyImmediate(Singleton<DMDPreview>.instance.gameObject); // clear scene on close
+                (79,52) DestroyImmediate(Singleton<DMDPreview>.instance.gameObject); // clear scene on close
+                (224,13) Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+                (224,23) Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+                (224,35) Singleton<DMDPreview>.instance.SetNode(Factory, node, frame: frame);
+      <Twisted>
+        Assets
+          Scripts
+            Twisted
+              DMDPreview.cs
+                (17,6) [Singleton(Automatic = true)]
+                (17,16) [Singleton(Automatic = true)]
+                (18,53) public sealed class DMDPreview : MonoBehaviour, ISingleton
 - on restored tree view selection, the scene is not updated
 - a way to check for valid normals
  - read whole file
