@@ -18,14 +18,14 @@ namespace Twisted.Editor
         {
             if (File.Exists(path))
             {
-                Factory           = DMDFactory.Create(path!);
-                FactoryPath       = path;
+                State.Factory     = DMDFactory.Create(path!);
+                State.FactoryPath = path;
                 titleContent.text = Path.GetFileName(path);
             }
             else
             {
-                Factory           = null;
-                FactoryPath       = null;
+                State.Factory     = null;
+                State.FactoryPath = null;
                 titleContent.text = "DMD Viewer";
             }
         }
@@ -46,26 +46,12 @@ namespace Twisted.Editor
 
         #region Fields
 
-        private DMDFactory? Factory;
-
         [SerializeField]
-        private bool FactorySplit = true;
-
-        [SerializeField]
-        private string? FactoryPath;
+        private DMDViewerState State = new();
 
         private TreeView<DMDNode> View = null!;
 
-        [SerializeField]
-        private float ViewHeight = 24;
-
         private SearchField ViewSearch = null!;
-
-        [SerializeField]
-        private TreeViewState? ViewState;
-
-        [SerializeField]
-        private MultiColumnHeaderState? ViewStateHeader;
 
         #endregion
 
@@ -83,11 +69,11 @@ namespace Twisted.Editor
         {
             // initialize factory from last opened file if any
 
-            InitializeFactory(FactoryPath);
+            InitializeFactory(State.FactoryPath);
 
             // initialize the view and search field
 
-            ViewState ??= new TreeViewState();
+            State.ViewState ??= new TreeViewState();
 
             var columns = new MultiColumnHeaderState.Column[]
             {
@@ -154,22 +140,22 @@ namespace Twisted.Editor
 
             headerState.maximumNumberOfSortedColumns = 1;
 
-            if (MultiColumnHeaderState.CanOverwriteSerializedFields(ViewStateHeader, headerState))
-                MultiColumnHeaderState.OverwriteSerializedFields(ViewStateHeader, headerState);
+            if (MultiColumnHeaderState.CanOverwriteSerializedFields(State.ViewStateHeader, headerState))
+                MultiColumnHeaderState.OverwriteSerializedFields(State.ViewStateHeader, headerState);
 
-            if (ViewStateHeader is null)
+            if (State.ViewStateHeader is null)
             {
                 header.ResizeToFit();
             }
 
-            ViewStateHeader ??= headerState;
+            State.ViewStateHeader ??= headerState;
 
-            View = new TreeView<DMDNode>(ViewState, header)
+            View = new TreeView<DMDNode>(State.ViewState, header)
             {
                 OnCanMultiSelect = _ => false,
-                Root             = Factory?.DMD,
-                RowHeight        = ViewHeight,
-                searchString     = ViewState!.searchString
+                Root             = State.Factory?.DMD,
+                RowHeight        = State.ViewHeight,
+                searchString     = State.ViewState!.searchString
             };
 
             View.NodeMouseContextClick += (_, e) =>
@@ -181,7 +167,7 @@ namespace Twisted.Editor
                     false,
                     s =>
                     {
-                        DMDPreview.Instance.SetNode(Factory, s as DMDNode00FF, FactorySplit, false); // don't frame now or it'll be choppy
+                        DMDPreview.Instance.SetNode(State.Factory, s as DMDNode00FF, State.FactorySplit, false); // don't frame now or it'll be choppy
                     },
                     e.Node
                 );
@@ -217,7 +203,7 @@ namespace Twisted.Editor
 
             View.NodeSelectionChanged += (_, e) =>
             {
-                DMDPreview.Instance.SetNode(Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), FactorySplit, Event.current.button == 0); // above will frame
+                DMDPreview.Instance.SetNode(State.Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), State.FactorySplit, Event.current.button == 0); // above will frame
             };
 
             ViewSearch = new SearchField();
@@ -232,7 +218,7 @@ namespace Twisted.Editor
 
         private void OnGUI()
         {
-            var disabled = Factory is null; // enable relevant UI only when a file has been loaded
+            var disabled = State.Factory is null; // enable relevant UI only when a file has been loaded
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
@@ -247,7 +233,7 @@ namespace Twisted.Editor
 
                         InitializeFactory(path);
 
-                        View.Root = Factory!.DMD;
+                        View.Root = State.Factory!.DMD;
 
                         // before reloading, clear active state so that handlers may perform some cleanup too
 
@@ -264,15 +250,14 @@ namespace Twisted.Editor
                     {
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
-                            var value = EditorGUIExtensions.ToggleButton(
-                                FactorySplit,
+                            var value = EditorGUIExtensions.ToggleButton(State.FactorySplit,
                                 DMDViewerStyles.ModelSplitContent,
                                 EditorStyles.toolbarButton
                             );
 
                             if (scope.changed)
                             {
-                                FactorySplit = value;
+                                State.FactorySplit = value;
                                 View.SetSelection(View.GetSelection(), TreeViewSelectionOptions.FireSelectionChanged);
                             }
                         }
@@ -311,11 +296,11 @@ namespace Twisted.Editor
 
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
-                            var value = GUILayout.HorizontalSlider(ViewHeight, 16, 32, GUILayout.Width(75.0f));
+                            var value = GUILayout.HorizontalSlider(State.ViewHeight, 16, 32, GUILayout.Width(75.0f));
 
                             if (scope.changed)
                             {
-                                View.RowHeight = ViewHeight = value;
+                                View.RowHeight = State.ViewHeight = value;
                             }
                         }
 
