@@ -49,6 +49,9 @@ namespace Twisted.Editor
         private DMDFactory? Factory;
 
         [SerializeField]
+        private bool FactorySplit = true;
+
+        [SerializeField]
         private string? FactoryPath;
 
         private TreeView<DMDNode> View = null!;
@@ -178,7 +181,7 @@ namespace Twisted.Editor
                     false,
                     s =>
                     {
-                        DMDPreview.Instance.SetNode(Factory, s as DMDNode00FF, frame: false); // don't frame now or it'll be choppy
+                        DMDPreview.Instance.SetNode(Factory, s as DMDNode00FF, FactorySplit, false); // don't frame now or it'll be choppy
                     },
                     e.Node
                 );
@@ -214,7 +217,7 @@ namespace Twisted.Editor
 
             View.NodeSelectionChanged += (_, e) =>
             {
-                DMDPreview.Instance.SetNode(Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), frame: Event.current.button == 0); // above will frame
+                DMDPreview.Instance.SetNode(Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), FactorySplit, Event.current.button == 0); // above will frame
             };
 
             ViewSearch = new SearchField();
@@ -259,6 +262,23 @@ namespace Twisted.Editor
 
                     using (new EditorGUI.DisabledScope(disabled))
                     {
+                        using (var scope = new EditorGUI.ChangeCheckScope())
+                        {
+                            var value = EditorGUIExtensions.ToggleButton(
+                                FactorySplit,
+                                DMDViewerStyles.ModelSplitContent,
+                                EditorStyles.toolbarButton
+                            );
+
+                            if (scope.changed)
+                            {
+                                FactorySplit = value;
+                                View.SetSelection(View.GetSelection(), TreeViewSelectionOptions.FireSelectionChanged);
+                            }
+                        }
+
+                        EditorGUILayout.Space();
+
                         EditorGUIExtensions.ToggleButtonShaderKeyword(
                             DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent,
                             EditorStyles.toolbarButton

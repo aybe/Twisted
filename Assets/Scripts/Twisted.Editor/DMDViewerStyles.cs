@@ -18,6 +18,8 @@ namespace Twisted.Editor
 
         public static GlobalKeyword ColorPolygonKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON");
 
+        public static GUIContent ModelSplitContent { get; } = EditorGUIUtility.TrIconContent("Grid Icon", "Toggle model split.");
+
         public static GUIContent TextureContent { get; } = EditorGUIUtility.TrIconContent("Texture2D Icon", "Toggle texture.");
 
         public static GlobalKeyword TextureKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_TEXTURE");
