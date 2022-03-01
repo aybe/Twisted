@@ -235,7 +235,9 @@ namespace Unity.Extensions.Editor
 
                 var result = column.Getter.Invoke(node);
 
-                GUI.Label(rect, result.ToString(), TreeViewStyles.Label[column.TextAnchor]);
+                var text = TextExtensions.Ellipsis(result.ToString(), rect.width, TreeViewStyles.Label[column.TextAnchor]);
+
+                GUI.Label(rect, text, TreeViewStyles.Label[column.TextAnchor]);
             }
         }
 
