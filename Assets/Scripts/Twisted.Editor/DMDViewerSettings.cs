@@ -7,6 +7,8 @@ namespace Twisted.Editor
     {
         public string? LastDirectory;
 
+        public bool SceneViewFraming = true;
+
         private void OnDisable()
         {
             Save();

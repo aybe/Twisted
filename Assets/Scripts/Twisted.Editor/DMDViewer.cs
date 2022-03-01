@@ -207,12 +207,15 @@ namespace Twisted.Editor
 
                 menu.ShowAsContext();
 
-                EditorApplication.delayCall += () => DMDPreview.Instance.FrameSelection(); // frame now, it won't be choppy
+                if (Settings.SceneViewFraming)
+                {
+                    EditorApplication.delayCall += () => DMDPreview.Instance.FrameSelection(); // frame now, it won't be choppy
+                }
             };
 
             View.NodeSelectionChanged += (_, e) =>
             {
-                DMDPreview.Instance.SetNode(State.Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), State.FactorySplit, Event.current.button == 0); // above will frame
+                DMDPreview.Instance.SetNode(State.Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), State.FactorySplit, Settings.SceneViewFraming && Event.current.button == 0);
             };
 
             ViewSearch = new SearchField();
@@ -266,6 +269,27 @@ namespace Twisted.Editor
 
                     using (new EditorGUI.DisabledScope(disabled))
                     {
+                        using (var scope = new EditorGUI.ChangeCheckScope())
+                        {
+                            var value = EditorGUIExtensions.ToggleButton(
+                                Settings.SceneViewFraming,
+                                DMDViewerStyles.SceneViewFraming,
+                                EditorStyles.toolbarButton
+                            );
+
+                            if (scope.changed)
+                            {
+                                Settings.SceneViewFraming = value;
+
+                                if (value)
+                                {
+                                    DMDPreview.Instance.FrameSelection();
+                                }
+                            }
+                        }
+
+                        EditorGUILayout.Space();
+
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
                             var value = EditorGUIExtensions.ToggleButton(State.FactorySplit,

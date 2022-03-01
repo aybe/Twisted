@@ -20,6 +20,8 @@ namespace Twisted.Editor
 
         public static GUIContent ModelSplitContent { get; } = EditorGUIUtility.TrIconContent("Grid Icon", "Toggle model split.");
 
+        public static GUIContent SceneViewFraming { get; } = EditorGUIUtility.TrIconContent("Camera Icon", "Toggle scene view framing.");
+
         public static GUIContent TextureContent { get; } = EditorGUIUtility.TrIconContent("Texture2D Icon", "Toggle texture.");
 
         public static GlobalKeyword TextureKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_TEXTURE");
