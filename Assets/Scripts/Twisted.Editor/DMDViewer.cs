@@ -325,40 +325,30 @@ namespace Twisted.Editor
 
                         EditorGUILayout.Space();
 
-                        using (var scope = new EditorGUI.ChangeCheckScope())
-                        {
-                            var value = EditorGUIExtensions.ToggleButton(
-                                Settings.SceneViewFraming,
-                                DMDViewerStyles.SceneViewFraming,
-                                EditorStyles.toolbarButton
-                            );
-
-                            if (scope.changed)
+                        ToggleButton(
+                            ref Settings.SceneViewFraming,
+                            DMDViewerStyles.SceneViewFraming,
+                            EditorStyles.toolbarButton,
+                            () =>
                             {
-                                Settings.SceneViewFraming = value;
-
-                                if (value)
+                                if (Settings.SceneViewFraming)
                                 {
                                     Preview.FrameSelection();
                                 }
                             }
-                        }
+                        );
 
                         EditorGUILayout.Space();
 
-                        using (var scope = new EditorGUI.ChangeCheckScope())
-                        {
-                            var value = EditorGUIExtensions.ToggleButton(State.FactorySplit,
-                                DMDViewerStyles.ModelSplitContent,
-                                EditorStyles.toolbarButton
-                            );
-
-                            if (scope.changed)
+                        ToggleButton(
+                            ref State.FactorySplit,
+                            DMDViewerStyles.ModelSplitContent,
+                            EditorStyles.toolbarButton,
+                            () =>
                             {
-                                State.FactorySplit = value;
                                 View.SetSelection(View.GetSelection(), TreeViewSelectionOptions.FireSelectionChanged);
                             }
-                        }
+                        );
 
                         EditorGUILayout.Space();
 
