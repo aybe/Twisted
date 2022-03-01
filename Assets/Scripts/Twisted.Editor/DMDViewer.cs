@@ -373,14 +373,11 @@ namespace Twisted.Editor
 
                         GUILayout.FlexibleSpace();
 
-                        if (!string.IsNullOrWhiteSpace(View.searchString))
-                        {
-                            GUILayout.Label(
-                                EditorGUIUtility.TrTempContent($"{View.GetRows().Count} items found"),
-                                GenericStyles.LabelMiniCentered,
-                                GUILayout.Height(EditorGUIUtility.singleLineHeight)
-                            );
-                        }
+                        GUILayout.Label(
+                            EditorGUIUtility.TrTempContent($"{View.GetRows().Count} items found"),
+                            GenericStyles.LabelMiniCentered,
+                            GUILayout.Height(EditorGUIUtility.singleLineHeight)
+                        );
 
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
