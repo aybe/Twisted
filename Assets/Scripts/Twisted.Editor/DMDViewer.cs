@@ -235,10 +235,19 @@ namespace Twisted.Editor
                 {
                     if (GUILayout.Button(DMDViewerStyles.OpenContent, EditorStyles.toolbarButton))
                     {
-                        var path = EditorUtility.OpenFilePanel(null, null, "DMD");
+                        var directory = Settings.LastDirectory;
+
+                        if (!Directory.Exists(directory))
+                        {
+                            directory = null;
+                        }
+
+                        var path = EditorUtility.OpenFilePanel(null, directory, "DMD");
 
                         if (string.IsNullOrEmpty(path))
                             return;
+
+                        Settings.LastDirectory = Path.GetDirectoryName(path);
 
                         InitializeFactory(path);
 
