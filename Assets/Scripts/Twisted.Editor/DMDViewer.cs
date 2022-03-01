@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Twisted.Graphics;
 using Unity.Extensions.Editor;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -176,7 +177,7 @@ namespace Twisted.Editor
                     false,
                     s =>
                     {
-                        DMDPreview.Instance.SetNode(State.Factory, s as DMDNode00FF, State.FactorySplit, false); // don't frame now or it'll be choppy
+                        Preview.SetNode(State.Factory, s as DMDNode00FF, State.FactorySplit, false); // don't frame now or it'll be choppy
                     },
                     e.Node
                 );
@@ -209,13 +210,13 @@ namespace Twisted.Editor
 
                 if (Settings.SceneViewFraming)
                 {
-                    EditorApplication.delayCall += () => DMDPreview.Instance.FrameSelection(); // frame now, it won't be choppy
+                    EditorApplication.delayCall += () => Preview.FrameSelection(); // frame now, it won't be choppy
                 }
             };
 
             View.NodeSelectionChanged += (_, e) =>
             {
-                DMDPreview.Instance.SetNode(State.Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), State.FactorySplit, Settings.SceneViewFraming && Event.current.button == 0);
+                Preview.SetNode(State.Factory, e.Nodes.OfType<DMDNode00FF>().FirstOrDefault(), State.FactorySplit, Settings.SceneViewFraming && Event.current.button == 0);
             };
 
             ViewSearch = new SearchField();
@@ -225,7 +226,7 @@ namespace Twisted.Editor
 
         private void OnDestroy()
         {
-            DestroyImmediate(DMDPreview.Instance.gameObject); // leave scene clear after we close
+            DestroyImmediate(Preview.gameObject); // leave scene clear after we close
         }
 
         private void OnGUI()
@@ -283,7 +284,7 @@ namespace Twisted.Editor
 
                                 if (value)
                                 {
-                                    DMDPreview.Instance.FrameSelection();
+                                    Preview.FrameSelection();
                                 }
                             }
                         }

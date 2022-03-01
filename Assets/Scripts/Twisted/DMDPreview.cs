@@ -17,8 +17,6 @@ namespace Twisted
     [Singleton(Automatic = true)]
     public sealed class DMDPreview : MonoBehaviour, ISingleton
     {
-        public static DMDPreview Instance => Singleton<DMDPreview>.instance;
-
         public void FrameSelection()
         {
             // this is a consistent framing experience unlike Unity's which may or may not further zoom in/out
