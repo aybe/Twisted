@@ -46,6 +46,10 @@ namespace Twisted.Editor
 
         #region Fields
 
+        private static DMDPreview Preview => Singleton<DMDPreview>.instance;
+
+        private static DMDViewerSettings Settings => DMDViewerSettings.instance;
+
         [SerializeField]
         private DMDViewerState State = new();
 
@@ -63,6 +67,11 @@ namespace Twisted.Editor
 
             Shader.SetKeyword(DMDViewerStyles.TextureKeyword,     true);
             Shader.SetKeyword(DMDViewerStyles.ColorVertexKeyword, true);
+        }
+
+        private void OnDisable()
+        {
+            Settings.Save();
         }
 
         private void OnEnable()
