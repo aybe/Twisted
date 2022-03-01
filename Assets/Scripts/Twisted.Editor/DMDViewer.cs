@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Graphics;
+using Unity.Extensions.Comparers;
 using Unity.Extensions.Editor;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -160,9 +161,17 @@ namespace Twisted.Editor
 
             State.ViewStateHeader ??= headerState;
 
+            // during search mode, only show distinct nodes by position as there will be many dupes
+
+            var comparer = new DelegateEqualityComparer<DMDNode>(
+                (a, b) => a == null && b == null || a != null && b != null && a.Position == b.Position,
+                s => s.Position.GetHashCode()
+            );
+
             View = new TreeView<DMDNode>(State.ViewState, header)
             {
                 OnCanMultiSelect = _ => false,
+                OnFilterItems    = s => s.Distinct(comparer),
                 Root             = State.Factory?.DMD,
                 RowHeight        = State.ViewHeight,
                 searchString     = State.ViewState!.searchString
