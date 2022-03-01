@@ -56,6 +56,8 @@ namespace Unity.Extensions.Editor
 
         public Func<TreeViewItem<T>, bool>? OnCanMultiSelect { private get; init; } // we need to expose this protected shit #1
 
+        public Func<IEnumerable<T>, IEnumerable<T>>? OnFilterItems { get; set; }
+
         public GetNewSelectionFunction OnGetNewSelection // we need to expose this protected shit #2
         {
             init => getNewSelectionOverride = value; // set-only, how cool is that?
@@ -134,13 +136,18 @@ namespace Unity.Extensions.Editor
                     }
                 }
             }
-            else // build a flattened, filtered view
+            else
             {
-                var items = Root
-                    .TraverseDfs()
-                    .Cast<T>()
-                    .Where(s => Filter(s, searchString))
-                    .Select(s => new TreeViewItem<T>(NodeForward[s], 0, s.ToString(), s));
+                // build a flattened, filtered view with items matching current search filter
+
+                var enumerable = Root.TraverseDfs().Cast<T>().Where(s => Filter(s, searchString));
+
+                if (OnFilterItems != null)
+                {
+                    enumerable = OnFilterItems(enumerable); // allow consumers to further filter the items
+                }
+
+                var items = enumerable.Select(s => new TreeViewItem<T>(NodeForward[s], 0, s.ToString(), s));
 
                 Rows.AddRange(items); // notice how we don't update passed root here
             }
