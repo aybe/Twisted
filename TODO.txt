@@ -1,3 +1,24 @@
+- see the implications of not checking strict texture page size in ctor
+    xarena1
+        377924, 
+        385472, 
+        388916, 
+        390624, 
+        391452, 
+        393140, 
+        400748, 
+        404232, 
+        405936, 
+        406764, 
+        407640, 
+        415052, 
+        418396, 
+        419992, 
+        420772, 
+        516932
+
+- add ellipsis to columns
+
 - when unity loads, last selected item is not rendered
 - try remove that dependency on visual scripting crap with tons of extension methods
     Search Target
