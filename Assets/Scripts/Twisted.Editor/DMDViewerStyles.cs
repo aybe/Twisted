@@ -19,6 +19,8 @@ namespace Twisted.Editor
         public static GlobalKeyword ColorPolygonKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON");
 
         public static GUIContent ModelSplitContent { get; } = EditorGUIUtility.TrIconContent("Grid Icon", "Toggle model split.");
+        
+        public static GUIContent DistinctFiltering { get; } = EditorGUIUtility.TrIconContent("Filter Icon", "Toggle distinct filtering.");
 
         public static GUIContent SceneViewFraming { get; } = EditorGUIUtility.TrIconContent("Camera Icon", "Toggle scene view framing.");
 

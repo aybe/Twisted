@@ -44,6 +44,37 @@ namespace Twisted.Editor
             };
         }
 
+        private static void ToggleButton(ref bool value, GUIContent content, GUIStyle style, Action<bool>? action = null)
+        {
+            if (content is null)
+                throw new ArgumentNullException(nameof(content));
+
+            if (style is null)
+                throw new ArgumentNullException(nameof(style));
+
+            using var scope = new EditorGUI.ChangeCheckScope();
+
+            var button = EditorGUIExtensions.ToggleButton(value, content, style);
+
+            if (!scope.changed)
+                return;
+
+            value = button;
+
+            action?.Invoke(value);
+        }
+
+        private static void ToggleButton(ref bool value, GUIContent content, GUIStyle style, Action? action = null)
+        {
+            if (content is null)
+                throw new ArgumentNullException(nameof(content));
+
+            if (style is null)
+                throw new ArgumentNullException(nameof(style));
+
+            ToggleButton(ref value, content, style, _ => action?.Invoke());
+        }
+
         #endregion
 
         #region Fields
@@ -171,7 +202,7 @@ namespace Twisted.Editor
             View = new TreeView<DMDNode>(State.ViewState, header)
             {
                 OnCanMultiSelect = _ => false,
-                OnFilterItems    = s => s.Distinct(comparer),
+                OnFilterItems    = s => Settings.DistinctFiltering ? s.Distinct(comparer) : s,
                 Root             = State.Factory?.DMD,
                 RowHeight        = State.ViewHeight,
                 searchString     = State.ViewState!.searchString
@@ -279,6 +310,21 @@ namespace Twisted.Editor
 
                     using (new EditorGUI.DisabledScope(disabled))
                     {
+                        using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(View.searchString)))
+                        {
+                            ToggleButton(
+                                ref Settings.DistinctFiltering,
+                                DMDViewerStyles.DistinctFiltering,
+                                EditorStyles.toolbarButton,
+                                () =>
+                                {
+                                    View.Reload();
+                                }
+                            );
+                        }
+
+                        EditorGUILayout.Space();
+
                         using (var scope = new EditorGUI.ChangeCheckScope())
                         {
                             var value = EditorGUIExtensions.ToggleButton(
