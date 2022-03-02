@@ -6,32 +6,85 @@ namespace Twisted.Editor
 {
     internal static class DMDViewerStyles
     {
-        public static GUIContent HelpContent { get; } = EditorGUIUtility.TrIconContent("_Help", "Open help for DMD Viewer.");
+        #region Actions
 
-        public static GUIContent OpenContent { get; } = EditorGUIUtility.TrIconContent("FolderOpened Icon", "Open a DMD file.");
-
-        public static GUIContent ColorVertexContent { get; } = EditorGUIUtility.TrIconContent("Material Icon", "Toggle vertex color.");
-
-        public static GlobalKeyword ColorVertexKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX");
-
-        public static GUIContent ColorPolygonContent { get; } = EditorGUIUtility.TrIconContent("Grid.FillTool", "Toggle polygon color.");
-
-        public static GlobalKeyword ColorPolygonKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON");
-
-        public static GUIContent ModelSplitContent { get; } = EditorGUIUtility.TrIconContent("Grid Icon", "Toggle model split.");
-        
-        public static GUIContent DistinctFiltering { get; } = EditorGUIUtility.TrIconContent("Filter Icon", "Toggle distinct filtering.");
-
-        public static GUIContent FilterRegex { get; } =
+        public static GUIContent Help { get; } =
             EditorGUIUtility.TrIconContent(
-                "FilterByLabel",
-                "Enable the use of regular expressions for filtering."
+                "_Help",
+                "Open help window."
             );
 
-        public static GUIContent SceneViewFraming { get; } = EditorGUIUtility.TrIconContent("Camera Icon", "Toggle scene view framing.");
+        public static GUIContent Open { get; } =
+            EditorGUIUtility.TrIconContent(
+                "FolderOpened Icon",
+                "Open an existing DMD file."
+            );
 
-        public static GUIContent TextureContent { get; } = EditorGUIUtility.TrIconContent("Texture2D Icon", "Toggle texture.");
+        #endregion
 
-        public static GlobalKeyword TextureKeyword { get; } = GlobalKeyword.Create("DMD_VIEWER_TEXTURE");
+        #region Settings
+
+        public static GUIContent FilteringDistinct { get; } =
+            EditorGUIUtility.TrIconContent(
+                "FilterByType",
+                "Enable distinct filtering for search mode."
+            );
+
+        public static GUIContent FilteringRegex { get; } =
+            EditorGUIUtility.TrIconContent(
+                "FilterByLabel",
+                "Enable regular expressions for search mode."
+            );
+
+        public static GUIContent Splitting { get; } =
+            EditorGUIUtility.TrIconContent(
+                "Grid Icon",
+                "Enable splitting of models as polygons."
+            );
+
+        public static GUIContent Framing { get; } =
+            EditorGUIUtility.TrIconContent(
+                "Camera Icon",
+                "Enable selection framing."
+            );
+
+        #endregion
+
+        #region Shader
+
+        public static GUIContent VertexColor { get; } =
+            EditorGUIUtility.TrIconContent(
+                "Material Icon",
+                "Enable vertex colors."
+            );
+
+        public static GlobalKeyword VertexColorKeyword { get; } =
+            GlobalKeyword.Create(
+                "DMD_VIEWER_COLOR_VERTEX"
+            );
+
+        public static GUIContent PolygonColor { get; } =
+            EditorGUIUtility.TrIconContent(
+                "Grid.FillTool",
+                "Enable polygon family coloring."
+            );
+
+        public static GlobalKeyword PolygonColorKeyword { get; } =
+            GlobalKeyword.Create(
+                "DMD_VIEWER_COLOR_POLYGON"
+            );
+
+        public static GUIContent ModelTexture { get; } =
+            EditorGUIUtility.TrIconContent(
+                "Texture2D Icon",
+                "Enable texturing."
+            );
+
+        public static GlobalKeyword ModelTextureKeyword { get; } =
+            GlobalKeyword.Create(
+                "DMD_VIEWER_TEXTURE"
+            );
+
+        #endregion
     }
 }

@@ -118,8 +118,8 @@ namespace Twisted.Editor
         {
             // initialize the shader once with sensible defaults that looks as intended
 
-            Shader.SetKeyword(DMDViewerStyles.TextureKeyword,     true);
-            Shader.SetKeyword(DMDViewerStyles.ColorVertexKeyword, true);
+            Shader.SetKeyword(DMDViewerStyles.ModelTextureKeyword, true);
+            Shader.SetKeyword(DMDViewerStyles.VertexColorKeyword,  true);
         }
 
         private void OnDisable()
@@ -298,7 +298,7 @@ namespace Twisted.Editor
             {
                 using (new EditorGUIUtility.IconSizeScope(new Vector2(16.0f, 16.0f)))
                 {
-                    if (GUILayout.Button(DMDViewerStyles.OpenContent, EditorStyles.toolbarButton))
+                    if (GUILayout.Button(DMDViewerStyles.Open, EditorStyles.toolbarButton))
                     {
                         var directory = Settings.LastDirectory;
 
@@ -331,39 +331,33 @@ namespace Twisted.Editor
 
                     using (new EditorGUI.DisabledScope(disabled))
                     {
-                        using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(View.searchString)))
-                        {
-                            ToggleButton(
-                                ref Settings.DistinctFiltering,
-                                DMDViewerStyles.DistinctFiltering,
-                                EditorStyles.toolbarButton,
-                                () =>
-                                {
-                                    View.Reload();
-                                }
-                            );
-                        }
+                        ToggleButton(
+                            ref Settings.DistinctFiltering,
+                            DMDViewerStyles.FilteringDistinct,
+                            EditorStyles.toolbarButton,
+                            () =>
+                            {
+                                View.Reload();
+                            }
+                        );
 
                         EditorGUILayout.Space();
 
-                        using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(View.searchString)))
-                        {
-                            ToggleButton(
-                                ref Settings.FilterRegex,
-                                DMDViewerStyles.FilterRegex,
-                                EditorStyles.toolbarButton,
-                                () =>
-                                {
-                                    View.Reload();
-                                }
-                            );
-                        }
+                        ToggleButton(
+                            ref Settings.FilterRegex,
+                            DMDViewerStyles.FilteringRegex,
+                            EditorStyles.toolbarButton,
+                            () =>
+                            {
+                                View.Reload();
+                            }
+                        );
 
                         EditorGUILayout.Space();
 
                         ToggleButton(
                             ref Settings.SceneViewFraming,
-                            DMDViewerStyles.SceneViewFraming,
+                            DMDViewerStyles.Framing,
                             EditorStyles.toolbarButton,
                             () =>
                             {
@@ -378,7 +372,7 @@ namespace Twisted.Editor
 
                         ToggleButton(
                             ref State.FactorySplit,
-                            DMDViewerStyles.ModelSplitContent,
+                            DMDViewerStyles.Splitting,
                             EditorStyles.toolbarButton,
                             () =>
                             {
@@ -389,21 +383,21 @@ namespace Twisted.Editor
                         EditorGUILayout.Space();
 
                         EditorGUIExtensions.ToggleButtonShaderKeyword(
-                            DMDViewerStyles.TextureKeyword, DMDViewerStyles.TextureContent,
+                            DMDViewerStyles.ModelTextureKeyword, DMDViewerStyles.ModelTexture,
                             EditorStyles.toolbarButton
                         );
 
                         EditorGUILayout.Space();
 
                         EditorGUIExtensions.ToggleButtonShaderKeyword(
-                            DMDViewerStyles.ColorVertexKeyword, DMDViewerStyles.ColorVertexContent,
+                            DMDViewerStyles.VertexColorKeyword, DMDViewerStyles.VertexColor,
                             EditorStyles.toolbarButton
                         );
 
                         EditorGUILayout.Space();
 
                         EditorGUIExtensions.ToggleButtonShaderKeyword(
-                            DMDViewerStyles.ColorPolygonKeyword, DMDViewerStyles.ColorPolygonContent,
+                            DMDViewerStyles.PolygonColorKeyword, DMDViewerStyles.PolygonColor,
                             EditorStyles.toolbarButton
                         );
 
@@ -449,7 +443,7 @@ namespace Twisted.Editor
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members")]
         private void ShowButton(Rect rect)
         {
-            if (GUI.Button(rect, DMDViewerStyles.HelpContent, EditorStyles.iconButton))
+            if (GUI.Button(rect, DMDViewerStyles.Help, EditorStyles.iconButton))
             {
                 EditorUtility.DisplayDialog("DMD Viewer", "TODO", "Close"); // TODO add help
             }
