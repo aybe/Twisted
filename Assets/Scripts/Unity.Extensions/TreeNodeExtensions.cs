@@ -43,6 +43,82 @@ namespace Unity.Extensions
             return result;
         }
 
+        public static string PrintHierarchyForward(this TreeNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            var stack = new Stack<TreeNode>();
+
+            stack.Push(node);
+
+            var builder = new StringBuilder();
+
+            while (stack.Count > 0)
+            {
+                var pop = stack.Pop();
+
+                var current = pop;
+
+                var position = builder.Length;
+
+                while (current.Parent != null)
+                {
+                    var count = current.Parent.Count;
+                    var index = current.Parent.IndexOf(current);
+                    var close = index != current.Parent.Count - 1;
+
+                    if (node.Depth < current.Depth) // make node as if root
+                    {
+                        if (current.Depth < pop.Depth)
+                        {
+                            if (count > 1 && close)
+                            {
+                                builder.Insert(position, "│   ");
+                            }
+                            else
+                            {
+                                builder.Insert(position, "    ");
+                            }
+                        }
+                        else
+                        {
+                            if (count > 1)
+                            {
+                                if (close)
+                                {
+                                    builder.Insert(position, "├───");
+                                }
+                                else
+                                {
+                                    builder.Insert(position, "└───");
+                                }
+                            }
+                            else
+                            {
+                                builder.Insert(position, "└───");
+                            }
+                        }
+                    }
+
+                    current = current.Parent;
+                }
+
+                builder.Append(pop);
+
+                builder.Append(Environment.NewLine);
+
+                for (var i = pop.Count - 1; i >= 0; i--)
+                {
+                    stack.Push(pop[i]);
+                }
+            }
+
+            var result = builder.ToString();
+
+            return result;
+        }
+
         public static IEnumerable<TreeNode> TraverseBfs(this TreeNode node)
         {
             if (node == null)
