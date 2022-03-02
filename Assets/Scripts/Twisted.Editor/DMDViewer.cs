@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Twisted.Graphics;
 using Unity.Extensions.Comparers;
 using Unity.Extensions.Editor;
@@ -73,6 +74,25 @@ namespace Twisted.Editor
                 throw new ArgumentNullException(nameof(style));
 
             ToggleButton(ref value, content, style, _ => action?.Invoke());
+        }
+
+        private static bool? ViewFilterHandler(DMDNode node, string column, string content, string filter)
+        {
+            if (Settings.FilterRegex is false)
+            {
+                return null;
+            }
+
+            try
+            {
+                return Regex.IsMatch(content, filter, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            }
+            catch (ArgumentException)
+            {
+                // NOTE: we don't output anything to console here as it'll slow down to a crawl otherwise
+            }
+
+            return null;
         }
 
         #endregion
@@ -201,6 +221,7 @@ namespace Twisted.Editor
 
             View = new TreeView<DMDNode>(State.ViewState, header)
             {
+                FilterHandler    = ViewFilterHandler,
                 OnCanMultiSelect = _ => false,
                 OnFilterItems    = s => Settings.DistinctFiltering ? s.Distinct(comparer) : s,
                 Root             = State.Factory?.DMD,
@@ -315,6 +336,21 @@ namespace Twisted.Editor
                             ToggleButton(
                                 ref Settings.DistinctFiltering,
                                 DMDViewerStyles.DistinctFiltering,
+                                EditorStyles.toolbarButton,
+                                () =>
+                                {
+                                    View.Reload();
+                                }
+                            );
+                        }
+
+                        EditorGUILayout.Space();
+
+                        using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(View.searchString)))
+                        {
+                            ToggleButton(
+                                ref Settings.FilterRegex,
+                                DMDViewerStyles.FilterRegex,
                                 EditorStyles.toolbarButton,
                                 () =>
                                 {

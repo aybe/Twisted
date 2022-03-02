@@ -10,6 +10,8 @@ namespace Twisted.Editor
         public bool SceneViewFraming = true;
 
         public bool DistinctFiltering = true;
+        
+        public bool FilterRegex;
 
         private void OnDisable()
         {

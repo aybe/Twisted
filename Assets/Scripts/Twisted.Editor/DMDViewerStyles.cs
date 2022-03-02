@@ -22,6 +22,12 @@ namespace Twisted.Editor
         
         public static GUIContent DistinctFiltering { get; } = EditorGUIUtility.TrIconContent("Filter Icon", "Toggle distinct filtering.");
 
+        public static GUIContent FilterRegex { get; } =
+            EditorGUIUtility.TrIconContent(
+                "FilterByLabel",
+                "Enable the use of regular expressions for filtering."
+            );
+
         public static GUIContent SceneViewFraming { get; } = EditorGUIUtility.TrIconContent("Camera Icon", "Toggle scene view framing.");
 
         public static GUIContent TextureContent { get; } = EditorGUIUtility.TrIconContent("Texture2D Icon", "Toggle texture.");
