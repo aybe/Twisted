@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Twisted.Graphics;
+using Unity.Extensions;
 using Unity.Extensions.Comparers;
 using Unity.Extensions.Editor;
 using Unity.VisualScripting;
@@ -265,6 +266,18 @@ namespace Twisted.Editor
                         Debug.Log(s.ToString());
                     },
                     data
+                );
+
+                menu.AddItem(
+                    L10n.TextContent("Dump/Hierarchy (Backward)"),
+                    false,
+                    s =>
+                    {
+                        var node = s as TreeNode ?? throw new InvalidDataException();
+
+                        EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyBackward();
+                    },
+                    e.Node
                 );
 
                 menu.ShowAsContext();
