@@ -54,6 +54,8 @@ namespace Unity.Extensions.Editor
 
         #region Properties (public)
 
+        public TreeViewFilterHandler<T>? FilterHandler { get; set; }
+
         public Func<TreeViewItem<T>, bool>? OnCanMultiSelect { private get; init; } // we need to expose this protected shit #1
 
         public Func<IEnumerable<T>, IEnumerable<T>>? OnFilterItems { get; set; }
@@ -262,13 +264,19 @@ namespace Unity.Extensions.Editor
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(text));
 
-            // try to find an ordinal, case-insensitive match on every column's ToString
+            // give callback an opportunity to filter, if it couldn't then fallback to internal filtering
 
             foreach (var column in multiColumnHeader.state.columns.Cast<TreeViewColumn<T>>())
             {
-                var value = column.Getter(node);
+                var value       = column.Getter(node);
+                var valueString = value.ToString();
 
-                if (value.ToString().Contains(text, StringComparison.OrdinalIgnoreCase))
+                if (FilterHandler?.Invoke(node, column.headerContent.text, valueString, text) ?? false)
+                {
+                    return true;
+                }
+
+                if (valueString.Contains(text, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
