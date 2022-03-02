@@ -7,9 +7,9 @@ namespace Twisted.Editor
     {
         public string? LastDirectory;
 
-        public bool SceneViewFraming = true;
+        public bool SceneViewFraming;
 
-        public bool DistinctFiltering = true;
+        public bool DistinctFiltering;
         
         public bool FilterRegex;
 
