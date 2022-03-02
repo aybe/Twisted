@@ -280,6 +280,18 @@ namespace Twisted.Editor
                     e.Node
                 );
 
+                menu.AddItem(
+                    L10n.TextContent("Dump/Hierarchy (Forward)"),
+                    false,
+                    s =>
+                    {
+                        var node = s as TreeNode ?? throw new InvalidDataException();
+
+                        EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyForward();
+                    },
+                    e.Node
+                );
+
                 menu.ShowAsContext();
 
                 if (Settings.SceneViewFraming)
