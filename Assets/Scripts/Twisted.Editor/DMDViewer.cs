@@ -15,6 +15,7 @@ using UnityEngine;
 namespace Twisted.Editor
 {
     internal sealed class DMDViewer : EditorWindow
+    // BUG wrong GO focused after context click
     {
         #region Methods
 
