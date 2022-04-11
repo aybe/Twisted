@@ -259,16 +259,6 @@ namespace Twisted.Editor
                 );
 
                 menu.AddItem(
-                    EditorGUIUtility.TrTextContent("Hex Dump/Console"),
-                    false,
-                    s =>
-                    {
-                        Debug.Log(s.ToString());
-                    },
-                    data
-                );
-
-                menu.AddItem(
                     L10n.TextContent("Dump/Hierarchy (Backward)"),
                     false,
                     s =>
