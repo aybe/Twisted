@@ -46,15 +46,23 @@ namespace Unity.PlayStation.Graphics
             Colors   = colors;
             Disable  = disable;
 
+            // BUG there are non-standard texture pages, only log an error and see how texture atlas behaves then
+            
             var xMax = 1024 - GetPixelWidth(this);
 
             if (position.x > xMax)
-                throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
+            {
+                // throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
+                Debug.LogError($"X must not be greater than {xMax}.");
+            }
 
             var yMax = 256;
 
             if (position.y > yMax)
-                throw new ArgumentOutOfRangeException(nameof(position.y), $"Must not be greater than {yMax}.");
+            {
+                // throw new ArgumentOutOfRangeException(nameof(position.y), $"Must not be greater than {yMax}.");
+                Debug.LogError($"Y must not be greater than {yMax}.");
+            }
         }
 
         public override string ToString()
