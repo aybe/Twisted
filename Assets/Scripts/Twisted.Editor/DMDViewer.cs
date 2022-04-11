@@ -249,7 +249,7 @@ namespace Twisted.Editor
                 var data = string.Concat(((DMDNode)e.Node).GetObjectData().Select(s => s.ToString("X2")));
 
                 menu.AddItem(
-                    EditorGUIUtility.TrTextContent("Hex Dump/Clipboard"),
+                    EditorGUIUtility.TrTextContent("Dump/Hexadecimal"),
                     false,
                     s =>
                     {
