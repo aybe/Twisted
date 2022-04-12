@@ -1,0 +1,44 @@
+.root {
+    flex-grow: 1;
+}
+
+.toolbar {
+}
+
+.toolbar-button, .toolbar-toggle {
+    min-width: 27px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.toolbar-label {
+    font-size: 10px; 
+    margin-left: 2px; 
+    margin-right: 2px;
+    -unity-text-align: middle-left; 
+}
+
+.toolbar-toggle:checked:hover {
+    background-color: rgb(239, 239, 239);
+}
+
+.toolbar-slider-item-height {
+    width: 100px;
+}
+
+.toolbar-slider-item-height > Label {
+    display: none;
+}
+
+.toolbar-search-field {
+    width: 120px;
+    overflow: hidden;
+}
+
+.tree-view-cell {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.toolbar-spacer {
+    flex-grow: 1;
+}
