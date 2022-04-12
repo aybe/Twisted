@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Editor
         private VisualTreeAsset VisualTreeAsset = null!;
 
         [SerializeField]
-        private DMDViewerModel? Model;
+        private DMDViewerModel Model = null!;
 
         public void CreateGUI()
         {
@@ -39,15 +40,14 @@ namespace Editor
             var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
             var toolbarSearchField             = root.Q<ToolbarSearchField>("toolbarSearchField");
 
-            if (Model == null)
-            {
-                Model = CreateInstance<DMDViewerModel>();
-            }
+            InitializeModel();
+            InitializeWindowTitle();
 
             toolbarButtonOpenFile.clicked += () =>
             {
                 Debug.Log(true);
                 Model.OpenFile();
+                InitializeWindowTitle();
             };
 
             toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
@@ -237,13 +237,27 @@ namespace Editor
             treeView.SetRootItems(items);
         }
 
+        private void InitializeModel()
+        {
+            if (Model == null)
+            {
+                Model = CreateInstance<DMDViewerModel>();
+            }
+        }
+
+        private void InitializeWindowTitle()
+        {
+            titleContent = new GUIContent(DMDViewerStyles.WindowTitle)
+            {
+                text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
+            };
+        }
+
 
         [MenuItem("Twisted/DMD Viewer (UI Elements)")]
         public static void InitializeWindow()
         {
-            var window = GetWindow<DMDViewer>();
-
-            window.titleContent = new GUIContent("DMDViewer");
+            GetWindow<DMDViewer>();
         }
     }
 }

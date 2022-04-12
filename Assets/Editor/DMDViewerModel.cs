@@ -6,7 +6,7 @@ namespace Editor
     internal sealed class DMDViewerModel : ScriptableObject
     {
         [SerializeField]
-        private string CurrentFile;
+        public string CurrentFile;
 
         [SerializeField]
         private bool UseDistinctFiltering;
