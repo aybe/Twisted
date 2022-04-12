@@ -1,0 +1,48 @@
+﻿add names to controls
+make their styles
+retrieve them
+create a model
+bind to it
+
+find what properties can be removed
+
+https://docs.unity3d.com/2022.2/Documentation/ScriptReference/UIElements.VisualElement-pickingMode.html
+https://docs.unity3d.com/2022.2/Documentation/ScriptReference/UIElements.TextElement-displayTooltipWhenElided.html
+https://docs.unity3d.com/2022.2/Documentation/ScriptReference/UIElements.Focusable-tabIndex.html
+
+When opening old viewer with resetted default layout:
+
+NullReferenceException: Object reference not set to an instance of an object
+Twisted.Editor.DMDViewer.OnGUI () (at Assets/Scripts/Twisted.Editor/DMDViewer.cs:422)
+UnityEditor.HostView.InvokeOnGUI (UnityEngine.Rect onGUIPosition) (at <3eed867d0f57417bb102f8914e403013>:0)
+UnityEditor.DockArea.DrawView (UnityEngine.Rect dockAreaRect) (at <3eed867d0f57417bb102f8914e403013>:0)
+UnityEditor.DockArea.OldOnGUI () (at <3eed867d0f57417bb102f8914e403013>:0)
+UnityEngine.UIElements.IMGUIContainer.DoOnGUI (UnityEngine.Event evt, UnityEngine.Matrix4x4 parentTransform, UnityEngine.Rect clippingRect, System.Boolean isComputingLayout, UnityEngine.Rect layoutSize, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, UnityEngine.Matrix4x4 worldTransform, UnityEngine.Rect clippingRect, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, System.Action onGUIHandler, System.Boolean canAffectFocus) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.HandleIMGUIEvent (UnityEngine.Event e, System.Boolean canAffectFocus) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.SendEventToIMGUIRaw (UnityEngine.UIElements.EventBase evt, System.Boolean canAffectFocus, System.Boolean verifyBounds) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.SendEventToIMGUI (UnityEngine.UIElements.EventBase evt, System.Boolean canAffectFocus, System.Boolean verifyBounds) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.ProcessEvent (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.IMGUIContainer.ExecuteDefaultActionAtTarget (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.CallbackEventHandler.HandleEvent (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.CallbackEventHandler.HandleEventAtCurrentTargetAndPhase (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.CallbackEventHandler.UnityEngine.UIElements.IEventHandler.HandleEvent (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatchUtilities.HandleEventAcrossPropagationPath (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatchUtilities.PropagateEvent (UnityEngine.UIElements.EventBase evt) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.SendEventToRegularTarget (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.BaseVisualElementPanel panel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.SendEventToTarget (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.BaseVisualElementPanel panel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.MouseEventDispatchingStrategy.DispatchEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel iPanel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.ApplyDispatchingStrategies (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel, System.Boolean imguiEventIsInitiallyUsed) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEventQueue () (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.OpenGate () (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcherGate.Dispose () (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.ProcessEvent (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.EventDispatcher.Dispatch (UnityEngine.UIElements.EventBase evt, UnityEngine.UIElements.IPanel panel, UnityEngine.UIElements.DispatchMode dispatchMode) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.BaseVisualElementPanel.SendEvent (UnityEngine.UIElements.EventBase e, UnityEngine.UIElements.DispatchMode dispatchMode) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.UIElementsUtility.DoDispatch (UnityEngine.UIElements.BaseVisualElementPanel panel) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.UIElementsUtility.UnityEngine.UIElements.IUIElementsUtility.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr, System.Boolean& eventHandled) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.UIEventRegistration.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.UIElements.UIEventRegistration+<>c.<.cctor>b__1_2 (System.Int32 i, System.IntPtr ptr) (at <e695f116dbe0469f820322a711491fb3>:0)
+UnityEngine.GUIUtility.ProcessEvent (System.Int32 instanceID, System.IntPtr nativeEventPtr, System.Boolean& result) (at <550cf7d7b70f452f992b3646b82474cf>:0)
