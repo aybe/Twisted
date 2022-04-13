@@ -213,13 +213,13 @@ namespace Editor
                 {
                     Func<DMDNode, string> selector = description.columnName switch
                     {
-                        "Node"     => GetNodeName,
-                        "Type 1"   => GetNodeType1,
-                        "Type 2"   => GetNodeType2,
-                        "Position" => GetNodePosition,
-                        "Length"   => GetNodeLength,
-                        "Polygons" => GetNodePolygons,
-                        _          => throw new NotSupportedException(description.columnName)
+                        ColumnNodeName     => GetNodeName,
+                        ColumnNodeType1    => GetNodeType1,
+                        ColumnNodeType2    => GetNodeType2,
+                        ColumnNodePosition => GetNodePosition,
+                        ColumnNodeLength   => GetNodeLength,
+                        ColumnNodePolygons => GetNodePolygons,
+                        _                  => throw new NotSupportedException(description.columnName)
                     };
 
                     children = children.Sort(selector, null, description.direction is SortDirection.Descending); // TODO could be object.ToString
@@ -269,12 +269,12 @@ namespace Editor
 
             view.SetRootItems(items);
 
-            var column1 = CreateDefaultColumn("Node",     200.0f, GetNodeName);
-            var column2 = CreateDefaultColumn("Type 1",   100.0f, GetNodeType1);
-            var column3 = CreateDefaultColumn("Type 2",   100.0f, GetNodeType2);
-            var column4 = CreateDefaultColumn("Position", 100.0f, GetNodePosition);
-            var column5 = CreateDefaultColumn("Length",   100.0f, GetNodeLength);
-            var column6 = CreateDefaultColumn("Polygons", 200.0f, GetNodePolygons);
+            var column1 = CreateDefaultColumn(ColumnNodeName,     200.0f, GetNodeName);
+            var column2 = CreateDefaultColumn(ColumnNodeType1,    100.0f, GetNodeType1);
+            var column3 = CreateDefaultColumn(ColumnNodeType2,    100.0f, GetNodeType2);
+            var column4 = CreateDefaultColumn(ColumnNodePosition, 100.0f, GetNodePosition);
+            var column5 = CreateDefaultColumn(ColumnNodeLength,   100.0f, GetNodeLength);
+            var column6 = CreateDefaultColumn(ColumnNodePolygons, 200.0f, GetNodePolygons);
 
             view.columns.Clear();
 
@@ -321,14 +321,14 @@ namespace Editor
             return list;
         }
 
-        private static Column CreateDefaultColumn(string header, float  width, Func<DMDNode, string> getter)
+        private static Column CreateDefaultColumn(string header, float width, Func<DMDNode, string> getter)
         {
             if (string.IsNullOrWhiteSpace(header))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(header));
-            
+
             if (getter is null)
                 throw new ArgumentNullException(nameof(getter));
-            
+
             if (width <= 0.0f)
                 throw new ArgumentOutOfRangeException(nameof(width));
 
@@ -408,6 +408,13 @@ namespace Editor
         }
 
         #region Getters
+
+        private const string ColumnNodeName     = "Node";
+        private const string ColumnNodeType1    = "Type 1";
+        private const string ColumnNodeType2    = "Type 2";
+        private const string ColumnNodePosition = "Position";
+        private const string ColumnNodeLength   = "Length";
+        private const string ColumnNodePolygons = "Polygons";
 
         private static string GetNodeName(DMDNode node)
         {
