@@ -11,8 +11,6 @@
             <uie:ToolbarToggle focusable="false" tooltip="Enable vertex colors." name="toolbarToggleVertexColors" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material Icon&apos;);" />
             <uie:ToolbarToggle focusable="false" tooltip="Enable polygon family coloring." name="toolbarTogglePolygonColoring" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
             <uie:ToolbarSpacer class="toolbar-spacer" />
-            <ui:Label tabindex="-1" text="sample text" display-tooltip-when-elided="true" name="toolbarLabelFile" class="toolbar-label" />
-            <uie:ToolbarSpacer class="toolbar-spacer" />
             <ui:Label tabindex="-1" text="sample text" display-tooltip-when-elided="true" name="toolbarLabelSearchResults" class="toolbar-label" />
             <ui:SliderInt low-value="16" high-value="32" picking-mode="Ignore" value="24" name="toolbarSliderItemHeight" class="toolbar-slider-item-height" />
             <uie:ToolbarSearchField name="toolbarSearchField" class="toolbar-search-field" />
