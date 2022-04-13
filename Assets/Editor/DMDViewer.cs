@@ -24,6 +24,8 @@ namespace Editor
         // BUG when tree view loses focus, one of its expander may turn blue at any time
         // BUG tree view keyboard expand/collapse may stop working for no reason at all
         // BUG horizontal scroll bar flickers and partially hides selected item at bottom
+        // BUG 
+        // BUG multi-column sort destroys expand state
     {
         [SerializeField]
         private DMDViewerModel Model = null!;
@@ -267,59 +269,12 @@ namespace Editor
 
             view.SetRootItems(items);
 
-            var column1 = CreateDefaultColumn("Node", 200.0f);
-
-            column1.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodeName(node);
-            };
-
-            var column2 = CreateDefaultColumn("Type 1");
-
-            column2.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodeType1(node);
-            };
-
-            var column3 = CreateDefaultColumn("Type 2");
-
-            column3.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodeType2(node);
-            };
-
-            var column4 = CreateDefaultColumn("Position");
-
-            column4.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodePosition(node);
-            };
-
-            var column5 = CreateDefaultColumn("Length");
-
-            column5.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodeLength(node);
-            };
-
-            var column6 = CreateDefaultColumn("Polygons", 200.0f);
-
-            column6.bindCell = (element, index) =>
-            {
-                var node = GetNodeFromItem(element, index);
-
-                ((Label)element).text = GetNodePolygons(node);
-            };
+            var column1 = CreateDefaultColumn("Node",     200.0f, GetNodeName);
+            var column2 = CreateDefaultColumn("Type 1",   100.0f, GetNodeType1);
+            var column3 = CreateDefaultColumn("Type 2",   100.0f, GetNodeType2);
+            var column4 = CreateDefaultColumn("Position", 100.0f, GetNodePosition);
+            var column5 = CreateDefaultColumn("Length",   100.0f, GetNodeLength);
+            var column6 = CreateDefaultColumn("Polygons", 200.0f, GetNodePolygons);
 
             view.columns.Clear();
 
@@ -366,10 +321,55 @@ namespace Editor
             return list;
         }
 
-        private static Column CreateDefaultColumn(string header, float? width = null)
+        private static Column CreateDefaultColumn(string header, float  width, Func<DMDNode, string> getter)
         {
             if (string.IsNullOrWhiteSpace(header))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(header));
+            
+            if (getter is null)
+                throw new ArgumentNullException(nameof(getter));
+            
+            if (width <= 0.0f)
+                throw new ArgumentOutOfRangeException(nameof(width));
+
+            static VisualElement CreateDefaultLabel(TextAnchor anchor)
+            {
+                return new Label
+                {
+                    style =
+                    {
+                        flexGrow       = 1,
+                        unityTextAlign = anchor,
+                        overflow       = Overflow.Hidden,
+                        textOverflow   = TextOverflow.Ellipsis
+                    }
+                };
+            }
+
+            VisualElement MakeHeader()
+            {
+                return CreateDefaultLabel(TextAnchor.MiddleLeft);
+            }
+
+            void BindHeader(VisualElement element)
+            {
+                ((Label)element).text = header;
+            }
+
+            void UnbindHeader(VisualElement element)
+            {
+                ((Label)element).text = default;
+            }
+
+            VisualElement MakeCell()
+            {
+                return CreateDefaultLabel(TextAnchor.MiddleLeft);
+            }
+
+            void BindCell(VisualElement element, int index)
+            {
+                ((Label)element).text = getter(GetNodeFromItem(element, index));
+            }
 
             var column = new Column // stretchable sucks big time
             {
@@ -377,38 +377,22 @@ namespace Editor
                 title         = header,
                 icon          = default,
                 visible       = true,
-                width         = width ?? 100.0f,
+                width         = width,
                 minWidth      = 75.0f,
                 sortable      = true,
                 optional      = true,
                 resizable     = true,
-                makeHeader    = () => CreateDefaultLabel(TextAnchor.MiddleLeft),
-                bindHeader    = element => ((Label)element).text = header,
-                unbindHeader  = element => ((Label)element).text = default,
+                makeHeader    = MakeHeader,
+                bindHeader    = BindHeader,
+                unbindHeader  = UnbindHeader,
                 destroyHeader = null,
-                makeCell      = () => CreateDefaultLabel(TextAnchor.MiddleLeft),
-                bindCell      = null,
+                makeCell      = MakeCell,
+                bindCell      = BindCell,
                 unbindCell    = null,
                 destroyCell   = null
             };
 
             return column;
-        }
-
-        private static VisualElement CreateDefaultLabel(TextAnchor anchor)
-        {
-            var label = new Label
-            {
-                style =
-                {
-                    flexGrow       = 1,
-                    unityTextAlign = anchor,
-                    overflow       = Overflow.Hidden,
-                    textOverflow   = TextOverflow.Ellipsis
-                }
-            };
-
-            return label;
         }
 
         private static DMDNode GetNodeFromItem(VisualElement element, int index)
