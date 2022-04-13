@@ -409,7 +409,7 @@ namespace Editor
 
         #region Getters
 
-        private const string ColumnNodeName     = "Node";
+        private const string ColumnNodeName     = "Name";
         private const string ColumnNodeType1    = "Type 1";
         private const string ColumnNodeType2    = "Type 2";
         private const string ColumnNodePosition = "Position";
