@@ -1,3 +1,4 @@
+using Twisted;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,6 +31,8 @@ namespace Editor
         private bool UsePolygonColors;
 
         public SerializedProperty CurrentFileProperty = null!;
+
+        public DMDFactory? DMDFactory;
 
         public SerializedProperty UseDistinctFilteringProperty = null!;
 
@@ -77,6 +80,7 @@ namespace Editor
 
         private void LoadFile()
         {
+            DMDFactory = DMDFactory.Create(CurrentFile);
         }
     }
 }
