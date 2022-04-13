@@ -34,3 +34,7 @@
 .toolbar-spacer {
     flex-grow: 1;
 }
+
+.unity-tree-view__item-content {
+    flex-shrink: 1;
+}
