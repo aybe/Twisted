@@ -31,10 +31,10 @@ namespace Editor
         public delegate string ContentProvider(DMDNode node, Expression<Func<DMDNode, object>> expression);
 
         [SerializeField]
-        private VisualTreeAsset VisualTreeAsset = null!;
+        private DMDViewerModel Model = null!;
 
         [SerializeField]
-        private DMDViewerModel Model = null!;
+        private VisualTreeAsset VisualTreeAsset = null!;
 
         private MultiColumnTreeView TreeView => rootVisualElement.Q<MultiColumnTreeView>();
 
@@ -162,7 +162,7 @@ namespace Editor
             });
 
             treeView.fixedItemHeight = sliderItemHeight.value; // sync our view with slider
-            
+
             if (Model.DMDFactory != null)
             {
                 InitializeTreeView();
@@ -179,8 +179,14 @@ namespace Editor
             {
                 Model = CreateInstance<DMDViewerModel>();
             }
-            
+
             Model.Initialize();
+        }
+
+        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
+        private static void InitializeWindow()
+        {
+            GetWindow<DMDViewer>();
         }
 
         private void InitializeWindowTitle()
@@ -189,12 +195,6 @@ namespace Editor
             {
                 text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
             };
-        }
-
-        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
-        public static void InitializeWindow()
-        {
-            GetWindow<DMDViewer>();
         }
 
         private void InitializeTreeView()
@@ -212,7 +212,7 @@ namespace Editor
 
             column1.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = node.GetType().Name;
             };
@@ -221,7 +221,7 @@ namespace Editor
 
             column2.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = $"0x{(node.NodeType >> 8) & 0xFF:X4}";
             };
@@ -230,7 +230,7 @@ namespace Editor
 
             column3.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = $"0x{(node.NodeType >> 0) & 0xFF:X4}";
             };
@@ -239,7 +239,7 @@ namespace Editor
 
             column4.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = $"{node.Position:N0}";
             };
@@ -248,7 +248,7 @@ namespace Editor
 
             column5.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = $"{node.Length:N0}";
             };
@@ -257,7 +257,7 @@ namespace Editor
 
             column6.bindCell = (element, index) =>
             {
-                var node = GetNode(element, index);
+                var node = GetNodeFromItem(element, index);
 
                 ((Label)element).text = $"{(node is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")}";
             };
@@ -271,16 +271,39 @@ namespace Editor
             view.columns.Add(column6);
         }
 
-        private static DMDNode GetNode(VisualElement element, int index)
+        private static List<TreeViewItemData<TreeNode>> InitializeTreeViewItems(DMD dmd)
         {
-            if (element is null)
-                throw new ArgumentNullException(nameof(element));
+            if (dmd is null)
+                throw new ArgumentNullException(nameof(dmd));
 
-            var view = element.GetParent<MultiColumnTreeView>() ?? throw new InvalidOperationException();
-            var item = view.viewController.GetItemForIndex(index);
-            var node = item as DMDNode ?? throw new InvalidOperationException();
+            var id    = 0;
+            var list  = new List<TreeViewItemData<TreeNode>>();
+            var stack = new Stack<(TreeNode Node, TreeViewItemData<TreeNode>? Container)>();
 
-            return node;
+            stack.Push((dmd, null));
+
+            while (stack.Count > 0)
+            {
+                var (node, container) = stack.Pop();
+
+                var data = new TreeViewItemData<TreeNode>(id++, node);
+
+                if (container is null)
+                {
+                    list.Add(data);
+                }
+                else
+                {
+                    ((IList<TreeViewItemData<TreeNode>>)container.Value.children).Add(data);
+                }
+
+                foreach (var child in node.Reverse())
+                {
+                    stack.Push((child, data));
+                }
+            }
+
+            return list;
         }
 
         private static Column CreateDefaultColumn(string header, TextAnchor anchor = TextAnchor.MiddleLeft)
@@ -328,39 +351,16 @@ namespace Editor
             return label;
         }
 
-        private static List<TreeViewItemData<TreeNode>> InitializeTreeViewItems(DMD dmd)
+        private static DMDNode GetNodeFromItem(VisualElement element, int index)
         {
-            if (dmd is null)
-                throw new ArgumentNullException(nameof(dmd));
+            if (element is null)
+                throw new ArgumentNullException(nameof(element));
 
-            var id    = 0;
-            var list  = new List<TreeViewItemData<TreeNode>>();
-            var stack = new Stack<(TreeNode Node, TreeViewItemData<TreeNode>? Container)>();
+            var view = element.GetParent<MultiColumnTreeView>() ?? throw new InvalidOperationException();
+            var item = view.viewController.GetItemForIndex(index);
+            var node = item as DMDNode ?? throw new InvalidOperationException();
 
-            stack.Push((dmd, null));
-
-            while (stack.Count > 0)
-            {
-                var (node, container) = stack.Pop();
-
-                var data = new TreeViewItemData<TreeNode>(id++, node);
-
-                if (container is null)
-                {
-                    list.Add(data);
-                }
-                else
-                {
-                    ((IList<TreeViewItemData<TreeNode>>)container.Value.children).Add(data);
-                }
-
-                foreach (var child in node.Reverse())
-                {
-                    stack.Push((child, data));
-                }
-            }
-
-            return list;
+            return node;
         }
     }
 }
