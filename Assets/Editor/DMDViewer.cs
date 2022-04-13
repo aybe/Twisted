@@ -167,6 +167,10 @@ namespace Editor
             {
                 InitializeTreeView();
             }
+            else
+            {
+                TreeView.visible = false; // otherwise stupid tree view greets you with a NRE when clicked
+            }
         }
 
         private void InitializeModel()
@@ -196,6 +200,9 @@ namespace Editor
         private void InitializeTreeView()
         {
             var view = TreeView;
+
+            if (view.visible is false)
+                view.visible = true;
 
             var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException());
 
