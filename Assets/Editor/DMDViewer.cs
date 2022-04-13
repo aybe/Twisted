@@ -165,7 +165,8 @@ namespace Editor
             }
             else
             {
-                TreeView.visible = false; // otherwise stupid tree view greets you with a NRE when clicked
+                TreeView.visible = false; // stupid tree view greets you with a NRE when clicked otherwise
+                                          // furthermore that shows an empty block where columns should be
             }
         }
 
