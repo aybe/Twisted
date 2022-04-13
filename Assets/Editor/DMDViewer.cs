@@ -350,7 +350,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"0x{(node.NodeType >> 8) & 0xFF:X4}";
+                ((Label)element).text = $"0x{((node.NodeType >> 16) & 0xFFFF):X4}";
             };
 
             var column3 = CreateDefaultColumn("Type 2");
@@ -359,7 +359,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"0x{(node.NodeType >> 0) & 0xFF:X4}";
+                ((Label)element).text = $"0x{((node.NodeType >> 00) & 0xFFFF):X4}";
             };
 
             var column4 = CreateDefaultColumn("Position");
