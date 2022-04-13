@@ -2,9 +2,6 @@
     flex-grow: 1;
 }
 
-.toolbar {
-}
-
 .toolbar-button, .toolbar-toggle {
     min-width: 27px;
     -unity-background-scale-mode: scale-to-fit;
@@ -32,11 +29,6 @@
 .toolbar-search-field {
     width: 120px;
     overflow: hidden;
-}
-
-.tree-view-cell {
-    flex-grow: 1;
-    -unity-text-align: middle-left;
 }
 
 .toolbar-spacer {
