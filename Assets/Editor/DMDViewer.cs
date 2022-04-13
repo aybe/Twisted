@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using Twisted.Graphics;
 using Unity.Extensions;
 using UnityEditor;
@@ -16,7 +15,6 @@ namespace Editor
         // TODO column sorting + arrows
         // TODO filtering + toolbar hint
         // TODO context menus
-        // TODO remove sample text
         // TODO try fix horizontal scroll bar
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
@@ -27,8 +25,6 @@ namespace Editor
         // BUG tree view keyboard expand/collapse may stop working for no reason at all
         // BUG horizontal scroll bar flickers and partially hides selected item at bottom
     {
-        public delegate string ContentProvider(DMDNode node, Expression<Func<DMDNode, object>> expression);
-
         [SerializeField]
         private DMDViewerModel Model = null!;
 
