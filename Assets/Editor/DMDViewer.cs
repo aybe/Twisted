@@ -166,8 +166,138 @@ namespace Editor
             else
             {
                 TreeView.visible = false; // stupid tree view greets you with a NRE when clicked otherwise
-                                          // furthermore that shows an empty block where columns should be
+                // furthermore that shows an empty block where columns should be
             }
+
+            TreeView.sortingEnabled = true;
+
+            TreeView.columnSortingChanged += () =>
+            {
+                var list = InitializeTreeViewItemsEx(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
+                TreeView.SetRootItems(list);
+                TreeView.Rebuild();
+            };
+        }
+
+        private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItemsEx(DMD dmd, SortColumnDescription[] descriptions)
+        {
+            if (dmd is null)
+                throw new ArgumentNullException(nameof(dmd));
+
+            var id    = 0;
+            var list  = new List<TreeViewItemData<DMDNode>>();
+            var stack = new Stack<(DMDNode Node, TreeViewItemData<DMDNode>? Container)>();
+
+            stack.Push((dmd, null));
+
+            while (stack.Count > 0)
+            {
+                var (node, container) = stack.Pop();
+
+                var data = new TreeViewItemData<DMDNode>(id++, node);
+
+                if (container is null)
+                {
+                    list.Add(data);
+                }
+                else
+                {
+                    ((IList<TreeViewItemData<DMDNode>>)container.Value.children).Add(data);
+                }
+
+                var children = node.Cast<DMDNode>().Reverse().ToArray();
+
+                // TODO // TODO // TODO // TODO // TODO // TODO 
+
+                IOrderedEnumerable<DMDNode> orderedEnumerable;
+
+                var first = descriptions.First();
+
+                switch (first.columnName)
+                {
+                    case "Node":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => s.GetType().Name)
+                            : children.OrderByDescending(s => s.GetType().Name);
+                        break;
+                    case "Type 1":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}")
+                            : children.OrderByDescending(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}");
+                        break;
+                    case "Type 2":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}")
+                            : children.OrderByDescending(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}");
+                        break;
+                    case "Position":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => s.Position)
+                            : children.OrderByDescending(s => s.Position);
+                        break;
+                    case "Length":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => s.Length)
+                            : children.OrderByDescending(s => s.Length);
+                        break;
+                    case "Polygons":
+                        orderedEnumerable = first.direction is SortDirection.Ascending
+                            ? children.OrderBy(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")
+                            : children.OrderByDescending(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A");
+                        break;
+                    default:
+                        throw new NotSupportedException(first.columnName);
+                }
+
+                foreach (var description in descriptions.Skip(1))
+                {
+                    var columnName = description.columnName;
+
+                    switch (columnName)
+                    {
+                        case "Node":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => s.GetType().Name)
+                                : orderedEnumerable.ThenByDescending(s => s.GetType().Name);
+                            break;
+                        case "Type 1":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}")
+                                : orderedEnumerable.ThenByDescending(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}");
+                            break;
+                        case "Type 2":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}")
+                                : orderedEnumerable.ThenByDescending(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}");
+                            break;
+                        case "Position":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => s.Position)
+                                : orderedEnumerable.ThenByDescending(s => s.Position);
+                            break;
+                        case "Length":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => s.Length)
+                                : orderedEnumerable.ThenByDescending(s => s.Length);
+                            break;
+                        case "Polygons":
+                            orderedEnumerable = first.direction is SortDirection.Ascending
+                                ? orderedEnumerable.ThenBy(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")
+                                : orderedEnumerable.ThenByDescending(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A");
+                            break;
+                        default:
+                            throw new NotSupportedException(columnName);
+                    }
+                }
+                children = orderedEnumerable.ToArray();
+
+                foreach (var child in children)
+                {
+                    stack.Push((child, data));
+                }
+            }
+
+            return list;
         }
 
         private void InitializeModel()
