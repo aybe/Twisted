@@ -205,91 +205,23 @@ namespace Editor
                     ((IList<TreeViewItemData<DMDNode>>)container.Value.children).Add(data);
                 }
 
-                var children = node.Cast<DMDNode>().Reverse().ToArray();
+                var children = node.Cast<DMDNode>().Reverse();
 
-                // TODO // TODO // TODO // TODO // TODO // TODO 
-
-                IOrderedEnumerable<DMDNode> orderedEnumerable;
-
-                var first = descriptions.First();
-
-                switch (first.columnName)
+                foreach (var description in descriptions)
                 {
-                    case "Node":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => s.GetType().Name)
-                            : children.OrderByDescending(s => s.GetType().Name);
-                        break;
-                    case "Type 1":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}")
-                            : children.OrderByDescending(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}");
-                        break;
-                    case "Type 2":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}")
-                            : children.OrderByDescending(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}");
-                        break;
-                    case "Position":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => s.Position)
-                            : children.OrderByDescending(s => s.Position);
-                        break;
-                    case "Length":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => s.Length)
-                            : children.OrderByDescending(s => s.Length);
-                        break;
-                    case "Polygons":
-                        orderedEnumerable = first.direction is SortDirection.Ascending
-                            ? children.OrderBy(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")
-                            : children.OrderByDescending(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A");
-                        break;
-                    default:
-                        throw new NotSupportedException(first.columnName);
-                }
-
-                foreach (var description in descriptions.Skip(1))
-                {
-                    var columnName = description.columnName;
-
-                    switch (columnName)
+                    Func<DMDNode, string> selector = description.columnName switch
                     {
-                        case "Node":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => s.GetType().Name)
-                                : orderedEnumerable.ThenByDescending(s => s.GetType().Name);
-                            break;
-                        case "Type 1":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}")
-                                : orderedEnumerable.ThenByDescending(s => $"0x{(s.NodeType >> 8) & 0xFFFF:X4}");
-                            break;
-                        case "Type 2":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}")
-                                : orderedEnumerable.ThenByDescending(s => $"0x{(s.NodeType >> 0) & 0xFFFF:X4}");
-                            break;
-                        case "Position":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => s.Position)
-                                : orderedEnumerable.ThenByDescending(s => s.Position);
-                            break;
-                        case "Length":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => s.Length)
-                                : orderedEnumerable.ThenByDescending(s => s.Length);
-                            break;
-                        case "Polygons":
-                            orderedEnumerable = first.direction is SortDirection.Ascending
-                                ? orderedEnumerable.ThenBy(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")
-                                : orderedEnumerable.ThenByDescending(s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A");
-                            break;
-                        default:
-                            throw new NotSupportedException(columnName);
-                    }
+                        "Node"     => s => s.GetType().Name,
+                        "Type 1"   => s => $"0x{((s.NodeType >> 16) & 0xFFFF):X4}",
+                        "Type 2"   => s => $"0x{((s.NodeType >> 00) & 0xFFFF):X4}",
+                        "Position" => s => s.Position.ToString(),
+                        "Length"   => s => s.Length.ToString(),
+                        "Polygons" => s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A",
+                        _          => throw new NotSupportedException(description.columnName)
+                    };
+
+                    children = children.Sort(selector, null, description.direction is SortDirection.Descending); // TODO could be object.ToString
                 }
-                children = orderedEnumerable.ToArray();
 
                 foreach (var child in children)
                 {
