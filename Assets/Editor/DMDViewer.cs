@@ -13,7 +13,6 @@ using UnityEngine.UIElements;
 namespace Editor
 {
     public sealed class DMDViewer : EditorWindow
-        // TODO set good size/stretching/etc for columns
         // TODO column sorting + arrows
         // TODO filtering + toolbar hint
         // TODO context menus
@@ -208,7 +207,7 @@ namespace Editor
 
             view.SetRootItems(items);
 
-            var column1 = CreateDefaultColumn("Node");
+            var column1 = CreateDefaultColumn("Node", 200.0f);
 
             column1.bindCell = (element, index) =>
             {
@@ -217,7 +216,7 @@ namespace Editor
                 ((Label)element).text = node.GetType().Name;
             };
 
-            var column2 = CreateDefaultColumn("Type 1", TextAnchor.MiddleRight);
+            var column2 = CreateDefaultColumn("Type 1");
 
             column2.bindCell = (element, index) =>
             {
@@ -226,7 +225,7 @@ namespace Editor
                 ((Label)element).text = $"0x{(node.NodeType >> 8) & 0xFF:X4}";
             };
 
-            var column3 = CreateDefaultColumn("Type 2", TextAnchor.MiddleRight);
+            var column3 = CreateDefaultColumn("Type 2");
 
             column3.bindCell = (element, index) =>
             {
@@ -235,7 +234,7 @@ namespace Editor
                 ((Label)element).text = $"0x{(node.NodeType >> 0) & 0xFF:X4}";
             };
 
-            var column4 = CreateDefaultColumn("Position", TextAnchor.MiddleRight);
+            var column4 = CreateDefaultColumn("Position");
 
             column4.bindCell = (element, index) =>
             {
@@ -244,7 +243,7 @@ namespace Editor
                 ((Label)element).text = $"{node.Position:N0}";
             };
 
-            var column5 = CreateDefaultColumn("Length", TextAnchor.MiddleRight);
+            var column5 = CreateDefaultColumn("Length");
 
             column5.bindCell = (element, index) =>
             {
@@ -253,7 +252,7 @@ namespace Editor
                 ((Label)element).text = $"{node.Length:N0}";
             };
 
-            var column6 = CreateDefaultColumn("Polygons");
+            var column6 = CreateDefaultColumn("Polygons", 200.0f);
 
             column6.bindCell = (element, index) =>
             {
@@ -263,6 +262,7 @@ namespace Editor
             };
 
             view.columns.Clear();
+
             view.columns.Add(column1);
             view.columns.Add(column2);
             view.columns.Add(column3);
@@ -306,29 +306,27 @@ namespace Editor
             return list;
         }
 
-        private static Column CreateDefaultColumn(string header, TextAnchor anchor = TextAnchor.MiddleLeft)
+        private static Column CreateDefaultColumn(string header, float? width = null)
         {
             if (string.IsNullOrWhiteSpace(header))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(header));
 
-            var column = new Column
+            var column = new Column // stretchable sucks big time
             {
                 name          = header,
                 title         = header,
                 icon          = default,
                 visible       = true,
-                width         = 200,
-                minWidth      = 100,
-                maxWidth      = 300,
+                width         = width ?? 100.0f,
+                minWidth      = 75.0f,
                 sortable      = true,
-                stretchable   = true,
                 optional      = true,
                 resizable     = true,
                 makeHeader    = () => CreateDefaultLabel(TextAnchor.MiddleLeft),
                 bindHeader    = element => ((Label)element).text = header,
                 unbindHeader  = element => ((Label)element).text = default,
                 destroyHeader = null,
-                makeCell      = () => CreateDefaultLabel(anchor),
+                makeCell      = () => CreateDefaultLabel(TextAnchor.MiddleLeft),
                 bindCell      = null,
                 unbindCell    = null,
                 destroyCell   = null
