@@ -211,12 +211,12 @@ namespace Editor
                 {
                     Func<DMDNode, string> selector = description.columnName switch
                     {
-                        "Node"     => s => s.GetType().Name,
-                        "Type 1"   => s => $"0x{((s.NodeType >> 16) & 0xFFFF):X4}",
-                        "Type 2"   => s => $"0x{((s.NodeType >> 00) & 0xFFFF):X4}",
-                        "Position" => s => s.Position.ToString(),
-                        "Length"   => s => s.Length.ToString(),
-                        "Polygons" => s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A",
+                        "Node"     => GetNodeName,
+                        "Type 1"   => GetNodeType1,
+                        "Type 2"   => GetNodeType2,
+                        "Position" => GetNodePosition,
+                        "Length"   => GetNodeLength,
+                        "Polygons" => GetNodePolygons,
                         _          => throw new NotSupportedException(description.columnName)
                     };
 
@@ -273,7 +273,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = node.GetType().Name;
+                ((Label)element).text = GetNodeName(node);
             };
 
             var column2 = CreateDefaultColumn("Type 1");
@@ -282,7 +282,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"0x{((node.NodeType >> 16) & 0xFFFF):X4}";
+                ((Label)element).text = GetNodeType1(node);
             };
 
             var column3 = CreateDefaultColumn("Type 2");
@@ -291,7 +291,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"0x{((node.NodeType >> 00) & 0xFFFF):X4}";
+                ((Label)element).text = GetNodeType2(node);
             };
 
             var column4 = CreateDefaultColumn("Position");
@@ -300,7 +300,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"{node.Position:N0}";
+                ((Label)element).text = GetNodePosition(node);
             };
 
             var column5 = CreateDefaultColumn("Length");
@@ -309,7 +309,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"{node.Length:N0}";
+                ((Label)element).text = GetNodeLength(node);
             };
 
             var column6 = CreateDefaultColumn("Polygons", 200.0f);
@@ -318,7 +318,7 @@ namespace Editor
             {
                 var node = GetNodeFromItem(element, index);
 
-                ((Label)element).text = $"{(node is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")}";
+                ((Label)element).text = GetNodePolygons(node);
             };
 
             view.columns.Clear();
@@ -422,5 +422,57 @@ namespace Editor
 
             return node;
         }
+
+        #region Getters
+
+        private static string GetNodeName(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return node.GetType().Name;
+        }
+
+        private static string GetNodeType1(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return $"0x{(node.NodeType >> 16) & 0xFFFF:X4}";
+        }
+
+        private static string GetNodeType2(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return $"0x{(node.NodeType >> 00) & 0xFFFF:X4}";
+        }
+
+        private static string GetNodePosition(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return $"{node.Position:N0}";
+        }
+
+        private static string GetNodeLength(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return $"{node.Length:N0}";
+        }
+
+        private static string GetNodePolygons(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            return $"{(node is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")}";
+        }
+
+        #endregion
     }
 }
