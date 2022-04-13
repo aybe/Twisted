@@ -342,7 +342,9 @@ namespace Editor
                 style =
                 {
                     flexGrow       = 1,
-                    unityTextAlign = anchor
+                    unityTextAlign = anchor,
+                    overflow       = Overflow.Hidden,
+                    textOverflow   = TextOverflow.Ellipsis
                 }
             };
 
