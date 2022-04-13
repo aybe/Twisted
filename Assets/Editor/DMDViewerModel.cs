@@ -1,3 +1,4 @@
+using System.IO;
 using Twisted;
 using UnityEditor;
 using UnityEngine;
@@ -75,12 +76,20 @@ namespace Editor
 
             CurrentFile = path;
 
-            LoadFile();
+            InitializeFactory();
         }
 
-        private void LoadFile()
+        public void Initialize()
         {
-            DMDFactory = DMDFactory.Create(CurrentFile);
+            InitializeFactory();
+        }
+
+        private void InitializeFactory()
+        {
+            if (File.Exists(CurrentFile))
+            {
+                DMDFactory = DMDFactory.Create(CurrentFile);
+            }
         }
     }
 }

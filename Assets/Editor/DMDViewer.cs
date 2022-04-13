@@ -19,7 +19,6 @@ namespace Editor
         // TODO context menus
         // TODO remove sample text
         // TODO try fix horizontal scroll bar
-        // TODO reload tree at reload
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
         // TODO what becomes primary column should be left aligned
@@ -163,7 +162,11 @@ namespace Editor
             });
 
             treeView.fixedItemHeight = sliderItemHeight.value; // sync our view with slider
+            
+            if (Model.DMDFactory != null)
             {
+                InitializeTreeView();
+            }
         }
 
         private void InitializeModel()
@@ -172,6 +175,8 @@ namespace Editor
             {
                 Model = CreateInstance<DMDViewerModel>();
             }
+            
+            Model.Initialize();
         }
 
         private void InitializeWindowTitle()
