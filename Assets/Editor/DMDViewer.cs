@@ -161,6 +161,7 @@ namespace Editor
             if (Model.DMDFactory != null)
             {
                 InitializeTreeView();
+                TreeView.ExpandAll();
             }
             else
             {
