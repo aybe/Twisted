@@ -169,12 +169,67 @@ namespace Editor
 
             TreeView.sortingEnabled = true;
 
-            TreeView.columnSortingChanged += () =>
+            TreeView.columnSortingChanged += OnTreeViewColumnSortingChanged;
+        }
+
+        private void OnTreeViewColumnSortingChanged()
+            // BUG code monkeys at Unity will raise this event N clicked headers + 2 times in a row, how nice...
+            // that, unless you hold Ctrl or Shift... but do you think they bothered documenting this fact?
+        {
+            Debug.Log(nameof(OnTreeViewColumnSortingChanged)); // TODO delete
+
+            // multi-column sort screws ids and thus expanded nodes, do a backup
+
+            var dictionary1 = new Dictionary<object, int>();
+            var dictionary2 = new Dictionary<int, bool>();
+            var controller  = TreeView.viewController;
+            var ids1        = controller.GetAllItemIds().ToArray(); // TODO delete ToArray
+
+            foreach (var id in ids1)
             {
-                var list = InitializeTreeViewItemsEx(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
-                TreeView.SetRootItems(list);
-                TreeView.Rebuild();
-            };
+                var index = controller.GetIndexForId(id);
+                if (index is -1)
+                    continue;
+
+                var key1 = controller.GetItemForIndex(index);
+                var key2 = controller.IsExpanded(id);
+                dictionary1.Add(key1, id);
+                dictionary2.Add(id, key2);
+            }
+
+            // perform the actual multi-column deep sorting
+
+            var items = InitializeTreeViewItemsEx(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
+            TreeView.SetRootItems(items);
+            TreeView.Rebuild();
+
+            // restore the state of expanded nodes
+
+            TreeView.CollapseAll();
+
+            var ids2 = controller.GetAllItemIds().ToArray(); // TODO delete ToArray
+
+            foreach (var id in ids2)
+            {
+                var index = controller.GetIndexForId(id);
+                if (index is -1)
+                    continue;
+
+                var o = controller.GetItemForIndex(index);
+
+                if (!dictionary1.TryGetValue(o, out var i))
+                    continue;
+
+                if (!dictionary2.TryGetValue(i, out var b))
+                    continue;
+
+                if (b)
+                {
+                    TreeView.ExpandItem(id); // don't even think about using controller here else...
+                }
+            }
+
+            TreeView.RefreshItems();
         }
 
         private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItemsEx(DMD dmd, SortColumnDescription[] descriptions)
