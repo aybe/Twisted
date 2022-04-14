@@ -199,13 +199,13 @@ namespace Editor
 
             // perform the actual multi-column deep sorting
 
-            var items = InitializeTreeViewItemsEx(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
+            var items = InitializeTreeViewItems(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
             TreeView.SetRootItems(items);
             TreeView.Rebuild();
 
             // restore the state of expanded nodes
 
-            TreeView.CollapseAll();
+            controller.CollapseAll();
 
             var ids2 = controller.GetAllItemIds().ToArray(); // TODO delete ToArray
 
@@ -225,14 +225,14 @@ namespace Editor
 
                 if (b)
                 {
-                    TreeView.ExpandItem(id); // don't even think about using controller here else...
+                    controller.ExpandItem(id, false, false);
                 }
             }
 
             TreeView.RefreshItems();
         }
 
-        private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItemsEx(DMD dmd, SortColumnDescription[] descriptions)
+        private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItems(DMD dmd, SortColumnDescription[]? descriptions)
         {
             if (dmd is null)
                 throw new ArgumentNullException(nameof(dmd));
@@ -260,22 +260,25 @@ namespace Editor
 
                 var children = node.Cast<DMDNode>().Reverse();
 
-                foreach (var description in descriptions)
+                if (descriptions != null)
                 {
-                    var column = description.columnName;
-
-                    Func<DMDNode, object> selector = column switch
+                    foreach (var description in descriptions)
                     {
-                        ColumnNodeName     => GetNodeName,
-                        ColumnNodeType1    => GetNodeType1,
-                        ColumnNodeType2    => GetNodeType2,
-                        ColumnNodePosition => GetNodePosition,
-                        ColumnNodeLength   => GetNodeLength,
-                        ColumnNodePolygons => GetNodePolygons,
-                        _                  => throw new NotSupportedException(column)
-                    };
+                        var column = description.columnName;
 
-                    children = children.Sort(selector, null, description.direction is SortDirection.Descending);
+                        Func<DMDNode, object> selector = column switch
+                        {
+                            ColumnNodeName     => GetNodeName,
+                            ColumnNodeType1    => GetNodeType1,
+                            ColumnNodeType2    => GetNodeType2,
+                            ColumnNodePosition => GetNodePosition,
+                            ColumnNodeLength   => GetNodeLength,
+                            ColumnNodePolygons => GetNodePolygons,
+                            _                  => throw new NotSupportedException(column)
+                        };
+
+                        children = children.Sort(selector, null, description.direction is SortDirection.Descending);
+                    }
                 }
 
                 foreach (var child in children)
@@ -331,7 +334,9 @@ namespace Editor
             view.columns.Add(column5);
             view.columns.Add(column6);
 
-            var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException());
+            view.sortColumnDescriptions.Clear();
+
+            var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException(), null);
 
             view.SetRootItems(items);
             view.Rebuild();
@@ -341,41 +346,6 @@ namespace Editor
             {
                 view.visible = true;
             }
-        }
-
-        private static List<TreeViewItemData<TreeNode>> InitializeTreeViewItems(DMD dmd)
-        {
-            if (dmd is null)
-                throw new ArgumentNullException(nameof(dmd));
-
-            var id    = 0;
-            var list  = new List<TreeViewItemData<TreeNode>>();
-            var stack = new Stack<(TreeNode Node, TreeViewItemData<TreeNode>? Container)>();
-
-            stack.Push((dmd, null));
-
-            while (stack.Count > 0)
-            {
-                var (node, container) = stack.Pop();
-
-                var data = new TreeViewItemData<TreeNode>(id++, node);
-
-                if (container is null)
-                {
-                    list.Add(data);
-                }
-                else
-                {
-                    ((IList<TreeViewItemData<TreeNode>>)container.Value.children).Add(data);
-                }
-
-                foreach (var child in node.Reverse())
-                {
-                    stack.Push((child, data));
-                }
-            }
-
-            return list;
         }
 
         private static Column CreateDefaultColumn(string header, float width, Func<DMDNode, object> getter)
