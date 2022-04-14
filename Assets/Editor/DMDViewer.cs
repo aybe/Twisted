@@ -62,7 +62,6 @@ namespace Editor
 
             toolbarButtonOpenFile.clicked += () =>
             {
-                Debug.Log(true);
                 Model.OpenFile();
                 InitializeWindowTitle();
                 InitializeTreeView();
@@ -72,49 +71,42 @@ namespace Editor
 
             toolbarToggleDistinctFiltering.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarToggleRegexSearch.BindProperty(Model.UseRegexSearchProperty);
 
             toolbarToggleRegexSearch.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarToggleSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
 
             toolbarToggleSelectionFraming.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarToggleModelSplitting.BindProperty(Model.UseModelSplittingProperty);
 
             toolbarToggleModelSplitting.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarToggleTexturing.BindProperty(Model.UseTexturingProperty);
 
             toolbarToggleTexturing.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarToggleVertexColors.BindProperty(Model.UseVertexColorsProperty);
 
             toolbarToggleVertexColors.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             toolbarTogglePolygonColoring.BindProperty(Model.UsePolygonColorsProperty);
 
             toolbarTogglePolygonColoring.RegisterValueChangedCallback(evt =>
             {
-                Debug.Log(evt.newValue);
             });
 
             // TODO other properties
