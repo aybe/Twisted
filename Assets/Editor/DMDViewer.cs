@@ -155,7 +155,6 @@ namespace Editor
             if (Model.DMDFactory != null)
             {
                 InitializeTreeView();
-                TreeView.ExpandAll();
             }
             else
             {
@@ -274,6 +273,7 @@ namespace Editor
 
             view.SetRootItems(items);
             view.Rebuild();
+            view.ExpandRootItems();
 
             if (view.visible is false)
             {
