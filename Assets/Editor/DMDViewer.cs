@@ -111,7 +111,7 @@ namespace Editor
                     column6
                 };
 
-                var treeView = new GenericTreeView<DMDNode>(columns);
+                var treeView = new GenericTreeView<DMDNode>(columns); // BUG stepping out on this will crash Unity LOL!
 
                 return treeView;
             }
