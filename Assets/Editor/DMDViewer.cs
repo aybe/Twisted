@@ -252,21 +252,14 @@ namespace Editor
 
         private void InitializeTreeView()
         {
-            var view = TreeView;
-
-            if (view.visible is false)
-                view.visible = true;
-
-            var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException());
-
-            view.SetRootItems(items);
-
             var column1 = CreateDefaultColumn(ColumnNodeName,     200.0f, GetNodeName);
             var column2 = CreateDefaultColumn(ColumnNodeType1,    100.0f, GetNodeType1);
             var column3 = CreateDefaultColumn(ColumnNodeType2,    100.0f, GetNodeType2);
             var column4 = CreateDefaultColumn(ColumnNodePosition, 100.0f, GetNodePosition);
             var column5 = CreateDefaultColumn(ColumnNodeLength,   100.0f, GetNodeLength);
             var column6 = CreateDefaultColumn(ColumnNodePolygons, 200.0f, GetNodePolygons);
+
+            var view = TreeView;
 
             view.columns.Clear();
 
@@ -276,6 +269,15 @@ namespace Editor
             view.columns.Add(column4);
             view.columns.Add(column5);
             view.columns.Add(column6);
+
+            var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException());
+
+            view.SetRootItems(items);
+
+            if (view.visible is false)
+            {
+                view.visible = true;
+            }
         }
 
         private static List<TreeViewItemData<TreeNode>> InitializeTreeViewItems(DMD dmd)
