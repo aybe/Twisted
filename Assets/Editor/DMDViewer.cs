@@ -205,9 +205,8 @@ namespace Editor
 
             root.Q("TreeViewHost").Add(TreeView);
 
-            var sliderItemHeight = root.Q<SliderInt>();
-            var searchField      = root.Q<ToolbarSearchField>();
-            var treeView         = TreeView;
+            var searchField = root.Q<ToolbarSearchField>();
+            var treeView    = TreeView;
 
             root.RegisterCallback<KeyDownEvent>(evt =>
             {
@@ -215,18 +214,6 @@ namespace Editor
                 {
                     searchField.Focus();
                 }
-            });
-
-            sliderItemHeight.RegisterValueChangedCallback(evt =>
-            {
-                // how nice is that, we must rebuild the tree for it to pick up fixed item height change...
-
-                if (treeView.virtualizationMethod is not CollectionVirtualizationMethod.FixedHeight)
-                    treeView.virtualizationMethod = CollectionVirtualizationMethod.FixedHeight;
-
-                treeView.fixedItemHeight = evt.newValue;
-
-                treeView.Rebuild();
             });
 
             searchField.RegisterValueChangedCallback(evt =>
@@ -241,8 +228,6 @@ namespace Editor
 
                 treeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
             });
-
-            treeView.fixedItemHeight = sliderItemHeight.value; // sync our view with slider
 
             if (Model.DMDFactory != null)
             {

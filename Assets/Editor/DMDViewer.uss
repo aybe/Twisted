@@ -22,10 +22,6 @@
     width: 100px;
 }
 
-.toolbar-slider-item-height > Label {
-    display: none;
-}
-
 .toolbar-search-field {
     width: 120px;
     overflow: hidden;
