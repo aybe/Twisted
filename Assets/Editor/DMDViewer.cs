@@ -200,8 +200,8 @@ namespace Editor
             // perform the actual multi-column deep sorting
 
             var items = InitializeTreeViewItems(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
+
             TreeView.SetRootItems(items);
-            TreeView.Rebuild();
 
             // restore the state of expanded nodes
 
