@@ -31,6 +31,8 @@ namespace Editor
             sortingEnabled = true;
 
             columnSortingChanged += OnColumnSortingChanged;
+
+            SetRoot(null); // because good old bad habits prevail at Unity, ensure that their internal crap gets initialized
         }
 
         public void Dispose()
@@ -40,6 +42,8 @@ namespace Editor
 
         public void SetRoot(T? node)
         {
+            visible = node is not null; // prevent a NRE when clicking an empty tree, better than showing lonesome headers
+
             Root = node;
 
             var items = GetRootItems();
