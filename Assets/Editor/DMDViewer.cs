@@ -262,7 +262,9 @@ namespace Editor
 
                 foreach (var description in descriptions)
                 {
-                    Func<DMDNode, string> selector = description.columnName switch
+                    var column = description.columnName;
+
+                    Func<DMDNode, object> selector = column switch
                     {
                         ColumnNodeName     => GetNodeName,
                         ColumnNodeType1    => GetNodeType1,
@@ -270,10 +272,10 @@ namespace Editor
                         ColumnNodePosition => GetNodePosition,
                         ColumnNodeLength   => GetNodeLength,
                         ColumnNodePolygons => GetNodePolygons,
-                        _                  => throw new NotSupportedException(description.columnName)
+                        _                  => throw new NotSupportedException(column)
                     };
 
-                    children = children.Sort(selector, null, description.direction is SortDirection.Descending); // TODO could be object.ToString
+                    children = children.Sort(selector, null, description.direction is SortDirection.Descending);
                 }
 
                 foreach (var child in children)
@@ -376,7 +378,7 @@ namespace Editor
             return list;
         }
 
-        private static Column CreateDefaultColumn(string header, float width, Func<DMDNode, string> getter)
+        private static Column CreateDefaultColumn(string header, float width, Func<DMDNode, object> getter)
         {
             if (string.IsNullOrWhiteSpace(header))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(header));
@@ -423,7 +425,7 @@ namespace Editor
 
             void BindCell(VisualElement element, int index)
             {
-                ((Label)element).text = getter(GetNodeFromItem(element, index));
+                ((Label)element).text = getter(GetNodeFromItem(element, index))?.ToString();
             }
 
             var column = new Column // stretchable sucks big time
@@ -471,51 +473,33 @@ namespace Editor
         private const string ColumnNodeLength   = "Length";
         private const string ColumnNodePolygons = "Polygons";
 
-        private static string GetNodeName(DMDNode node)
+        private static object GetNodeName(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
             return node.GetType().Name;
         }
 
-        private static string GetNodeType1(DMDNode node)
+        private static object GetNodeType1(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
             return $"0x{(node.NodeType >> 16) & 0xFFFF:X4}";
         }
 
-        private static string GetNodeType2(DMDNode node)
+        private static object GetNodeType2(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
             return $"0x{(node.NodeType >> 00) & 0xFFFF:X4}";
         }
 
-        private static string GetNodePosition(DMDNode node)
+        private static object GetNodePosition(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
-            return $"{node.Position:N0}";
+            return node.Position;
         }
 
-        private static string GetNodeLength(DMDNode node)
+        private static object GetNodeLength(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
-            return $"{node.Length:N0}";
+            return node.Length;
         }
 
-        private static string GetNodePolygons(DMDNode node)
+        private static object GetNodePolygons(DMDNode node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
             return $"{(node is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A")}";
         }
 
