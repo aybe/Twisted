@@ -183,7 +183,7 @@ namespace Editor
             var dictionary1 = new Dictionary<object, int>();
             var dictionary2 = new Dictionary<int, bool>();
             var controller  = TreeView.viewController;
-            var ids1        = controller.GetAllItemIds().ToArray(); // TODO delete ToArray
+            var ids1        = controller.GetAllItemIds();
 
             foreach (var id in ids1)
             {
@@ -199,7 +199,7 @@ namespace Editor
 
             // perform the actual multi-column deep sorting
 
-            var items = InitializeTreeViewItems(Model.DMDFactory!.DMD, TreeView.sortedColumns.ToArray());
+            var items = InitializeTreeViewItems(Model.DMDFactory!.DMD, TreeView.sortedColumns);
 
             TreeView.SetRootItems(items);
 
@@ -207,7 +207,7 @@ namespace Editor
 
             controller.CollapseAll();
 
-            var ids2 = controller.GetAllItemIds().ToArray(); // TODO delete ToArray
+            var ids2 = controller.GetAllItemIds();
 
             foreach (var id in ids2)
             {
@@ -232,10 +232,12 @@ namespace Editor
             TreeView.RefreshItems();
         }
 
-        private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItems(DMD dmd, SortColumnDescription[]? descriptions)
+        private static List<TreeViewItemData<DMDNode>> InitializeTreeViewItems(DMD dmd, IEnumerable<SortColumnDescription>? descriptions)
         {
             if (dmd is null)
                 throw new ArgumentNullException(nameof(dmd));
+
+            descriptions = descriptions as SortColumnDescription[] ?? descriptions?.ToArray();
 
             var id    = 0;
             var list  = new List<TreeViewItemData<DMDNode>>();
