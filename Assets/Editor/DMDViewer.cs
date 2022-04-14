@@ -35,6 +35,11 @@ namespace Editor
 
         private MultiColumnTreeView TreeView => rootVisualElement.Q<MultiColumnTreeView>();
 
+        private void OnDisable()
+        {
+            TreeView.columnSortingChanged -= OnTreeViewColumnSortingChanged;
+        }
+
         public void CreateGUI()
         {
             var root = rootVisualElement;
