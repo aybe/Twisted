@@ -273,6 +273,7 @@ namespace Editor
             var items = InitializeTreeViewItems(Model.DMDFactory?.DMD ?? throw new InvalidOperationException());
 
             view.SetRootItems(items);
+            view.Rebuild();
 
             if (view.visible is false)
             {
