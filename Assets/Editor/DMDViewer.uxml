@@ -15,6 +15,6 @@
             <ui:SliderInt low-value="16" high-value="32" picking-mode="Ignore" value="24" name="toolbarSliderItemHeight" class="toolbar-slider-item-height" />
             <uie:ToolbarSearchField name="toolbarSearchField" class="toolbar-search-field" />
         </uie:Toolbar>
-        <ui:MultiColumnTreeView />
+        <ui:VisualElement name="TreeViewHost" style="flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>
