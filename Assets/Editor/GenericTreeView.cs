@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Unity.Extensions;
+using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
 namespace Editor
@@ -58,13 +59,25 @@ namespace Editor
         {
             // deep sorting screws ids and thus expanded nodes, save this info to restore it later on new hierarchy
 
+            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SaveExpandedNodes)}");
             SaveExpandedNodes(out var map1, out var map2);
+            Profiler.EndSample();
 
-            SetRootItems(GetRootItems());
+            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(GetRootItems)}");
+            var items = GetRootItems();
+            Profiler.EndSample();
 
+            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SetRootItems)}");
+            SetRootItems(items);
+            Profiler.EndSample();
+
+            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(LoadExpandedNodes)}");
             LoadExpandedNodes(map1, map2);
+            Profiler.EndSample();
 
+            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(RefreshItems)}");
             RefreshItems();
+            Profiler.EndSample();
         }
 
         private void SaveExpandedNodes(out IReadOnlyDictionary<object, int> map1, out IReadOnlyDictionary<int, bool> map2)
@@ -74,17 +87,27 @@ namespace Editor
 
             var controller = viewController;
 
+            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetAllItemIds)}");
             var ids = controller.GetAllItemIds();
+            Profiler.EndSample();
 
             foreach (var id in ids)
             {
+                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetIndexForId)}");
                 var index = controller.GetIndexForId(id);
+                Profiler.EndSample();
 
                 if (index is -1)
                     continue;
 
+                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetItemForIndex)}");
                 var key1 = controller.GetItemForIndex(index);
+                Profiler.EndSample();
+
+                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.IsExpanded)}");
                 var key2 = controller.IsExpanded(id);
+                Profiler.EndSample();
+
                 dictionary1.Add(key1, id);
                 dictionary2.Add(id, key2);
             }
@@ -103,18 +126,26 @@ namespace Editor
 
             var controller = viewController;
 
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
             controller.CollapseAll();
+            Profiler.EndSample();
 
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetAllItemIds)}");
             var ids = controller.GetAllItemIds();
+            Profiler.EndSample();
 
             foreach (var id in ids)
             {
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetIndexForId)}");
                 var index = controller.GetIndexForId(id);
+                Profiler.EndSample();
 
                 if (index is -1)
                     continue;
 
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetItemForIndex)}");
                 var o = controller.GetItemForIndex(index);
+                Profiler.EndSample();
 
                 if (!map1.TryGetValue(o, out var i))
                     continue;
@@ -124,7 +155,9 @@ namespace Editor
 
                 if (b)
                 {
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
                     controller.ExpandItem(id, false, false);
+                    Profiler.EndSample();
                 }
             }
         }
