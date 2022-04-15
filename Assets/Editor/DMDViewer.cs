@@ -263,11 +263,11 @@ namespace Editor
         {
             var dmd = Model.DMDFactory?.DMD ?? throw new InvalidOperationException();
 
+            TreeView.sortColumnDescriptions.Clear();
+
             TreeView.SetRoot(dmd);
 
             TreeView.CollapseAll();
-
-            TreeView.sortColumnDescriptions.Clear();
         }
     }
 }
