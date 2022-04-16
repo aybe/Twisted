@@ -265,9 +265,9 @@ namespace Editor
 
             TreeView.sortColumnDescriptions.Clear();
 
-            TreeView.SetRoot(dmd);
-
             TreeView.CollapseAll();
+
+            TreeView.SetRoot(dmd);
         }
     }
 }
