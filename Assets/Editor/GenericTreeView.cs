@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Unity.Extensions;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -15,6 +17,8 @@ namespace Editor
         private T? Root;
 
         private List<TreeViewItemData<T>>? RootItems;
+
+        private Task? TaskSorting;
 
         public GenericTreeView(GenericTreeViewColumn<T>[] columns)
         {
@@ -58,6 +62,16 @@ namespace Editor
 
         private void OnColumnSortingChanged()
             // BUG: Unity code monkeys raise this N headers + 2 times in a row... unless you hold a fucking modifier!
+        {
+            Debug.Log($"Task status: {TaskSorting?.Status}, Task exception: {TaskSorting?.Exception}");
+
+            if (TaskSorting?.IsCompleted != false)
+            {
+                TaskSorting = Task.Factory.StartNew(NewMethod, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+            }
+        }
+
+        private void NewMethod()
         {
             Debug.Log(nameof(OnColumnSortingChanged));
 
