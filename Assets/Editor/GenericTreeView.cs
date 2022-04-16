@@ -4,12 +4,26 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Extensions;
-using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
 namespace Editor
 {
+    // some general notes about the masterpiece of shit that this tree view is:
+
+    // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
+    // it's also unbelievably buggy but from them this isn't a surprise at all...
+    
+    // it looks like it's been inspired from IMGUI since the same silly design
+    // forces one to roll-out surprisingly similar fixes for it to work right
+    // at least the IMGUI version was fast even though it was a pain to use...
+
+    // the most astonishing is the column sorting and all of their stuff around
+    // that is needed for implementing a decent multi-column deep sort; in short,
+    // you can't trust much of their code either because it's buggy, slow or both
+
+    // e.g. deep sort 10K+ nodes: theirs = ~30 seconds, mine = less than a second
+
     public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     {
         private readonly GenericTreeViewColumn<T>[] Columns;
@@ -18,7 +32,7 @@ namespace Editor
 
         private List<TreeViewItemData<T>>? RootItems;
 
-        private Task? TaskSorting;
+        private Task? SortingTask;
 
         public GenericTreeView(GenericTreeViewColumn<T>[] columns)
         {
@@ -39,7 +53,7 @@ namespace Editor
 
             columnSortingChanged += OnColumnSortingChanged;
 
-            SetRoot(null); // because good old bad habits prevail at Unity, ensure that their internal crap gets initialized
+            SetRoot(null); // good old habits prevail at Unity, this initializes their internal shit
         }
 
         public void Dispose()
@@ -49,7 +63,12 @@ namespace Editor
 
         public void SetRoot(T? node)
         {
-            visible = node is not null; // prevent a NRE when clicking an empty tree, better than showing lonesome headers
+            // the stupid tree view will greet with you a NullReferenceException when you
+            // click anywhere on it and it hasn't yet been populated with tree view items
+            
+            // instead of showing lonesome headers, hide it entirely, this is the best UX
+
+            visible = node is not null;
 
             Root = node;
 
@@ -61,45 +80,59 @@ namespace Editor
         }
 
         private void OnColumnSortingChanged()
-            // BUG: Unity code monkeys raise this N headers + 2 times in a row... unless you hold a fucking modifier!
         {
-            Debug.Log($"Task status: {TaskSorting?.Status}, Task exception: {TaskSorting?.Exception}");
+            // these code monkey will raise N headers + 2 times in a row... for no fucking reason
+            // that is unless you hold a fucking modifier such as Shift or Ctrl, not explained...
 
-            if (TaskSorting?.IsCompleted != false)
-            {
-                TaskSorting = Task.Factory.StartNew(NewMethod, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
-            }
+            // protect ourselves from their stupid shit by using a task with a rudimentary guard
+
+            if (SortingTask?.IsCompleted == false)
+                return;
+
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext(); // just like in WPF
+
+            SortingTask = Task.Factory.StartNew(SortTreeItems, CancellationToken.None, TaskCreationOptions.None, scheduler);
         }
 
-        private void NewMethod()
+        private void SortTreeItems()
         {
-            Debug.Log(nameof(OnColumnSortingChanged));
+            // deep sorting will screw ids and therefore expanded nodes, save this information
 
-            // deep sorting screws ids and thus expanded nodes, save this info to restore it later on new hierarchy
-
-            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SaveExpandedNodes)}");
-            var data = SaveExpandedNodes();
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
+            var state = SaveExpandedNodes();
             Profiler.EndSample();
 
-            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(GetRootItems)}");
-            RootItems = GetRootItems(); // NOTE: this sorts the items
+            // perform the actual sorting
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(GetRootItems)}");
+            RootItems = GetRootItems();
             Profiler.EndSample();
 
-            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SetRootItems)}");
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SetRootItems)}");
             SetRootItems(RootItems);
             Profiler.EndSample();
 
-            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(LoadExpandedNodes)}");
-            LoadExpandedNodes(data);
+            // restore the collapsed/expanded state of tree view items but in a FAST manner
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(LoadExpandedNodes)}");
+            LoadExpandedNodes(state);
             Profiler.EndSample();
 
-            Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(RefreshItems)}");
+            // finally, get this stupid control to redraw itself
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
             RefreshItems();
             Profiler.EndSample();
         }
 
         private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (children == null)
+                throw new ArgumentNullException(nameof(children));
+
             var list = new List<TSource>();
 
             var stack = new Stack<TSource>();
@@ -126,6 +159,8 @@ namespace Editor
 
         private TreeNodeState SaveExpandedNodes()
         {
+            // if we were to use some of their dumb methods, this would take ages because they're poorly written
+
             var controller = viewController;
 
             Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
@@ -155,13 +190,11 @@ namespace Editor
 
         private void LoadExpandedNodes(TreeNodeState state)
         {
-            var controller = viewController;
+            // their shitty methods take exponentially longer as you have more nodes in the tree
+            // as they're pure garbage, they simply freeze the UI for an astonishingly long time
+            // here we use a very simple approach that works and scales well for 10K+ tree nodes
 
-            var expand = state.Expanded.Count > state.Collapsed.Count;
-
-            Debug.Log($"Expanded objects: {state.Expanded.Count}, " +
-                      $"Collapsed objects: {state.Collapsed.Count}, " +
-                      $"{nameof(expand)}: {(expand ? "<color=green>TRUE</color>" : "<color=red>FALSE</color>")}");
+            // build a dictionary to be able to retrieve newly assigned IDs to tree view items
 
             Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: flatten items");
             var items = Flatten(RootItems!, s => s.children);
@@ -171,9 +204,15 @@ namespace Editor
             var dictionary = items.ToDictionary(s => s.data, s => s.id);
             Profiler.EndSample();
 
+            // now downright fucking stupid: do it in whichever way that will take the shortest time
+
+            var controller = viewController;
+
+            var expand = state.Expanded.Count > state.Collapsed.Count;
+
             if (expand)
             {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: expand all");
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandAll)}");
                 controller.ExpandAll();
                 Profiler.EndSample();
 
@@ -181,14 +220,14 @@ namespace Editor
                 {
                     var id = dictionary[data];
 
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: collapse item");
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseItem)}");
                     controller.CollapseItem(id, false);
                     Profiler.EndSample();
                 }
             }
             else
             {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: collapse all");
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
                 controller.CollapseAll();
                 Profiler.EndSample();
 
@@ -196,15 +235,19 @@ namespace Editor
                 {
                     var id = dictionary[data];
 
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: expand item");
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
                     controller.ExpandItem(id, false, false);
                     Profiler.EndSample();
                 }
             }
+
+            // the main cause of all that is that these newbies don't know how to use LINQ reasonably
         }
 
         private List<TreeViewItemData<T>> GetRootItems()
         {
+            // another damn fine struct from Unity with, among other things, everything useful being internal
+
             var list = new List<TreeViewItemData<T>>();
 
             if (Root is null)
@@ -257,7 +300,7 @@ namespace Editor
             return list;
         }
 
-        private class TreeNodeState
+        private sealed class TreeNodeState
         {
             public TreeNodeState(HashSet<T> collapsed, HashSet<T> expanded)
             {
