@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Unity.Extensions;
+using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
@@ -13,6 +13,8 @@ namespace Editor
         private readonly GenericTreeViewColumn<T>[] Columns;
 
         private T? Root;
+
+        private List<TreeViewItemData<T>>? RootItems;
 
         public GenericTreeView(GenericTreeViewColumn<T>[] columns)
         {
@@ -47,9 +49,9 @@ namespace Editor
 
             Root = node;
 
-            var items = GetRootItems();
+            RootItems = GetRootItems();
 
-            SetRootItems(items);
+            SetRootItems(RootItems);
 
             Rebuild();
         }
@@ -57,22 +59,24 @@ namespace Editor
         private void OnColumnSortingChanged()
             // BUG: Unity code monkeys raise this N headers + 2 times in a row... unless you hold a fucking modifier!
         {
+            Debug.Log(nameof(OnColumnSortingChanged));
+
             // deep sorting screws ids and thus expanded nodes, save this info to restore it later on new hierarchy
 
             Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SaveExpandedNodes)}");
-            SaveExpandedNodes(out var map1, out var map2);
+            var data = SaveExpandedNodes();
             Profiler.EndSample();
 
             Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(GetRootItems)}");
-            var items = GetRootItems();
+            RootItems = GetRootItems(); // NOTE: this sorts the items
             Profiler.EndSample();
 
             Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(SetRootItems)}");
-            SetRootItems(items);
+            SetRootItems(RootItems);
             Profiler.EndSample();
 
             Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(LoadExpandedNodes)}");
-            LoadExpandedNodes(map1, map2);
+            LoadExpandedNodes(data);
             Profiler.EndSample();
 
             Profiler.BeginSample($"{nameof(OnColumnSortingChanged)}: {nameof(RefreshItems)}");
@@ -80,82 +84,105 @@ namespace Editor
             Profiler.EndSample();
         }
 
-        private void SaveExpandedNodes(out IReadOnlyDictionary<object, int> map1, out IReadOnlyDictionary<int, bool> map2)
+        private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
         {
-            var dictionary1 = new Dictionary<object, int>();
-            var dictionary2 = new Dictionary<int, bool>();
+            var list = new List<TSource>();
 
-            var controller = viewController;
+            var stack = new Stack<TSource>();
 
-            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetAllItemIds)}");
-            var ids = controller.GetAllItemIds();
-            Profiler.EndSample();
-
-            foreach (var id in ids)
+            foreach (var source in collection)
             {
-                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetIndexForId)}");
-                var index = controller.GetIndexForId(id);
-                Profiler.EndSample();
-
-                if (index is -1)
-                    continue;
-
-                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.GetItemForIndex)}");
-                var key1 = controller.GetItemForIndex(index);
-                Profiler.EndSample();
-
-                Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: {nameof(controller.IsExpanded)}");
-                var key2 = controller.IsExpanded(id);
-                Profiler.EndSample();
-
-                dictionary1.Add(key1, id);
-                dictionary2.Add(id, key2);
+                stack.Push(source);
             }
 
-            map1 = new ReadOnlyDictionary<object, int>(dictionary1);
-            map2 = new ReadOnlyDictionary<int, bool>(dictionary2);
+            while (stack.Count > 0)
+            {
+                var pop = stack.Pop();
+
+                list.Add(pop);
+
+                foreach (var child in children(pop).Reverse())
+                {
+                    stack.Push(child);
+                }
+            }
+
+            return list;
         }
 
-        private void LoadExpandedNodes(IReadOnlyDictionary<object, int> map1, IReadOnlyDictionary<int, bool> map2)
+        private TreeNodeState SaveExpandedNodes()
         {
-            if (map1 == null)
-                throw new ArgumentNullException(nameof(map1));
-
-            if (map2 == null)
-                throw new ArgumentNullException(nameof(map2));
-
             var controller = viewController;
 
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
-            controller.CollapseAll();
-            Profiler.EndSample();
+            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
 
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetAllItemIds)}");
-            var ids = controller.GetAllItemIds();
-            Profiler.EndSample();
+            var items     = Flatten(RootItems!, s => s.children);
+            var collapsed = new HashSet<T>();
+            var expanded  = new HashSet<T>();
 
-            foreach (var id in ids)
+            foreach (var item in items)
             {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetIndexForId)}");
-                var index = controller.GetIndexForId(id);
-                Profiler.EndSample();
+                var data = item.data;
 
-                if (index is -1)
-                    continue;
-
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.GetItemForIndex)}");
-                var o = controller.GetItemForIndex(index);
-                Profiler.EndSample();
-
-                if (!map1.TryGetValue(o, out var i))
-                    continue;
-
-                if (!map2.TryGetValue(i, out var b))
-                    continue;
-
-                if (b)
+                if (controller.IsExpanded(item.id))
                 {
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
+                    expanded.Add(data);
+                }
+                else
+                {
+                    collapsed.Add(data);
+                }
+            }
+
+            Profiler.EndSample();
+
+            return new TreeNodeState(collapsed, expanded);
+        }
+
+        private void LoadExpandedNodes(TreeNodeState state)
+        {
+            var controller = viewController;
+
+            var expand = state.Expanded.Count > state.Collapsed.Count;
+
+            Debug.Log($"Expanded objects: {state.Expanded.Count}, " +
+                      $"Collapsed objects: {state.Collapsed.Count}, " +
+                      $"{nameof(expand)}: {(expand ? "<color=green>TRUE</color>" : "<color=red>FALSE</color>")}");
+
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: flatten items");
+            var items = Flatten(RootItems!, s => s.children);
+            Profiler.EndSample();
+
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: data -> id map");
+            var dictionary = items.ToDictionary(s => s.data, s => s.id);
+            Profiler.EndSample();
+
+            if (expand)
+            {
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: expand all");
+                controller.ExpandAll();
+                Profiler.EndSample();
+
+                foreach (var data in state.Collapsed)
+                {
+                    var id = dictionary[data];
+
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: collapse item");
+                    controller.CollapseItem(id, false);
+                    Profiler.EndSample();
+                }
+            }
+            else
+            {
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: collapse all");
+                controller.CollapseAll();
+                Profiler.EndSample();
+
+                foreach (var data in state.Expanded)
+                {
+                    var id = dictionary[data];
+
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: expand item");
                     controller.ExpandItem(id, false, false);
                     Profiler.EndSample();
                 }
@@ -214,6 +241,19 @@ namespace Editor
             }
 
             return list;
+        }
+
+        private class TreeNodeState
+        {
+            public TreeNodeState(HashSet<T> collapsed, HashSet<T> expanded)
+            {
+                Collapsed = collapsed ?? throw new ArgumentNullException(nameof(collapsed));
+                Expanded  = expanded ?? throw new ArgumentNullException(nameof(expanded));
+            }
+
+            public HashSet<T> Collapsed { get; }
+
+            public HashSet<T> Expanded { get; }
         }
     }
 }
