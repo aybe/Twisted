@@ -46,8 +46,8 @@ namespace Editor
             {
                 var column1 = new GenericTreeViewColumn<DMDNode>
                 {
-                    Title          = "Name",
-                    Name           = "Name",
+                    Title          = "Node",
+                    Name           = "Node",
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}",
