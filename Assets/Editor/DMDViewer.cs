@@ -37,7 +37,9 @@ namespace Editor
 
         private void OnEnable()
         {
-            TreeView = CreateTreeView();
+            TreeView                   =  CreateTreeView();
+            TreeView.selectionType     =  SelectionType.Single;
+            TreeView.onSelectionChange += OnTreeViewSelectionChange;
 
             [SuppressMessage("ReSharper", "UnusedParameter.Local")]
             static GenericTreeView<DMDNode> CreateTreeView()
@@ -120,7 +122,6 @@ namespace Editor
 
         private void OnDisable()
         {
-            //TreeView.columnSortingChanged -= OnTreeViewColumnSortingChanged;
             TreeView.Dispose();
         }
 
@@ -247,20 +248,7 @@ namespace Editor
                 treeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
             });
 
-            if (Model.DMDFactory != null)
-            {
-                InitializeTreeView();
-            }
-
-            // initialize controls' properties
-
-            ToolbarBreadcrumbsHost.visible = false;
-
-            TreeView.visible = false; // otherwise stupid tree NREs when not populated
-
-            TreeView.selectionType = SelectionType.Single;
-
-            TreeView.onSelectionChange += OnTreeViewSelectionChange;
+            InitializeTreeView();
         }
 
         private void InitializeModel()
@@ -289,19 +277,23 @@ namespace Editor
 
         private void InitializeTreeView()
         {
-            var dmd = Model.DMDFactory?.DMD ?? throw new InvalidOperationException();
+            var dmd = Model.DMDFactory?.DMD;
 
-            TreeView.sortColumnDescriptions.Clear();
+            if (dmd is not null)
+            {
+                TreeView.sortColumnDescriptions.Clear();
 
-            TreeView.CollapseAll();
+                TreeView.CollapseAll();
 
-            TreeView.SetRoot(dmd);
+                TreeView.SetRoot(dmd);
 
-            TreeView.visible = true;
+                TreeView.SelectNode(dmd, true, true);
+            }
 
-            ToolbarBreadcrumbsHost.visible = true;
+            var visible = dmd is not null; // stupid tree will NRE when clicked and is not populated
 
-            TreeView.SelectNode(dmd, true, true);
+            TreeView.visible               = visible;
+            ToolbarBreadcrumbsHost.visible = visible;
         }
 
         #region TreeView
