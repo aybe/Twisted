@@ -2,16 +2,21 @@
     flex-grow: 1;
 }
 
-.toolbar-button, .toolbar-toggle {
+.toolbar-button {
+    min-width: 27px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.toolbar-toggle {
     min-width: 27px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .toolbar-label {
-    font-size: 10px; 
-    margin-left: 2px; 
+    font-size: 10px;
+    margin-left: 2px;
     margin-right: 2px;
-    -unity-text-align: middle-left; 
+    -unity-text-align: middle-left;
 }
 
 .toolbar-toggle:checked:hover {
