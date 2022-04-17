@@ -30,3 +30,4 @@
 .unity-tree-view__item-content {
     flex-shrink: 1;
 }
+
