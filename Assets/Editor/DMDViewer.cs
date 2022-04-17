@@ -51,7 +51,7 @@ namespace Editor
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}",
-                    Width          = 200.0f
+                    MinWidth       = 200.0f
                 };
 
                 var column2 = new GenericTreeViewColumn<DMDNode>
@@ -61,7 +61,7 @@ namespace Editor
                     ValueGetter    = s => s.NodeType,
                     ValueComparer  = s => Comparer<uint>.Default,
                     ValueFormatter = s => s is uint u ? $"0x{(u >> 16) & 0xFFFF:X8}" : null,
-                    Width          = 100.0f
+                    MinWidth       = 60.0f
                 };
 
                 var column3 = new GenericTreeViewColumn<DMDNode>
@@ -71,7 +71,7 @@ namespace Editor
                     ValueGetter    = s => s.NodeType,
                     ValueComparer  = s => Comparer<uint>.Default,
                     ValueFormatter = s => s is uint u ? $"0x{(u >> 00) & 0xFFFF:X8}" : null,
-                    Width          = 100.0f
+                    MinWidth       = 60.0f
                 };
 
                 var column4 = new GenericTreeViewColumn<DMDNode>
@@ -81,7 +81,7 @@ namespace Editor
                     ValueGetter    = s => s.Position,
                     ValueComparer  = s => Comparer<long>.Default,
                     ValueFormatter = s => $"{s:N0}",
-                    Width          = 100.0f
+                    MinWidth       = 75.0f
                 };
 
                 var column5 = new GenericTreeViewColumn<DMDNode>
@@ -91,7 +91,7 @@ namespace Editor
                     ValueGetter    = s => s.Length,
                     ValueComparer  = s => Comparer<long>.Default,
                     ValueFormatter = s => $"{s:N0}",
-                    Width          = 100.0f
+                    MinWidth       = 75.0f
                 };
 
                 var column6 = new GenericTreeViewColumn<DMDNode>
@@ -101,7 +101,7 @@ namespace Editor
                     ValueGetter    = s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A",
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}",
-                    Width          = 200.0f
+                    MinWidth       = 200.0f
                 };
 
                 var columns = new[]
