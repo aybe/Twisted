@@ -60,7 +60,7 @@ namespace Editor
                     Name           = "Type 1",
                     ValueGetter    = s => s.NodeType,
                     ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{(u >> 16) & 0xFFFF:X8}" : null,
+                    ValueFormatter = s => s is uint u ? $"0x{(u >> 16) & 0xFFFF:X4}" : null,
                     MinWidth       = 60.0f
                 };
 
@@ -70,7 +70,7 @@ namespace Editor
                     Name           = "Type 2",
                     ValueGetter    = s => s.NodeType,
                     ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{(u >> 00) & 0xFFFF:X8}" : null,
+                    ValueFormatter = s => s is uint u ? $"0x{(u >> 00) & 0xFFFF:X4}" : null,
                     MinWidth       = 60.0f
                 };
 
