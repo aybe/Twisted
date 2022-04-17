@@ -363,7 +363,13 @@ namespace Editor
             }
 
             var node = BreadcrumbsNodes[index];
-            var id   = TreeView.GetItemId(node);
+
+            var id = TreeView.GetNodeId(node);
+
+            if (id is -1)
+            {
+                throw new InvalidOperationException();
+            }
 
             TreeView.SetSelectionByIdWithoutNotify(new[] { id });
             TreeView.ScrollToItemById(id);

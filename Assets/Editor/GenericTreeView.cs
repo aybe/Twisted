@@ -28,6 +28,8 @@ namespace Editor
     {
         private readonly GenericTreeViewColumn<T>[] Columns;
 
+        private Dictionary<T, int>? NodesDictionary;
+
         private T? Root;
 
         private List<TreeViewItemData<T>>? RootItems;
@@ -61,15 +63,12 @@ namespace Editor
             columnSortingChanged -= OnColumnSortingChanged;
         }
 
-        public int GetItemId(T node)
+        public int GetNodeId(T node)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            var items = Flatten(RootItems ?? throw new InvalidOperationException(), s => s.children);
-            var item  = items.Single(s => s.data == node);
-
-            return item.id;
+            return NodesDictionary is null ? -1 : NodesDictionary[node];
         }
 
         public void SetRoot(T? node)
@@ -84,6 +83,8 @@ namespace Editor
             Root = node;
 
             RootItems = GetRootItems();
+
+            NodesDictionary = Flatten(RootItems, s => s.children).ToDictionary(s => s.data, s => s.id);
 
             SetRootItems(RootItems);
 
