@@ -11,25 +11,24 @@ namespace Editor
         public string CurrentFile;
 
         [SerializeField]
-        private bool UseDistinctFiltering;
+        public bool UseDistinctFiltering;
+
+        public bool UseRegexSearch;
 
         [SerializeField]
-        private bool UseRegexSearch;
+        public bool UseSelectionFraming;
 
         [SerializeField]
-        private bool UseSelectionFraming;
+        public bool UseModelSplitting;
 
         [SerializeField]
-        private bool UseModelSplitting;
+        public bool UseTexturing;
 
         [SerializeField]
-        private bool UseTexturing;
+        public bool UseVertexColors;
 
         [SerializeField]
-        private bool UseVertexColors;
-
-        [SerializeField]
-        private bool UsePolygonColors;
+        public bool UsePolygonColors;
 
         public SerializedProperty CurrentFileProperty = null!;
 
