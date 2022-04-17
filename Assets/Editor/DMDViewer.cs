@@ -146,9 +146,23 @@ namespace Editor
             var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
             var toolbarLabelSearchResults      = root.Q<Label>("toolbarLabelSearchResults");
             var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
-            var toolbarSearchField             = root.Q<ToolbarSearchField>("toolbarSearchField");
+            var toolbarPopupSearchField        = root.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
 
             Breadcrumbs = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+
+            toolbarPopupSearchField.RegisterValueChangedCallback(evt =>
+            {
+                Debug.Log($"User typed '{evt.newValue}'.");
+            });
+
+            toolbarPopupSearchField.menu.AppendAction(
+                "Use Regex",
+                action =>
+                {
+                    Model.UseRegexSearch = !Model.UseRegexSearch;
+                },
+                action => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
+            );
 
             InitializeModel();
             InitializeWindowTitle();
