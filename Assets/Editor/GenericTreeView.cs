@@ -61,6 +61,17 @@ namespace Editor
             columnSortingChanged -= OnColumnSortingChanged;
         }
 
+        public int GetItemId(T node)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            var items = Flatten(RootItems ?? throw new InvalidOperationException(), s => s.children);
+            var item  = items.Single(s => s.data == node);
+
+            return item.id;
+        }
+
         public void SetRoot(T? node)
         {
             // the stupid tree view will greet with you a NullReferenceException when you

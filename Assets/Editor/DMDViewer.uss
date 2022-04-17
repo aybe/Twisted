@@ -31,3 +31,7 @@
     flex-shrink: 1;
 }
 
+.unity-toolbar-breadcrumbs__item {
+    flex-shrink: 0;
+    width: 100px;
+}

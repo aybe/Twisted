@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using Twisted.Graphics;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -147,6 +148,8 @@ namespace Editor
             var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
             var toolbarSearchField             = root.Q<ToolbarSearchField>("toolbarSearchField");
 
+            Breadcrumbs = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+
             InitializeModel();
             InitializeWindowTitle();
 
@@ -233,6 +236,10 @@ namespace Editor
             {
                 InitializeTreeView();
             }
+
+            treeView.selectionType = SelectionType.Single;
+
+            treeView.onSelectionChange += OnTreeViewSelectionChange;
         }
 
         private void InitializeModel()
@@ -269,5 +276,85 @@ namespace Editor
 
             TreeView.SetRoot(dmd);
         }
+
+        #region TreeView
+
+        private void OnTreeViewSelectionChange(IEnumerable<object> objects)
+        {
+            UpdateBreadcrumbs(objects);
+        }
+
+        #endregion
+
+        #region Breadcrumbs
+
+        private ToolbarBreadcrumbs Breadcrumbs = null!;
+
+        private readonly List<DMDNode> BreadcrumbsNodes = new();
+
+        private void OnBreadcrumbsItemClick(ClickEvent evt)
+        {
+            UpdateBreadcrumbsItem(evt);
+        }
+
+        private void UpdateBreadcrumbs(IEnumerable<object> objects)
+        {
+            for (var i = 0; i < Breadcrumbs.childCount; i++)
+            {
+                var element = Breadcrumbs.ElementAt(i);
+                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+            }
+
+            while (Breadcrumbs.childCount > 0)
+            {
+                Breadcrumbs.PopItem();
+                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
+            }
+
+            var current = objects.Single() as DMDNode;
+
+            while (current != null)
+            {
+                BreadcrumbsNodes.Insert(0, current);
+                current = current.Parent as DMDNode;
+            }
+
+            foreach (var node in BreadcrumbsNodes)
+            {
+                Breadcrumbs.PushItem($"0x{node.NodeType:X8}");
+            }
+
+            for (var i = 0; i < Breadcrumbs.childCount; i++)
+            {
+                var element = Breadcrumbs.ElementAt(i);
+                element.RegisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+            }
+        }
+
+        private void UpdateBreadcrumbsItem(ClickEvent evt)
+        {
+            if (evt == null)
+                throw new ArgumentNullException(nameof(evt));
+
+            var target = evt.target as VisualElement ?? throw new InvalidOperationException();
+            var parent = target.parent;
+            var index  = parent.IndexOf(target);
+
+            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
+            {
+                var element = parent.ElementAt(i);
+                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+                Breadcrumbs.PopItem();
+                BreadcrumbsNodes.RemoveAt(i);
+            }
+
+            var node = BreadcrumbsNodes[index];
+            var id   = TreeView.GetItemId(node);
+
+            TreeView.SetSelectionByIdWithoutNotify(new[] { id });
+            TreeView.ScrollToItemById(id);
+        }
+
+        #endregion
     }
 }

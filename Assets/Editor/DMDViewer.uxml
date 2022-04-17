@@ -14,6 +14,9 @@
             <ui:Label tabindex="-1" text="sample text" display-tooltip-when-elided="true" name="toolbarLabelSearchResults" class="toolbar-label" />
             <uie:ToolbarSearchField name="toolbarSearchField" class="toolbar-search-field" />
         </uie:Toolbar>
+        <uie:Toolbar>
+            <uie:ToolbarBreadcrumbs name="toolbarBreadcrumbs" />
+        </uie:Toolbar>
         <ui:VisualElement name="TreeViewHost" style="flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>
