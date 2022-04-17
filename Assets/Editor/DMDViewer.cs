@@ -148,7 +148,8 @@ namespace Editor
             var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
             var toolbarPopupSearchField        = root.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
 
-            Breadcrumbs = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+            ToolbarBreadcrumbsHost = root.Q<Toolbar>("toolbarBreadcrumbsHost");
+            ToolbarBreadcrumbs     = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
 
             toolbarPopupSearchField.RegisterValueChangedCallback(evt =>
             {
@@ -251,9 +252,15 @@ namespace Editor
                 InitializeTreeView();
             }
 
-            treeView.selectionType = SelectionType.Single;
+            // initialize controls' properties
 
-            treeView.onSelectionChange += OnTreeViewSelectionChange;
+            ToolbarBreadcrumbsHost.visible = false;
+
+            TreeView.visible = false; // otherwise stupid tree NREs when not populated
+
+            TreeView.selectionType = SelectionType.Single;
+
+            TreeView.onSelectionChange += OnTreeViewSelectionChange;
         }
 
         private void InitializeModel()
@@ -289,6 +296,10 @@ namespace Editor
             TreeView.CollapseAll();
 
             TreeView.SetRoot(dmd);
+
+            TreeView.visible = true;
+
+            ToolbarBreadcrumbsHost.visible = true;
         }
 
         #region TreeView
@@ -302,7 +313,9 @@ namespace Editor
 
         #region Breadcrumbs
 
-        private ToolbarBreadcrumbs Breadcrumbs = null!;
+        private Toolbar ToolbarBreadcrumbsHost = null!;
+
+        private ToolbarBreadcrumbs ToolbarBreadcrumbs = null!;
 
         private readonly List<DMDNode> BreadcrumbsNodes = new();
 
@@ -313,15 +326,15 @@ namespace Editor
 
         private void UpdateBreadcrumbs(IEnumerable<object> objects)
         {
-            for (var i = 0; i < Breadcrumbs.childCount; i++)
+            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
             {
-                var element = Breadcrumbs.ElementAt(i);
+                var element = ToolbarBreadcrumbs.ElementAt(i);
                 element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
             }
 
-            while (Breadcrumbs.childCount > 0)
+            while (ToolbarBreadcrumbs.childCount > 0)
             {
-                Breadcrumbs.PopItem();
+                ToolbarBreadcrumbs.PopItem();
                 BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
             }
 
@@ -335,12 +348,12 @@ namespace Editor
 
             foreach (var node in BreadcrumbsNodes)
             {
-                Breadcrumbs.PushItem($"0x{node.NodeType:X8}");
+                ToolbarBreadcrumbs.PushItem($"0x{node.NodeType:X8}");
             }
 
-            for (var i = 0; i < Breadcrumbs.childCount; i++)
+            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
             {
-                var element = Breadcrumbs.ElementAt(i);
+                var element = ToolbarBreadcrumbs.ElementAt(i);
                 element.RegisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
             }
         }
@@ -358,7 +371,7 @@ namespace Editor
             {
                 var element = parent.ElementAt(i);
                 element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
-                Breadcrumbs.PopItem();
+                ToolbarBreadcrumbs.PopItem();
                 BreadcrumbsNodes.RemoveAt(i);
             }
 

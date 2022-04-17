@@ -73,13 +73,6 @@ namespace Editor
 
         public void SetRoot(T? node)
         {
-            // the stupid tree view will greet with you a NullReferenceException when you
-            // click anywhere on it and it hasn't yet been populated with tree view items
-
-            // instead of showing lonesome headers, hide it entirely, this is the best UX
-
-            visible = node is not null;
-
             Root = node;
 
             RootItems = GetRootItems();
