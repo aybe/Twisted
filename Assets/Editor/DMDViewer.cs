@@ -300,6 +300,8 @@ namespace Editor
             TreeView.visible = true;
 
             ToolbarBreadcrumbsHost.visible = true;
+
+            TreeView.SelectNode(dmd, true, true);
         }
 
         #region TreeView
@@ -377,15 +379,7 @@ namespace Editor
 
             var node = BreadcrumbsNodes[index];
 
-            var id = TreeView.GetNodeId(node);
-
-            if (id is -1)
-            {
-                throw new InvalidOperationException();
-            }
-
-            TreeView.SetSelectionByIdWithoutNotify(new[] { id });
-            TreeView.ScrollToItemById(id);
+            TreeView.SelectNode(node, true, true);
         }
 
         #endregion

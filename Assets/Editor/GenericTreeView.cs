@@ -305,6 +305,33 @@ namespace Editor
             return list;
         }
 
+        public void SelectNode(T node, bool notify, bool scroll)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            var id = GetNodeId(node);
+
+            if (id is -1)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (notify)
+            {
+                SetSelectionById(id);
+            }
+            else
+            {
+                SetSelectionByIdWithoutNotify(new[] { id });
+            }
+
+            if (scroll)
+            {
+                ScrollToItemById(id);
+            }
+        }
+
         private sealed class TreeNodeState
         {
             public TreeNodeState(HashSet<T> collapsed, HashSet<T> expanded)
