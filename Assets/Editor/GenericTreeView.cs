@@ -13,7 +13,7 @@ namespace Editor
 
     // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
     // it's also unbelievably buggy but from them this isn't a surprise at all...
-    
+
     // it looks like it's been inspired from IMGUI since the same silly design
     // forces one to roll-out surprisingly similar fixes for it to work right
     // at least the IMGUI version was fast even though it was a pain to use...
@@ -75,7 +75,7 @@ namespace Editor
         {
             // the stupid tree view will greet with you a NullReferenceException when you
             // click anywhere on it and it hasn't yet been populated with tree view items
-            
+
             // instead of showing lonesome headers, hide it entirely, this is the best UX
 
             visible = node is not null;
