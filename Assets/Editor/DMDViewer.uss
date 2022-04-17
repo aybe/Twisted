@@ -27,6 +27,11 @@
     flex-grow: 1;
 }
 
+.unity-multi-column-header__column__content {
+    margin-left: 3px;
+    margin-bottom: 3px;
+}
+
 .unity-tree-view__item-content {
     flex-shrink: 1;
 }
