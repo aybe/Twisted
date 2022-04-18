@@ -145,9 +145,9 @@ namespace Editor
             var toolbarToggleTexturing         = root.Q<ToolbarToggle>("toolbarToggleTexturing");
             var toolbarToggleVertexColors      = root.Q<ToolbarToggle>("toolbarToggleVertexColors");
             var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
-            var toolbarLabelSearchResults      = root.Q<Label>("toolbarLabelSearchResults");
-            var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
-           
+            ToolbarSearchResults = root.Q<Label>("toolbarLabelSearchResults");
+            var toolbarSliderItemHeight = root.Q<SliderInt>("toolbarSliderItemHeight");
+
             ToolbarBreadcrumbsHost = root.Q<Toolbar>("toolbarBreadcrumbsHost");
             ToolbarBreadcrumbs     = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
 
@@ -237,22 +237,6 @@ namespace Editor
             InitializeTreeView();
         }
 
-        private void InitializeSearch()
-        {
-            var field = rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
-
-            field.RegisterValueChangedCallback(evt =>
-            {
-                TreeView.SetSearchFilter(evt.newValue);
-            });
-
-            field.menu.AppendAction(
-                "Use Regex",
-                _ => { Model.UseRegexSearch = !Model.UseRegexSearch; },
-                _ => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
-            );
-        }
-
         private void InitializeModel()
         {
             if (Model == null)
@@ -303,6 +287,64 @@ namespace Editor
         private void OnTreeViewSelectionChange(IEnumerable<object> objects)
         {
             UpdateBreadcrumbs(objects);
+        }
+
+        #endregion
+
+        #region Search
+
+        private Label ToolbarSearchResults = null!;
+
+        private void InitializeSearch()
+        {
+            var field = rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
+
+            field.RegisterValueChangedCallback(evt =>
+            {
+                var element = evt.target as VisualElement ?? throw new InvalidOperationException();
+
+                var valid = TreeView.IsSearchPatternValid(evt.newValue);
+
+                if (valid)
+                {
+                    element.style.borderBottomColor = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                    element.style.borderLeftColor   = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                    element.style.borderRightColor  = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                    element.style.borderTopColor    = new StyleColor(new Color32(0xA0, 0xA0, 0xA0, 0xFF));
+                }
+                else
+                {
+                    element.style.borderBottomColor = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                    element.style.borderLeftColor   = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                    element.style.borderRightColor  = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                    element.style.borderTopColor    = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                }
+
+                if (valid)
+                {
+                    RemoveNotification();
+                }
+                else
+                {
+                    ShowNotification(EditorGUIUtility.TrTempContent("Search pattern is not valid."));
+                }
+
+                if (valid)
+                {
+                    TreeView.SetSearchFilter(evt.newValue);
+                }
+
+                ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
+            });
+
+            field.menu.AppendAction(
+                "Use Regex",
+                _ =>
+                {
+                    Model.UseRegexSearch = !Model.UseRegexSearch;
+                },
+                _ => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
+            );
         }
 
         #endregion

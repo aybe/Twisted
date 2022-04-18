@@ -371,6 +371,31 @@ namespace Editor
             }
         }
 
+        public int GetRowCount()
+        {
+            return NodesDictionary?.Count ?? throw new InvalidOperationException();
+        }
+
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public bool IsSearchPatternValid(string pattern)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+            {
+                return true;
+            }
+
+            try
+            {
+                new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public void SelectNode(T node, bool notify, bool scroll)
         {
             if (node == null)
