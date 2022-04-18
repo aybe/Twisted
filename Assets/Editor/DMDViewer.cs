@@ -217,11 +217,42 @@ namespace Editor
             TreeView.onSelectionChange += OnTreeViewSelectionChange;
         }
 
-        #region TreeView
+        #region Event handlers
 
         private void OnTreeViewSelectionChange(IEnumerable<object> objects)
         {
-            UpdateBreadcrumbs(objects);
+            // update breadcrumbs: clicking, elements, node stack
+
+            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
+            {
+                var element = ToolbarBreadcrumbs.ElementAt(i);
+                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+            }
+
+            while (ToolbarBreadcrumbs.childCount > 0)
+            {
+                ToolbarBreadcrumbs.PopItem();
+                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
+            }
+
+            var current = objects.Single() as DMDNode;
+
+            while (current != null)
+            {
+                BreadcrumbsNodes.Insert(0, current);
+                current = current.Parent as DMDNode;
+            }
+
+            foreach (var node in BreadcrumbsNodes)
+            {
+                ToolbarBreadcrumbs.PushItem($"0x{node.NodeType:X8}");
+            }
+
+            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
+            {
+                var element = ToolbarBreadcrumbs.ElementAt(i);
+                element.RegisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+            }
         }
 
         #endregion
@@ -295,40 +326,6 @@ namespace Editor
         private void OnBreadcrumbsItemClick(ClickEvent evt)
         {
             UpdateBreadcrumbsItem(evt);
-        }
-
-        private void UpdateBreadcrumbs(IEnumerable<object> objects)
-        {
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
-            }
-
-            while (ToolbarBreadcrumbs.childCount > 0)
-            {
-                ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
-            }
-
-            var current = objects.Single() as DMDNode;
-
-            while (current != null)
-            {
-                BreadcrumbsNodes.Insert(0, current);
-                current = current.Parent as DMDNode;
-            }
-
-            foreach (var node in BreadcrumbsNodes)
-            {
-                ToolbarBreadcrumbs.PushItem($"0x{node.NodeType:X8}");
-            }
-
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.RegisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
-            }
         }
 
         private void UpdateBreadcrumbsItem(ClickEvent evt)
