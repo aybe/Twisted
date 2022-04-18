@@ -26,6 +26,9 @@ namespace Editor
         // BUG horizontal scroll bar flickers and partially hides selected item at bottom
         // BUG 
         // BUG multi-column sort destroys expand state
+        // BUG 
+        // BUG when sorting, selected item is lost
+        // BUG 
     {
         [SerializeField]
         private DMDViewerModel Model = null!;
@@ -33,18 +36,13 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private GenericTreeView<DMDNode> TreeView = null!;
-
-        private void OnEnable()
-        {
-            TreeView                   =  new GenericTreeView<DMDNode>(DMDViewerTreeView.GetColumns());
-            TreeView.selectionType     =  SelectionType.Single;
-            TreeView.onSelectionChange += OnTreeViewSelectionChange;
-        }
+        private DMDTreeView TreeView => rootVisualElement.Q<DMDTreeView>();
 
         private void OnDisable()
         {
-            TreeView.Dispose();
+            TreeView.onSelectionChange -= OnTreeViewSelectionChange;
+
+            TreeView.Dispose(); // for columns callback
         }
 
         [SuppressMessage("ReSharper", "UnusedVariable")]
@@ -76,6 +74,10 @@ namespace Editor
             InitializeModel();
             InitializeSearch();
             InitializeWindowTitle();
+
+            TreeView.SetColumns(DMDTreeView.GetColumns());
+
+            TreeView.onSelectionChange += OnTreeViewSelectionChange;
 
             toolbarButtonOpenFile.clicked += () =>
             {
@@ -130,10 +132,7 @@ namespace Editor
 
             root.Bind(Model.SerializedObject);
 
-            root.Q("TreeViewHost").Add(TreeView);
-
             var searchField = root.Q<ToolbarSearchField>();
-            var treeView    = TreeView;
 
             root.RegisterCallback<KeyDownEvent>(evt =>
             {
@@ -153,7 +152,7 @@ namespace Editor
                 if (evt.keyCode is not KeyCode.DownArrow)
                     return;
 
-                treeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
+                TreeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
             });
 
             InitializeTreeView();
@@ -185,22 +184,35 @@ namespace Editor
 
         private void InitializeTreeView()
         {
+            // set defaults right from here instead from within UXML as it's already complex enough...
+
+            if (TreeView.selectionType is not SelectionType.Single)
+                TreeView.selectionType = SelectionType.Single;
+
+            if (TreeView.sortingEnabled is false)
+                TreeView.sortingEnabled = true;
+
+            // try populate the tree
+
             var dmd = Model.DMDFactory?.DMD;
+
+            TreeView.SetRoot(dmd); // more subtle than you think: it initializes their internal shit
+
+            TreeView.sortColumnDescriptions.Clear(); // clean up garbage from previous file, if any
+
+            TreeView.CollapseAll(); // also but stupid method NRE unless root is set, hence why here
 
             if (dmd is not null)
             {
-                TreeView.sortColumnDescriptions.Clear();
-
-                TreeView.CollapseAll();
-
-                TreeView.SetRoot(dmd);
-
-                TreeView.SelectNode(dmd, true, true);
+                TreeView.SelectNode(dmd, true, true); // get breadcrumbs to show or UI will look bad
             }
 
-            var visible = dmd is not null; // stupid tree will NRE when clicked and is not populated
+            // show or hide depending DMD, because dumb ass tree will NRE when clicked but is empty
 
-            TreeView.visible               = visible;
+            var visible = dmd is not null;
+
+            TreeView.visible = visible;
+
             ToolbarBreadcrumbsHost.visible = visible;
         }
 

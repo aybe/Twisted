@@ -28,7 +28,7 @@ namespace Editor
 
     public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     {
-        private readonly GenericTreeViewColumn<T>[] Columns;
+        private GenericTreeViewColumn<T>[]? Columns;
 
         private Dictionary<T, int>? NodesDictionary;
 
@@ -38,33 +38,32 @@ namespace Editor
 
         private Task? SortingTask;
 
-        public GenericTreeView(GenericTreeViewColumn<T>[] columns)
-        {
-            if (columns == null)
-                throw new ArgumentNullException(nameof(columns));
-
-            if (columns.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(columns));
-
-            Columns = columns;
-
-            foreach (var column in columns)
-            {
-                this.columns.Add(column.GetColumn());
-            }
-
-            sortingEnabled = true;
-
-            columnSortingChanged += OnColumnSortingChanged;
-
-            SetRoot(null); // good old habits prevail at Unity, this initializes their internal shit
-        }
-
         private string? SearchFilter { get; set; }
 
         public void Dispose()
         {
             columnSortingChanged -= OnColumnSortingChanged;
+        }
+
+        public void SetColumns(GenericTreeViewColumn<T>[] collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (collection.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(collection));
+
+            columnSortingChanged -= OnColumnSortingChanged;
+
+            foreach (var column in collection)
+            {
+                columns.Add(column.GetColumn());
+            }
+
+
+            columnSortingChanged += OnColumnSortingChanged;
+
+            Columns = collection;
         }
 
         public void SetSearchFilter(string? searchFilter)
@@ -268,6 +267,11 @@ namespace Editor
         private List<TreeViewItemData<T>> GetRootItems()
         {
             // another damn fine struct from Unity with, among other things, everything useful being internal
+
+            if (Columns is null)
+            {
+                return new List<TreeViewItemData<T>>();
+            }
 
             var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
             var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
