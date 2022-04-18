@@ -58,8 +58,6 @@ namespace Editor
             TreeView.Dispose(); // for columns callback
         }
 
-        [SuppressMessage("ReSharper", "UnusedVariable")]
-        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public void CreateGUI()
         {
             var root = rootVisualElement;
@@ -71,56 +69,12 @@ namespace Editor
             root.Add(container);
 
             var toolbarButtonOpenFile          = root.Q<ToolbarButton>("toolbarButtonOpenFile");
-            var toolbarToggleDistinctFiltering = root.Q<ToolbarToggle>("toolbarToggleDistinctFiltering");
-            var toolbarToggleSelectionFraming  = root.Q<ToolbarToggle>("toolbarToggleSelectionFraming");
-            var toolbarToggleModelSplitting    = root.Q<ToolbarToggle>("toolbarToggleModelSplitting");
-            var toolbarToggleTexturing         = root.Q<ToolbarToggle>("toolbarToggleTexturing");
-            var toolbarToggleVertexColors      = root.Q<ToolbarToggle>("toolbarToggleVertexColors");
-            var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
-
             InitializeModel();
             InitializeSearch();
 
             InitializeTreeView();
 
             toolbarButtonOpenFile.clicked += OnToolbarOpenFile;
-
-            toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
-
-            toolbarToggleDistinctFiltering.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarToggleSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
-
-            toolbarToggleSelectionFraming.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarToggleModelSplitting.BindProperty(Model.UseModelSplittingProperty);
-
-            toolbarToggleModelSplitting.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarToggleTexturing.BindProperty(Model.UseTexturingProperty);
-
-            toolbarToggleTexturing.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarToggleVertexColors.BindProperty(Model.UseVertexColorsProperty);
-
-            toolbarToggleVertexColors.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarTogglePolygonColoring.BindProperty(Model.UsePolygonColorsProperty);
-
-            toolbarTogglePolygonColoring.RegisterValueChangedCallback(evt =>
-            {
-            });
-
             // TODO other properties
 
             root.Bind(Model.SerializedObject);
