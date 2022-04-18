@@ -37,87 +37,9 @@ namespace Editor
 
         private void OnEnable()
         {
-            TreeView                   =  CreateTreeView();
+            TreeView                   =  new GenericTreeView<DMDNode>(DMDViewerTreeView.GetColumns());
             TreeView.selectionType     =  SelectionType.Single;
             TreeView.onSelectionChange += OnTreeViewSelectionChange;
-
-            [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-            static GenericTreeView<DMDNode> CreateTreeView()
-            {
-                var column1 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Node",
-                    Name           = "Node",
-                    ValueGetter    = s => s.GetType().Name,
-                    ValueComparer  = s => Comparer<string>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 200.0f
-                };
-
-                var column2 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Type 1",
-                    Name           = "Type 1",
-                    ValueGetter    = s => (s.NodeType >> 16) & 0xFFFF,
-                    ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
-                    MinWidth       = 60.0f
-                };
-
-                var column3 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Type 2",
-                    Name           = "Type 2",
-                    ValueGetter    = s => (s.NodeType >> 00) & 0xFFFF,
-                    ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
-                    MinWidth       = 60.0f
-                };
-
-                var column4 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Position",
-                    Name           = "Position",
-                    ValueGetter    = s => s.Position,
-                    ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 75.0f
-                };
-
-                var column5 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Length",
-                    Name           = "Length",
-                    ValueGetter    = s => s.Length,
-                    ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 75.0f
-                };
-
-                var column6 = new GenericTreeViewColumn<DMDNode>
-                {
-                    Title          = "Polygons",
-                    Name           = "Polygons",
-                    ValueGetter    = s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A",
-                    ValueComparer  = s => Comparer<string>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 200.0f
-                };
-
-                var columns = new[]
-                {
-                    column1,
-                    column2,
-                    column3,
-                    column4,
-                    column5,
-                    column6
-                };
-
-                var treeView = new GenericTreeView<DMDNode>(columns); // BUG stepping out on this will crash Unity LOL!
-
-                return treeView;
-            }
         }
 
         private void OnDisable()
