@@ -78,7 +78,6 @@ namespace Editor
             var toolbarToggleTexturing         = root.Q<ToolbarToggle>("toolbarToggleTexturing");
             var toolbarToggleVertexColors      = root.Q<ToolbarToggle>("toolbarToggleVertexColors");
             var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
-            var toolbarSliderItemHeight = root.Q<SliderInt>("toolbarSliderItemHeight");
 
             InitializeModel();
             InitializeSearch();
