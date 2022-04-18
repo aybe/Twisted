@@ -344,10 +344,11 @@ namespace Editor
                         var s = column.ValueFormatter?.Invoke(o);
                         var b = s?.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase);
 
-                        if (b is true)
-                        {
-                            list.Add(new TreeViewItemData<T>(id++, pop));
-                        }
+                        if (b is false)
+                            continue;
+
+                        nodes.Add(pop);
+                        break;
                     }
 
                     foreach (var child in pop.Cast<T>().Reverse())
