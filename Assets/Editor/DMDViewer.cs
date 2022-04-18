@@ -36,6 +36,9 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
+        private ToolbarButton ToolbarButtonOpenFile =>
+            rootVisualElement.Q<ToolbarButton>("toolbarButtonOpenFile");
+
         private Label ToolbarSearchResults =>
             rootVisualElement.Q<Label>("toolbarLabelSearchResults");
 
@@ -68,38 +71,21 @@ namespace Editor
 
             root.Add(container);
 
-            var toolbarButtonOpenFile          = root.Q<ToolbarButton>("toolbarButtonOpenFile");
             InitializeModel();
             InitializeSearch();
-
+            InitializeToolbar();
             InitializeTreeView();
 
-            toolbarButtonOpenFile.clicked += OnToolbarOpenFile;
             // TODO other properties
 
             root.Bind(Model.SerializedObject);
-
-            var searchField = root.Q<ToolbarSearchField>();
 
             root.RegisterCallback<KeyDownEvent>(evt =>
             {
                 if (evt.keyCode is KeyCode.F && evt.ctrlKey)
                 {
-                    searchField.Focus();
+                    ToolbarSearchField.Focus();
                 }
-            });
-
-            searchField.RegisterValueChangedCallback(evt =>
-            {
-                Debug.Log(evt.newValue); // TODO update tree view
-            });
-
-            searchField.RegisterCallback<KeyDownEvent>(evt =>
-            {
-                if (evt.keyCode is not KeyCode.DownArrow)
-                    return;
-
-                TreeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
             });
 
             UpdateTreeViewAndBreadcrumbs();
@@ -156,6 +142,13 @@ namespace Editor
             };
         }
 
+        private void InitializeToolbar()
+        {
+            ToolbarButtonOpenFile.clicked += OnToolbarOpenFile;
+
+            ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
+        }
+
         private void InitializeTreeView()
         {
             TreeView.selectionType = SelectionType.Single;
@@ -174,6 +167,14 @@ namespace Editor
             Model.OpenFile();
             UpdateTreeViewAndBreadcrumbs();
             UpdateWindowTitle();
+        }
+
+        private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
+        {
+            if (evt.keyCode is not KeyCode.DownArrow)
+                return;
+
+            TreeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
         }
 
         private void OnToolbarSearchFieldValueChanged(ChangeEvent<string> evt)
