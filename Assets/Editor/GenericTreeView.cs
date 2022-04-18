@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -262,9 +263,13 @@ namespace Editor
             // the main cause of all that is that these newbies don't know how to use LINQ reasonably
         }
 
+        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
         private List<TreeViewItemData<T>> GetRootItems()
         {
             // another damn fine struct from Unity with, among other things, everything useful being internal
+
+            var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
+            var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
 
             if (string.IsNullOrWhiteSpace(SearchFilter))
             {
@@ -279,9 +284,6 @@ namespace Editor
 
                 stack.Push((Root, null));
 
-                var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
-
-                var dictionary = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
 
                 var id = 0;
 
@@ -321,18 +323,13 @@ namespace Editor
             }
             else
             {
-                var list = new List<TreeViewItemData<T>>();
-
                 if (Root is null)
                 {
-                    return list;
+                    return new List<TreeViewItemData<T>>();
                 }
 
-                var stack = new Stack<T>();
-
-                stack.Push(Root);
-
-                var id = 0;
+                var nodes = new List<T>();
+                var stack = new Stack<T>(new[] { Root });
 
                 while (stack.Count > 0)
                 {
@@ -357,7 +354,18 @@ namespace Editor
                     }
                 }
 
-                return list; // TODO sort items
+                var sort = nodes.AsEnumerable();
+
+                foreach (var description in descriptions)
+                {
+                    var column = dictionary[description.columnName];
+                    var getter = column.ValueGetter ?? throw new InvalidOperationException();
+                    var order  = description.direction is SortDirection.Descending;
+
+                    sort = sort.Sort(getter, null, order);
+                }
+
+                return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
             }
         }
 
