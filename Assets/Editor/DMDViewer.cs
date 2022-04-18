@@ -58,9 +58,9 @@ namespace Editor
                 {
                     Title          = "Type 1",
                     Name           = "Type 1",
-                    ValueGetter    = s => s.NodeType,
+                    ValueGetter    = s => (s.NodeType >> 16) & 0xFFFF,
                     ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{(u >> 16) & 0xFFFF:X4}" : null,
+                    ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
                     MinWidth       = 60.0f
                 };
 
@@ -68,9 +68,9 @@ namespace Editor
                 {
                     Title          = "Type 2",
                     Name           = "Type 2",
-                    ValueGetter    = s => s.NodeType,
+                    ValueGetter    = s => (s.NodeType >> 00) & 0xFFFF,
                     ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{(u >> 00) & 0xFFFF:X4}" : null,
+                    ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
                     MinWidth       = 60.0f
                 };
 
