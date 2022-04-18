@@ -13,8 +13,6 @@ namespace Editor
         [SerializeField]
         public bool UseDistinctFiltering;
 
-        public bool UseRegexSearch;
-
         [SerializeField]
         public bool UseSelectionFraming;
 
@@ -40,8 +38,6 @@ namespace Editor
 
         public SerializedProperty UsePolygonColorsProperty = null!;
 
-        public SerializedProperty UseRegexSearchProperty = null!;
-
         public SerializedProperty UseSelectionFramingProperty = null!;
 
         public SerializedProperty UseTexturingProperty = null!;
@@ -56,7 +52,6 @@ namespace Editor
 
             CurrentFileProperty          = SerializedObject.FindProperty(nameof(CurrentFile));
             UseDistinctFilteringProperty = SerializedObject.FindProperty(nameof(UseDistinctFiltering));
-            UseRegexSearchProperty       = SerializedObject.FindProperty(nameof(UseRegexSearch));
             UseSelectionFramingProperty  = SerializedObject.FindProperty(nameof(UseSelectionFraming));
             UseModelSplittingProperty    = SerializedObject.FindProperty(nameof(UseModelSplitting));
             UseTexturingProperty         = SerializedObject.FindProperty(nameof(UseTexturing));

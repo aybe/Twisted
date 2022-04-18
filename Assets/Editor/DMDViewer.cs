@@ -36,19 +36,19 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private Label ToolbarSearchResults => 
+        private Label ToolbarSearchResults =>
             rootVisualElement.Q<Label>("toolbarLabelSearchResults");
 
-        private ToolbarPopupSearchField ToolbarSearchField =>
-            rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
+        private ToolbarSearchField ToolbarSearchField =>
+            rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
 
-        private Toolbar ToolbarBreadcrumbsHost => 
+        private Toolbar ToolbarBreadcrumbsHost =>
             rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
 
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs => 
+        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
             rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
 
-        private DMDTreeView TreeView => 
+        private DMDTreeView TreeView =>
             rootVisualElement.Q<DMDTreeView>();
 
         private void OnDisable()
@@ -72,7 +72,6 @@ namespace Editor
 
             var toolbarButtonOpenFile          = root.Q<ToolbarButton>("toolbarButtonOpenFile");
             var toolbarToggleDistinctFiltering = root.Q<ToolbarToggle>("toolbarToggleDistinctFiltering");
-            var toolbarToggleRegexSearch       = root.Q<ToolbarToggle>("toolbarToggleRegexSearch");
             var toolbarToggleSelectionFraming  = root.Q<ToolbarToggle>("toolbarToggleSelectionFraming");
             var toolbarToggleModelSplitting    = root.Q<ToolbarToggle>("toolbarToggleModelSplitting");
             var toolbarToggleTexturing         = root.Q<ToolbarToggle>("toolbarToggleTexturing");
@@ -94,12 +93,6 @@ namespace Editor
             toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
 
             toolbarToggleDistinctFiltering.RegisterValueChangedCallback(evt =>
-            {
-            });
-
-            toolbarToggleRegexSearch.BindProperty(Model.UseRegexSearchProperty);
-
-            toolbarToggleRegexSearch.RegisterValueChangedCallback(evt =>
             {
             });
 
@@ -329,15 +322,6 @@ namespace Editor
 
                 ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
             });
-
-            ToolbarSearchField.menu.AppendAction(
-                "Use Regex",
-                _ =>
-                {
-                    Model.UseRegexSearch = !Model.UseRegexSearch;
-                },
-                _ => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
-            );
         }
 
         #endregion
