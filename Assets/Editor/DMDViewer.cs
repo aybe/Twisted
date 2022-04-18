@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Graphics;
@@ -36,29 +35,9 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private ToolbarButton ToolbarButtonOpenFile =>
-            rootVisualElement.Q<ToolbarButton>("toolbarButtonOpenFile");
-
-        private Label ToolbarSearchResults =>
-            rootVisualElement.Q<Label>("toolbarLabelSearchResults");
-
-        private ToolbarSearchField ToolbarSearchField =>
-            rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
-
-        private Toolbar ToolbarBreadcrumbsHost =>
-            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
-
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
-            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
-
-        private DMDTreeView TreeView =>
-            rootVisualElement.Q<DMDTreeView>();
-
         private void OnDisable()
         {
-            TreeView.onSelectionChange -= OnTreeViewSelectionChange;
-
-            TreeView.Dispose(); // for columns callback
+            CleanupTreeView();
         }
 
         public void CreateGUI()
@@ -68,8 +47,40 @@ namespace Editor
             InitializeToolbar();
             InitializeTreeView();
 
-            UpdateTreeViewAndBreadcrumbs();
-            UpdateWindowTitle();
+            UpdateControls();
+            UpdateTitle();
+        }
+
+        #region Controls
+
+        private ToolbarButton ToolbarOpenFileButton =>
+            rootVisualElement.Q<ToolbarButton>("toolbarOpenFileButton");
+
+        private Label ToolbarSearchLabel =>
+            rootVisualElement.Q<Label>("toolbarSearchLabel");
+
+        private ToolbarSearchField ToolbarSearchField =>
+            rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
+
+        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
+            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+
+        private Toolbar ToolbarBreadcrumbsHost =>
+            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
+
+        private List<DMDNode> ToolbarBreadcrumbsNodes { get; } = new();
+
+        private DMDTreeView TreeView =>
+            rootVisualElement.Q<DMDTreeView>();
+
+        #endregion
+
+        #region Initialization/cleanup
+
+        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
+        private static void InitializeWindow()
+        {
+            GetWindow<DMDViewer>();
         }
 
         private void InitializeModel()
@@ -97,13 +108,38 @@ namespace Editor
             root.RegisterCallback<KeyDownEvent>(OnRootKeyDown);
         }
 
-        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
-        private static void InitializeWindow()
+        private void InitializeToolbar()
         {
-            GetWindow<DMDViewer>();
+            ToolbarOpenFileButton.clicked += OnToolbarOpenFile;
+
+            ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
+
+            ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
         }
 
-        private void UpdateTreeViewAndBreadcrumbs()
+        private void InitializeTreeView()
+        {
+            TreeView.selectionType = SelectionType.Single;
+
+            TreeView.sortingEnabled = true;
+
+            TreeView.SetColumns(DMDTreeView.GetColumns());
+
+            TreeView.onSelectionChange += OnTreeViewSelectionChange;
+        }
+
+        private void CleanupTreeView()
+        {
+            TreeView.onSelectionChange -= OnTreeViewSelectionChange;
+
+            TreeView.Dispose(); // for columns callback
+        }
+
+        #endregion
+
+        #region Updaters
+
+        private void UpdateControls()
         {
             // try populate the tree
 
@@ -129,7 +165,7 @@ namespace Editor
             ToolbarBreadcrumbsHost.visible = visible;
         }
 
-        private void UpdateWindowTitle()
+        private void UpdateTitle()
         {
             titleContent = new GUIContent(DMDViewerStyles.WindowTitle)
             {
@@ -137,25 +173,7 @@ namespace Editor
             };
         }
 
-        private void InitializeToolbar()
-        {
-            ToolbarButtonOpenFile.clicked += OnToolbarOpenFile;
-
-            ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
-
-            ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
-        }
-
-        private void InitializeTreeView()
-        {
-            TreeView.selectionType = SelectionType.Single;
-
-            TreeView.sortingEnabled = true;
-
-            TreeView.SetColumns(DMDTreeView.GetColumns());
-
-            TreeView.onSelectionChange += OnTreeViewSelectionChange;
-        }
+        #endregion
 
         #region Event handlers
 
@@ -170,8 +188,8 @@ namespace Editor
         private void OnToolbarOpenFile()
         {
             Model.OpenFile();
-            UpdateTreeViewAndBreadcrumbs();
-            UpdateWindowTitle();
+            UpdateControls();
+            UpdateTitle();
         }
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
@@ -217,7 +235,7 @@ namespace Editor
                 TreeView.SetSearchFilter(evt.newValue);
             }
 
-            ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
+            ToolbarSearchLabel.text = $"{TreeView.GetRowCount()} items found";
         }
 
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
@@ -228,17 +246,17 @@ namespace Editor
             var parent = target.parent;
             var index  = parent.IndexOf(target);
 
-            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
+            for (var i = ToolbarBreadcrumbsNodes.Count - 1; i > index; i--)
             {
                 var element = parent.ElementAt(i);
                 element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
                 ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(i);
+                ToolbarBreadcrumbsNodes.RemoveAt(i);
             }
 
             // sync tree view selection with clicked breadcrumbs
 
-            var node = BreadcrumbsNodes[index];
+            var node = ToolbarBreadcrumbsNodes[index];
 
             TreeView.SelectNode(node, true, true);
         }
@@ -256,18 +274,18 @@ namespace Editor
             while (ToolbarBreadcrumbs.childCount > 0)
             {
                 ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
+                ToolbarBreadcrumbsNodes.RemoveAt(ToolbarBreadcrumbsNodes.Count - 1);
             }
 
             var current = objects.Single() as DMDNode;
 
             while (current != null)
             {
-                BreadcrumbsNodes.Insert(0, current);
+                ToolbarBreadcrumbsNodes.Insert(0, current);
                 current = current.Parent as DMDNode;
             }
 
-            foreach (var node in BreadcrumbsNodes)
+            foreach (var node in ToolbarBreadcrumbsNodes)
             {
                 ToolbarBreadcrumbs.PushItem($"0x{node.NodeType:X8}");
             }
@@ -278,12 +296,6 @@ namespace Editor
                 element.RegisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
             }
         }
-
-        #endregion
-
-        #region Breadcrumbs
-
-        private readonly List<DMDNode> BreadcrumbsNodes = new();
 
         #endregion
     }
