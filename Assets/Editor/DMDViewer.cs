@@ -83,12 +83,7 @@ namespace Editor
 
             InitializeTreeView();
 
-            toolbarButtonOpenFile.clicked += () =>
-            {
-                Model.OpenFile();
-                UpdateTreeViewAndBreadcrumbs();
-                UpdateWindowTitle();
-            };
+            toolbarButtonOpenFile.clicked += OnToolbarOpenFile;
 
             toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
 
@@ -219,6 +214,13 @@ namespace Editor
         }
 
         #region Event handlers
+
+        private void OnToolbarOpenFile()
+        {
+            Model.OpenFile();
+            UpdateTreeViewAndBreadcrumbs();
+            UpdateWindowTitle();
+        }
 
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
         {
