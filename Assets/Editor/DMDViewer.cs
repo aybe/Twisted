@@ -163,6 +163,17 @@ namespace Editor
             TreeView.visible = visible;
 
             ToolbarBreadcrumbsHost.visible = visible;
+
+            // show the actual count of nodes count next to search field
+
+            UpdateToolbarSearchLabel();
+        }
+
+        private void UpdateToolbarSearchLabel()
+        {
+            var count = TreeView.GetRowCount();
+
+            ToolbarSearchLabel.text = count is 0 ? string.Empty : $"{count} item{(count is not 1 ? "s" : string.Empty)}";
         }
 
         private void UpdateTitle()
@@ -235,7 +246,7 @@ namespace Editor
                 TreeView.SetSearchFilter(evt.newValue);
             }
 
-            ToolbarSearchLabel.text = $"{TreeView.GetRowCount()} items found";
+            UpdateToolbarSearchLabel();
         }
 
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
