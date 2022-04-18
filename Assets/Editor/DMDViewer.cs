@@ -73,15 +73,14 @@ namespace Editor
 
             InitializeModel();
             InitializeSearch();
-            InitializeWindowTitle();
 
             InitializeTreeView();
 
             toolbarButtonOpenFile.clicked += () =>
             {
                 Model.OpenFile();
-                InitializeWindowTitle();
                 UpdateTreeViewAndBreadcrumbs();
+                UpdateWindowTitle();
             };
 
             toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
@@ -154,6 +153,7 @@ namespace Editor
             });
 
             UpdateTreeViewAndBreadcrumbs();
+            UpdateWindowTitle();
         }
 
         private void InitializeModel()
@@ -170,14 +170,6 @@ namespace Editor
         private static void InitializeWindow()
         {
             GetWindow<DMDViewer>();
-        }
-
-        private void InitializeWindowTitle()
-        {
-            titleContent = new GUIContent(DMDViewerStyles.WindowTitle)
-            {
-                text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
-            };
         }
 
         private void UpdateTreeViewAndBreadcrumbs()
@@ -204,6 +196,14 @@ namespace Editor
             TreeView.visible = visible;
 
             ToolbarBreadcrumbsHost.visible = visible;
+        }
+
+        private void UpdateWindowTitle()
+        {
+            titleContent = new GUIContent(DMDViewerStyles.WindowTitle)
+            {
+                text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
+            };
         }
 
         private void InitializeTreeView()
