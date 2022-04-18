@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Extensions;
@@ -330,6 +331,7 @@ namespace Editor
 
                 var nodes = new List<T>();
                 var stack = new Stack<T>(new[] { Root });
+                var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
                 while (stack.Count > 0)
                 {
@@ -339,7 +341,7 @@ namespace Editor
                     {
                         var o = column.ValueGetter?.Invoke(pop);
                         var s = column.ValueFormatter?.Invoke(o);
-                        var b = s?.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase);
+                        var b = s != null && regex.IsMatch(s);
 
                         if (b is false)
                             continue;
