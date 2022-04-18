@@ -72,7 +72,6 @@ namespace Editor
             root.Add(container);
 
             InitializeModel();
-            InitializeSearch();
             InitializeToolbar();
             InitializeTreeView();
 
@@ -147,6 +146,8 @@ namespace Editor
             ToolbarButtonOpenFile.clicked += OnToolbarOpenFile;
 
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
+
+            ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
         }
 
         private void InitializeTreeView()
@@ -272,15 +273,6 @@ namespace Editor
                 var element = ToolbarBreadcrumbs.ElementAt(i);
                 element.RegisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
             }
-        }
-
-        #endregion
-
-        #region Search
-
-        private void InitializeSearch()
-        {
-            ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
         }
 
         #endregion
