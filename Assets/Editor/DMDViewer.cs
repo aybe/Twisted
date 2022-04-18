@@ -219,6 +219,29 @@ namespace Editor
 
         #region Event handlers
 
+        private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
+        {
+            // update breadcrumbs: clicking, elements, node stack
+
+            var target = evt.target as VisualElement ?? throw new InvalidOperationException();
+            var parent = target.parent;
+            var index  = parent.IndexOf(target);
+
+            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
+            {
+                var element = parent.ElementAt(i);
+                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
+                ToolbarBreadcrumbs.PopItem();
+                BreadcrumbsNodes.RemoveAt(i);
+            }
+
+            // sync tree view selection with clicked breadcrumbs
+
+            var node = BreadcrumbsNodes[index];
+
+            TreeView.SelectNode(node, true, true);
+        }
+
         private void OnTreeViewSelectionChange(IEnumerable<object> objects)
         {
             // update breadcrumbs: clicking, elements, node stack
@@ -226,7 +249,7 @@ namespace Editor
             for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
             {
                 var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
             }
 
             while (ToolbarBreadcrumbs.childCount > 0)
@@ -251,7 +274,7 @@ namespace Editor
             for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
             {
                 var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.RegisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
+                element.RegisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
             }
         }
 
@@ -322,33 +345,6 @@ namespace Editor
         private ToolbarBreadcrumbs ToolbarBreadcrumbs = null!;
 
         private readonly List<DMDNode> BreadcrumbsNodes = new();
-
-        private void OnBreadcrumbsItemClick(ClickEvent evt)
-        {
-            UpdateBreadcrumbsItem(evt);
-        }
-
-        private void UpdateBreadcrumbsItem(ClickEvent evt)
-        {
-            if (evt == null)
-                throw new ArgumentNullException(nameof(evt));
-
-            var target = evt.target as VisualElement ?? throw new InvalidOperationException();
-            var parent = target.parent;
-            var index  = parent.IndexOf(target);
-
-            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
-            {
-                var element = parent.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnBreadcrumbsItemClick);
-                ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(i);
-            }
-
-            var node = BreadcrumbsNodes[index];
-
-            TreeView.SelectNode(node, true, true);
-        }
 
         #endregion
     }
