@@ -80,7 +80,7 @@ namespace Editor
                     Name           = "Position",
                     ValueGetter    = s => s.Position,
                     ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s:N0}",
+                    ValueFormatter = s => $"{s}",
                     MinWidth       = 75.0f
                 };
 
@@ -90,7 +90,7 @@ namespace Editor
                     Name           = "Length",
                     ValueGetter    = s => s.Length,
                     ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s:N0}",
+                    ValueFormatter = s => $"{s}",
                     MinWidth       = 75.0f
                 };
 
