@@ -58,9 +58,17 @@ namespace Editor
             SetRoot(null); // good old habits prevail at Unity, this initializes their internal shit
         }
 
+        private string? SearchFilter { get; set; }
+
         public void Dispose()
         {
             columnSortingChanged -= OnColumnSortingChanged;
+        }
+
+        public void SetSearchFilter(string? searchFilter)
+        {
+            SearchFilter = searchFilter;
+            Reload();
         }
 
         public int GetNodeId(T node)
@@ -75,6 +83,11 @@ namespace Editor
         {
             Root = node;
 
+            Reload();
+        }
+
+        private void Reload()
+        {
             RootItems = GetRootItems();
 
             NodesDictionary = Flatten(RootItems, s => s.children).ToDictionary(s => s.data, s => s.id);
@@ -253,56 +266,98 @@ namespace Editor
         {
             // another damn fine struct from Unity with, among other things, everything useful being internal
 
-            var list = new List<TreeViewItemData<T>>();
-
-            if (Root is null)
+            if (string.IsNullOrWhiteSpace(SearchFilter))
             {
+                var list = new List<TreeViewItemData<T>>();
+
+                if (Root is null)
+                {
+                    return list;
+                }
+
+                var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
+
+                stack.Push((Root, null));
+
+                var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
+
+                var dictionary = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
+
+                var id = 0;
+
+                while (stack.Count > 0)
+                {
+                    var (node, container) = stack.Pop();
+
+                    var item = new TreeViewItemData<T>(id++, node);
+
+                    if (container is null)
+                    {
+                        list.Add(item);
+                    }
+                    else
+                    {
+                        ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
+                    }
+
+                    var children = node.Cast<T>().Reverse();
+
+
+                    foreach (var description in descriptions)
+                    {
+                        var column = dictionary[description.columnName];
+                        var getter = column.ValueGetter ?? throw new InvalidOperationException();
+                        var order  = description.direction is SortDirection.Descending;
+
+                        children = children.Sort(getter, null, order);
+                    }
+
+                    foreach (var child in children)
+                    {
+                        stack.Push((child, item));
+                    }
+                }
                 return list;
             }
-
-            var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
-
-            stack.Push((Root, null));
-
-            var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
-
-            var dictionary = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
-
-            var id = 0;
-
-            while (stack.Count > 0)
+            else
             {
-                var (node, container) = stack.Pop();
+                var list = new List<TreeViewItemData<T>>();
 
-                var data = new TreeViewItemData<T>(id++, node);
-
-                if (container is null)
+                if (Root is null)
                 {
-                    list.Add(data);
-                }
-                else
-                {
-                    ((IList<TreeViewItemData<T>>)container.Value.children).Add(data);
+                    return list;
                 }
 
-                var children = node.Cast<T>().Reverse();
+                var stack = new Stack<T>();
 
-                foreach (var description in descriptions)
+                stack.Push(Root);
+
+                var id = 0;
+
+                while (stack.Count > 0)
                 {
-                    var column = dictionary[description.columnName];
-                    var getter = column.ValueGetter ?? throw new InvalidOperationException();
-                    var order  = description.direction is SortDirection.Descending;
+                    var pop = stack.Pop();
 
-                    children = children.Sort(getter, null, order);
+                    foreach (var column in Columns)
+                    {
+                        var o = column.ValueGetter?.Invoke(pop);
+                        var s = column.ValueFormatter?.Invoke(o);
+                        var b = s?.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase);
+
+                        if (b is true)
+                        {
+                            list.Add(new TreeViewItemData<T>(id++, pop));
+                        }
+                    }
+
+                    foreach (var child in pop.Cast<T>().Reverse())
+                    {
+                        stack.Push(child);
+                    }
                 }
 
-                foreach (var child in children)
-                {
-                    stack.Push((child, data));
-                }
+                return list; // TODO sort items
             }
-
-            return list;
         }
 
         public void SelectNode(T node, bool notify, bool scroll)

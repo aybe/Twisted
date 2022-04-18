@@ -147,26 +147,12 @@ namespace Editor
             var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
             var toolbarLabelSearchResults      = root.Q<Label>("toolbarLabelSearchResults");
             var toolbarSliderItemHeight        = root.Q<SliderInt>("toolbarSliderItemHeight");
-            var toolbarPopupSearchField        = root.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
-
+           
             ToolbarBreadcrumbsHost = root.Q<Toolbar>("toolbarBreadcrumbsHost");
             ToolbarBreadcrumbs     = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
 
-            toolbarPopupSearchField.RegisterValueChangedCallback(evt =>
-            {
-                Debug.Log($"User typed '{evt.newValue}'.");
-            });
-
-            toolbarPopupSearchField.menu.AppendAction(
-                "Use Regex",
-                action =>
-                {
-                    Model.UseRegexSearch = !Model.UseRegexSearch;
-                },
-                action => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
-            );
-
             InitializeModel();
+            InitializeSearch();
             InitializeWindowTitle();
 
             toolbarButtonOpenFile.clicked += () =>
@@ -249,6 +235,22 @@ namespace Editor
             });
 
             InitializeTreeView();
+        }
+
+        private void InitializeSearch()
+        {
+            var field = rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
+
+            field.RegisterValueChangedCallback(evt =>
+            {
+                TreeView.SetSearchFilter(evt.newValue);
+            });
+
+            field.menu.AppendAction(
+                "Use Regex",
+                _ => { Model.UseRegexSearch = !Model.UseRegexSearch; },
+                _ => Model.UseRegexSearch ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal
+            );
         }
 
         private void InitializeModel()
