@@ -83,7 +83,7 @@ namespace Editor
             {
                 Model.OpenFile();
                 InitializeWindowTitle();
-                InitializeTreeView();
+                UpdateTreeViewAndBreadcrumbs();
             };
 
             toolbarToggleDistinctFiltering.BindProperty(Model.UseDistinctFilteringProperty);
@@ -155,7 +155,7 @@ namespace Editor
                 TreeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
             });
 
-            InitializeTreeView();
+            UpdateTreeViewAndBreadcrumbs();
         }
 
         private void InitializeModel()
@@ -182,7 +182,7 @@ namespace Editor
             };
         }
 
-        private void InitializeTreeView()
+        private void UpdateTreeViewAndBreadcrumbs()
         {
             // set defaults right from here instead from within UXML as it's already complex enough...
 
