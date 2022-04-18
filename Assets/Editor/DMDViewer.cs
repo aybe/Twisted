@@ -75,9 +75,7 @@ namespace Editor
             InitializeSearch();
             InitializeWindowTitle();
 
-            TreeView.SetColumns(DMDTreeView.GetColumns());
-
-            TreeView.onSelectionChange += OnTreeViewSelectionChange;
+            InitializeTreeView();
 
             toolbarButtonOpenFile.clicked += () =>
             {
@@ -184,14 +182,6 @@ namespace Editor
 
         private void UpdateTreeViewAndBreadcrumbs()
         {
-            // set defaults right from here instead from within UXML as it's already complex enough...
-
-            if (TreeView.selectionType is not SelectionType.Single)
-                TreeView.selectionType = SelectionType.Single;
-
-            if (TreeView.sortingEnabled is false)
-                TreeView.sortingEnabled = true;
-
             // try populate the tree
 
             var dmd = Model.DMDFactory?.DMD;
@@ -214,6 +204,17 @@ namespace Editor
             TreeView.visible = visible;
 
             ToolbarBreadcrumbsHost.visible = visible;
+        }
+
+        private void InitializeTreeView()
+        {
+            TreeView.selectionType = SelectionType.Single;
+
+            TreeView.sortingEnabled = true;
+
+            TreeView.SetColumns(DMDTreeView.GetColumns());
+
+            TreeView.onSelectionChange += OnTreeViewSelectionChange;
         }
 
         #region TreeView
