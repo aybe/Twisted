@@ -36,7 +36,20 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private DMDTreeView TreeView => rootVisualElement.Q<DMDTreeView>();
+        private Label ToolbarSearchResults => 
+            rootVisualElement.Q<Label>("toolbarLabelSearchResults");
+
+        private ToolbarPopupSearchField ToolbarSearchField =>
+            rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
+
+        private Toolbar ToolbarBreadcrumbsHost => 
+            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
+
+        private ToolbarBreadcrumbs ToolbarBreadcrumbs => 
+            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+
+        private DMDTreeView TreeView => 
+            rootVisualElement.Q<DMDTreeView>();
 
         private void OnDisable()
         {
@@ -65,11 +78,7 @@ namespace Editor
             var toolbarToggleTexturing         = root.Q<ToolbarToggle>("toolbarToggleTexturing");
             var toolbarToggleVertexColors      = root.Q<ToolbarToggle>("toolbarToggleVertexColors");
             var toolbarTogglePolygonColoring   = root.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
-            ToolbarSearchResults = root.Q<Label>("toolbarLabelSearchResults");
             var toolbarSliderItemHeight = root.Q<SliderInt>("toolbarSliderItemHeight");
-
-            ToolbarBreadcrumbsHost = root.Q<Toolbar>("toolbarBreadcrumbsHost");
-            ToolbarBreadcrumbs     = root.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
 
             InitializeModel();
             InitializeSearch();
@@ -282,13 +291,9 @@ namespace Editor
 
         #region Search
 
-        private Label ToolbarSearchResults = null!;
-
         private void InitializeSearch()
         {
-            var field = rootVisualElement.Q<ToolbarPopupSearchField>("toolbarPopupSearchField");
-
-            field.RegisterValueChangedCallback(evt =>
+            ToolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 var element = evt.target as VisualElement ?? throw new InvalidOperationException();
 
@@ -326,7 +331,7 @@ namespace Editor
                 ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
             });
 
-            field.menu.AppendAction(
+            ToolbarSearchField.menu.AppendAction(
                 "Use Regex",
                 _ =>
                 {
@@ -339,10 +344,6 @@ namespace Editor
         #endregion
 
         #region Breadcrumbs
-
-        private Toolbar ToolbarBreadcrumbsHost = null!;
-
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs = null!;
 
         private readonly List<DMDNode> BreadcrumbsNodes = new();
 
