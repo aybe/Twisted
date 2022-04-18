@@ -222,6 +222,44 @@ namespace Editor
             UpdateWindowTitle();
         }
 
+        private void OnToolbarSearchFieldValueChanged(ChangeEvent<string> evt)
+        {
+            var element = evt.target as VisualElement ?? throw new InvalidOperationException();
+
+            var valid = TreeView.IsSearchPatternValid(evt.newValue);
+
+            if (valid)
+            {
+                element.style.borderBottomColor = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                element.style.borderLeftColor   = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                element.style.borderRightColor  = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
+                element.style.borderTopColor    = new StyleColor(new Color32(0xA0, 0xA0, 0xA0, 0xFF));
+            }
+            else
+            {
+                element.style.borderBottomColor = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                element.style.borderLeftColor   = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                element.style.borderRightColor  = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+                element.style.borderTopColor    = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
+            }
+
+            if (valid)
+            {
+                RemoveNotification();
+            }
+            else
+            {
+                ShowNotification(EditorGUIUtility.TrTempContent("Search pattern is not valid."));
+            }
+
+            if (valid)
+            {
+                TreeView.SetSearchFilter(evt.newValue);
+            }
+
+            ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
+        }
+
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
         {
             // update breadcrumbs: clicking, elements, node stack
@@ -287,43 +325,7 @@ namespace Editor
 
         private void InitializeSearch()
         {
-            ToolbarSearchField.RegisterValueChangedCallback(evt =>
-            {
-                var element = evt.target as VisualElement ?? throw new InvalidOperationException();
-
-                var valid = TreeView.IsSearchPatternValid(evt.newValue);
-
-                if (valid)
-                {
-                    element.style.borderBottomColor = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
-                    element.style.borderLeftColor   = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
-                    element.style.borderRightColor  = new StyleColor(new Color32(0xB7, 0xB7, 0xB7, 0xFF));
-                    element.style.borderTopColor    = new StyleColor(new Color32(0xA0, 0xA0, 0xA0, 0xFF));
-                }
-                else
-                {
-                    element.style.borderBottomColor = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
-                    element.style.borderLeftColor   = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
-                    element.style.borderRightColor  = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
-                    element.style.borderTopColor    = new StyleColor(new Color32(0xFF, 0x00, 0x00, 0xFF));
-                }
-
-                if (valid)
-                {
-                    RemoveNotification();
-                }
-                else
-                {
-                    ShowNotification(EditorGUIUtility.TrTempContent("Search pattern is not valid."));
-                }
-
-                if (valid)
-                {
-                    TreeView.SetSearchFilter(evt.newValue);
-                }
-
-                ToolbarSearchResults.text = $"{TreeView.GetRowCount()} items found";
-            });
+            ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
         }
 
         #endregion
