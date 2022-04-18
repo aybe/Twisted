@@ -63,29 +63,10 @@ namespace Editor
 
         public void CreateGUI()
         {
-            var root = rootVisualElement;
-
-            var container = VisualTreeAsset.Instantiate();
-
-            container.style.flexGrow = 1;
-
-            root.Add(container);
-
             InitializeModel();
+            InitializeRoot();
             InitializeToolbar();
             InitializeTreeView();
-
-            // TODO other properties
-
-            root.Bind(Model.SerializedObject);
-
-            root.RegisterCallback<KeyDownEvent>(evt =>
-            {
-                if (evt.keyCode is KeyCode.F && evt.ctrlKey)
-                {
-                    ToolbarSearchField.Focus();
-                }
-            });
 
             UpdateTreeViewAndBreadcrumbs();
             UpdateWindowTitle();
@@ -99,6 +80,21 @@ namespace Editor
             }
 
             Model.Initialize();
+        }
+
+        private void InitializeRoot()
+        {
+            var root = rootVisualElement;
+
+            var container = VisualTreeAsset.Instantiate();
+
+            container.style.flexGrow = 1;
+
+            root.Add(container);
+
+            root.Bind(Model.SerializedObject);
+
+            root.RegisterCallback<KeyDownEvent>(OnRootKeyDown);
         }
 
         [MenuItem("Twisted/DMD Viewer (UI Elements)")]
@@ -162,6 +158,14 @@ namespace Editor
         }
 
         #region Event handlers
+
+        private void OnRootKeyDown(KeyDownEvent evt)
+        {
+            if (evt.keyCode is KeyCode.F && evt.ctrlKey)
+            {
+                ToolbarSearchField.Focus();
+            }
+        }
 
         private void OnToolbarOpenFile()
         {
