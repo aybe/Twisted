@@ -11,21 +11,14 @@ using UnityEngine.UIElements;
 namespace Editor
 {
     public sealed class DMDViewer : EditorWindow
-        // TODO column sorting + arrows
-        // TODO filtering + toolbar hint
         // TODO context menus
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
         // TODO what becomes primary column should be left aligned
         // TODO everything missing from legacy viewer
-        // TODO
         // BUG when tree view loses focus, one of its expander may turn blue at any time
         // BUG tree view keyboard expand/collapse may stop working for no reason at all
-        // BUG 
-        // BUG multi-column sort destroys expand state
-        // BUG 
         // BUG when sorting, selected item is lost
-        // BUG 
     {
         [SerializeField]
         private DMDViewerModel Model = null!;
