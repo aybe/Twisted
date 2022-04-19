@@ -113,37 +113,6 @@ namespace Editor
             SortingTask = Task.Factory.StartNew(SortTreeItems, CancellationToken.None, TaskCreationOptions.None, scheduler);
         }
 
-        private void SortTreeItems()
-        {
-            // deep sorting will screw ids and therefore expanded nodes, save this information
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
-            var state = SaveExpandedNodes();
-            Profiler.EndSample();
-
-            // perform the actual sorting
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(GetRootItems)}");
-            RootItems = GetRootItems();
-            Profiler.EndSample();
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SetRootItems)}");
-            SetRootItems(RootItems);
-            Profiler.EndSample();
-
-            // restore the collapsed/expanded state of tree view items but in a FAST manner
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(LoadExpandedNodes)}");
-            LoadExpandedNodes(state);
-            Profiler.EndSample();
-
-            // finally, get this stupid control to redraw itself
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
-            RefreshItems();
-            Profiler.EndSample();
-        }
-
         private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
         {
             if (collection == null)
@@ -174,93 +143,6 @@ namespace Editor
             }
 
             return list;
-        }
-
-        private TreeNodeState SaveExpandedNodes()
-        {
-            // if we were to use some of their dumb methods, this would take ages because they're poorly written
-
-            var controller = viewController;
-
-            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
-
-            var items     = Flatten(RootItems!, s => s.children);
-            var collapsed = new HashSet<T>();
-            var expanded  = new HashSet<T>();
-
-            foreach (var item in items)
-            {
-                var data = item.data;
-
-                if (controller.IsExpanded(item.id))
-                {
-                    expanded.Add(data);
-                }
-                else
-                {
-                    collapsed.Add(data);
-                }
-            }
-
-            Profiler.EndSample();
-
-            return new TreeNodeState(collapsed, expanded);
-        }
-
-        private void LoadExpandedNodes(TreeNodeState state)
-        {
-            // their shitty methods take exponentially longer as you have more nodes in the tree
-            // as they're pure garbage, they simply freeze the UI for an astonishingly long time
-            // here we use a very simple approach that works and scales well for 10K+ tree nodes
-
-            // build a dictionary to be able to retrieve newly assigned IDs to tree view items
-
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: flatten items");
-            var items = Flatten(RootItems!, s => s.children);
-            Profiler.EndSample();
-
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: data -> id map");
-            var dictionary = items.ToDictionary(s => s.data, s => s.id);
-            Profiler.EndSample();
-
-            // now downright fucking stupid: do it in whichever way that will take the shortest time
-
-            var controller = viewController;
-
-            var expand = state.Expanded.Count > state.Collapsed.Count;
-
-            if (expand)
-            {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandAll)}");
-                controller.ExpandAll();
-                Profiler.EndSample();
-
-                foreach (var data in state.Collapsed)
-                {
-                    var id = dictionary[data];
-
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseItem)}");
-                    controller.CollapseItem(id, false);
-                    Profiler.EndSample();
-                }
-            }
-            else
-            {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
-                controller.CollapseAll();
-                Profiler.EndSample();
-
-                foreach (var data in state.Expanded)
-                {
-                    var id = dictionary[data];
-
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
-                    controller.ExpandItem(id, false, false);
-                    Profiler.EndSample();
-                }
-            }
-
-            // the main cause of all that is that these newbies don't know how to use LINQ reasonably
         }
 
         [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
@@ -439,5 +321,127 @@ namespace Editor
 
             public HashSet<T> Expanded { get; }
         }
+
+        #region Sorting
+
+        private void SortTreeItems()
+        {
+            // deep sorting will screw ids and therefore expanded nodes, save this information
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
+            var state = SaveExpandedNodes();
+            Profiler.EndSample();
+
+            // perform the actual sorting
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(GetRootItems)}");
+            RootItems = GetRootItems();
+            Profiler.EndSample();
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SetRootItems)}");
+            SetRootItems(RootItems);
+            Profiler.EndSample();
+
+            // restore the collapsed/expanded state of tree view items but in a FAST manner
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(LoadExpandedNodes)}");
+            LoadExpandedNodes(state);
+            Profiler.EndSample();
+
+            // finally, get this stupid control to redraw itself
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
+            RefreshItems();
+            Profiler.EndSample();
+        }
+
+        private TreeNodeState SaveExpandedNodes()
+        {
+            // if we were to use some of their dumb methods, this would take ages because they're poorly written
+
+            var controller = viewController;
+
+            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
+
+            var items     = Flatten(RootItems!, s => s.children);
+            var collapsed = new HashSet<T>();
+            var expanded  = new HashSet<T>();
+
+            foreach (var item in items)
+            {
+                var data = item.data;
+
+                if (controller.IsExpanded(item.id))
+                {
+                    expanded.Add(data);
+                }
+                else
+                {
+                    collapsed.Add(data);
+                }
+            }
+
+            Profiler.EndSample();
+
+            return new TreeNodeState(collapsed, expanded);
+        }
+
+        private void LoadExpandedNodes(TreeNodeState state)
+        {
+            // their shitty methods take exponentially longer as you have more nodes in the tree
+            // as they're pure garbage, they simply freeze the UI for an astonishingly long time
+            // here we use a very simple approach that works and scales well for 10K+ tree nodes
+
+            // build a dictionary to be able to retrieve newly assigned IDs to tree view items
+
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: flatten items");
+            var items = Flatten(RootItems!, s => s.children);
+            Profiler.EndSample();
+
+            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: data -> id map");
+            var dictionary = items.ToDictionary(s => s.data, s => s.id);
+            Profiler.EndSample();
+
+            // now downright fucking stupid: do it in whichever way that will take the shortest time
+
+            var controller = viewController;
+
+            var expand = state.Expanded.Count > state.Collapsed.Count;
+
+            if (expand)
+            {
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandAll)}");
+                controller.ExpandAll();
+                Profiler.EndSample();
+
+                foreach (var data in state.Collapsed)
+                {
+                    var id = dictionary[data];
+
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseItem)}");
+                    controller.CollapseItem(id, false);
+                    Profiler.EndSample();
+                }
+            }
+            else
+            {
+                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
+                controller.CollapseAll();
+                Profiler.EndSample();
+
+                foreach (var data in state.Expanded)
+                {
+                    var id = dictionary[data];
+
+                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
+                    controller.ExpandItem(id, false, false);
+                    Profiler.EndSample();
+                }
+            }
+
+            // the main cause of all that is that these newbies don't know how to use LINQ reasonably
+        }
+
+        #endregion
     }
 }
