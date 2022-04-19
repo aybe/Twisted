@@ -45,176 +45,6 @@ namespace Editor
             columnSortingChanged -= OnColumnSortingChanged;
         }
 
-        private void Reload()
-        {
-            RootItems = GetRootItems();
-
-            NodesDictionary = Flatten(RootItems, s => s.children).ToDictionary(s => s.data, s => s.id);
-
-            SetRootItems(RootItems);
-
-            Rebuild();
-        }
-
-        private void OnColumnSortingChanged()
-        {
-            // these code monkey will raise N headers + 2 times in a row... for no fucking reason
-            // that is unless you hold a fucking modifier such as Shift or Ctrl, not explained...
-
-            // protect ourselves from their stupid shit by using a task with a rudimentary guard
-
-            if (SortingTask?.IsCompleted == false)
-                return;
-
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext(); // just like in WPF
-
-            SortingTask = Task.Factory.StartNew(SortTreeItems, CancellationToken.None, TaskCreationOptions.None, scheduler);
-        }
-
-        private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
-        {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-
-            if (children == null)
-                throw new ArgumentNullException(nameof(children));
-
-            var list = new List<TSource>();
-
-            var stack = new Stack<TSource>();
-
-            foreach (var source in collection)
-            {
-                stack.Push(source);
-            }
-
-            while (stack.Count > 0)
-            {
-                var pop = stack.Pop();
-
-                list.Add(pop);
-
-                foreach (var child in children(pop).Reverse())
-                {
-                    stack.Push(child);
-                }
-            }
-
-            return list;
-        }
-
-        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
-        private List<TreeViewItemData<T>> GetRootItems()
-        {
-            // another damn fine struct from Unity with, among other things, everything useful being internal
-
-            if (Columns is null)
-            {
-                return new List<TreeViewItemData<T>>();
-            }
-
-            var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
-            var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
-
-            if (string.IsNullOrWhiteSpace(SearchFilter))
-            {
-                var list = new List<TreeViewItemData<T>>();
-
-                if (Root is null)
-                {
-                    return list;
-                }
-
-                var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
-
-                stack.Push((Root, null));
-
-
-                var id = 0;
-
-                while (stack.Count > 0)
-                {
-                    var (node, container) = stack.Pop();
-
-                    var item = new TreeViewItemData<T>(id++, node);
-
-                    if (container is null)
-                    {
-                        list.Add(item);
-                    }
-                    else
-                    {
-                        ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
-                    }
-
-                    var children = node.Cast<T>().Reverse();
-
-
-                    foreach (var description in descriptions)
-                    {
-                        var column = dictionary[description.columnName];
-                        var getter = column.ValueGetter ?? throw new InvalidOperationException();
-                        var order  = description.direction is SortDirection.Descending;
-
-                        children = children.Sort(getter, null, order);
-                    }
-
-                    foreach (var child in children)
-                    {
-                        stack.Push((child, item));
-                    }
-                }
-                return list;
-            }
-            else
-            {
-                if (Root is null)
-                {
-                    return new List<TreeViewItemData<T>>();
-                }
-
-                var nodes = new List<T>();
-                var stack = new Stack<T>(new[] { Root });
-                var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
-
-                while (stack.Count > 0)
-                {
-                    var pop = stack.Pop();
-
-                    foreach (var column in Columns)
-                    {
-                        var o = column.ValueGetter?.Invoke(pop);
-                        var s = column.ValueFormatter?.Invoke(o);
-                        var b = s != null && regex.IsMatch(s);
-
-                        if (b is false)
-                            continue;
-
-                        nodes.Add(pop);
-                        break;
-                    }
-
-                    foreach (var child in pop.Cast<T>().Reverse())
-                    {
-                        stack.Push(child);
-                    }
-                }
-
-                var sort = nodes.AsEnumerable();
-
-                foreach (var description in descriptions)
-                {
-                    var column = dictionary[description.columnName];
-                    var getter = column.ValueGetter ?? throw new InvalidOperationException();
-                    var order  = description.direction is SortDirection.Descending;
-
-                    sort = sort.Sort(getter, null, order);
-                }
-
-                return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
-            }
-        }
-
         #region Public methods
 
         public int GetNodeId(T node)
@@ -430,6 +260,180 @@ namespace Editor
             }
 
             // the main cause of all that is that these newbies don't know how to use LINQ reasonably
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (children == null)
+                throw new ArgumentNullException(nameof(children));
+
+            var list = new List<TSource>();
+
+            var stack = new Stack<TSource>();
+
+            foreach (var source in collection)
+            {
+                stack.Push(source);
+            }
+
+            while (stack.Count > 0)
+            {
+                var pop = stack.Pop();
+
+                list.Add(pop);
+
+                foreach (var child in children(pop).Reverse())
+                {
+                    stack.Push(child);
+                }
+            }
+
+            return list;
+        }
+
+        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
+        private List<TreeViewItemData<T>> GetRootItems()
+        {
+            // another damn fine struct from Unity with, among other things, everything useful being internal
+
+            if (Columns is null)
+            {
+                return new List<TreeViewItemData<T>>();
+            }
+
+            var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
+            var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
+
+            if (string.IsNullOrWhiteSpace(SearchFilter))
+            {
+                var list = new List<TreeViewItemData<T>>();
+
+                if (Root is null)
+                {
+                    return list;
+                }
+
+                var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
+
+                stack.Push((Root, null));
+
+
+                var id = 0;
+
+                while (stack.Count > 0)
+                {
+                    var (node, container) = stack.Pop();
+
+                    var item = new TreeViewItemData<T>(id++, node);
+
+                    if (container is null)
+                    {
+                        list.Add(item);
+                    }
+                    else
+                    {
+                        ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
+                    }
+
+                    var children = node.Cast<T>().Reverse();
+
+
+                    foreach (var description in descriptions)
+                    {
+                        var column = dictionary[description.columnName];
+                        var getter = column.ValueGetter ?? throw new InvalidOperationException();
+                        var order  = description.direction is SortDirection.Descending;
+
+                        children = children.Sort(getter, null, order);
+                    }
+
+                    foreach (var child in children)
+                    {
+                        stack.Push((child, item));
+                    }
+                }
+                return list;
+            }
+            else
+            {
+                if (Root is null)
+                {
+                    return new List<TreeViewItemData<T>>();
+                }
+
+                var nodes = new List<T>();
+                var stack = new Stack<T>(new[] { Root });
+                var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+                while (stack.Count > 0)
+                {
+                    var pop = stack.Pop();
+
+                    foreach (var column in Columns)
+                    {
+                        var o = column.ValueGetter?.Invoke(pop);
+                        var s = column.ValueFormatter?.Invoke(o);
+                        var b = s != null && regex.IsMatch(s);
+
+                        if (b is false)
+                            continue;
+
+                        nodes.Add(pop);
+                        break;
+                    }
+
+                    foreach (var child in pop.Cast<T>().Reverse())
+                    {
+                        stack.Push(child);
+                    }
+                }
+
+                var sort = nodes.AsEnumerable();
+
+                foreach (var description in descriptions)
+                {
+                    var column = dictionary[description.columnName];
+                    var getter = column.ValueGetter ?? throw new InvalidOperationException();
+                    var order  = description.direction is SortDirection.Descending;
+
+                    sort = sort.Sort(getter, null, order);
+                }
+
+                return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
+            }
+        }
+
+        private void OnColumnSortingChanged()
+        {
+            // these code monkey will raise N headers + 2 times in a row... for no fucking reason
+            // that is unless you hold a fucking modifier such as Shift or Ctrl, not explained...
+
+            // protect ourselves from their stupid shit by using a task with a rudimentary guard
+
+            if (SortingTask?.IsCompleted == false)
+                return;
+
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext(); // just like in WPF
+
+            SortingTask = Task.Factory.StartNew(SortTreeItems, CancellationToken.None, TaskCreationOptions.None, scheduler);
+        }
+
+        private void Reload()
+        {
+            RootItems = GetRootItems();
+
+            NodesDictionary = Flatten(RootItems, s => s.children).ToDictionary(s => s.data, s => s.id);
+
+            SetRootItems(RootItems);
+
+            Rebuild();
         }
 
         #endregion
