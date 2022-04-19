@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Twisted.Graphics;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -153,11 +152,6 @@ namespace Editor
 
             TreeView.CollapseAll(); // also but stupid method NRE unless root is set, hence why here
 
-            if (dmd is not null)
-            {
-                TreeView.SelectNode(dmd, true, true); // get breadcrumbs to show or UI will look bad
-            }
-
             // show or hide depending DMD, because dumb ass tree will NRE when clicked but is empty
 
             var visible = dmd is not null;
@@ -166,9 +160,16 @@ namespace Editor
 
             ToolbarBreadcrumbsHost.visible = visible;
 
-            // show the actual count of nodes count next to search field
+            // update relevant controls
 
             UpdateToolbarSearchLabel();
+
+            // select something to get breadcrumbs populated else the interface will look like shit
+
+            if (dmd is not null)
+            {
+                TreeView.SelectNode(dmd, true, true); // this will trigger UpdateToolbarBreadcrumbs
+            }
         }
 
         private void UpdateToolbarSearchLabel()
@@ -178,7 +179,7 @@ namespace Editor
             ToolbarSearchLabel.text = count is 0 ? string.Empty : $"{count} item{(count is not 1 ? "s" : string.Empty)}";
         }
 
-        private void UpdateToolbarBreadcrumbs(IEnumerable<object> objects)
+        private void UpdateToolbarBreadcrumbs()
         {
             // update breadcrumbs: clicking, elements, node stack
 
@@ -194,7 +195,7 @@ namespace Editor
                 ToolbarBreadcrumbsNodes.RemoveAt(ToolbarBreadcrumbsNodes.Count - 1);
             }
 
-            var current = objects.Single() as DMDNode;
+            var current = TreeView.selectedItem as DMDNode;
 
             while (current != null)
             {
@@ -205,9 +206,9 @@ namespace Editor
                     current = null;
             }
 
-            foreach (var node in ToolbarBreadcrumbsNodes)
+            foreach (var item in ToolbarBreadcrumbsNodes)
             {
-                ToolbarBreadcrumbs.PushItem($"0x{node.NodeType:X8}");
+                ToolbarBreadcrumbs.PushItem($"0x{item.NodeType:X8}");
             }
 
             for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
@@ -288,7 +289,7 @@ namespace Editor
             }
 
             UpdateToolbarSearchLabel();
-            UpdateToolbarBreadcrumbs(TreeView.selectedItems);
+            UpdateToolbarBreadcrumbs();
         }
 
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
@@ -316,7 +317,7 @@ namespace Editor
 
         private void OnTreeViewSelectionChange(IEnumerable<object> objects)
         {
-            UpdateToolbarBreadcrumbs(objects);
+            UpdateToolbarBreadcrumbs();
         }
 
         #endregion
