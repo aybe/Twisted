@@ -309,19 +309,6 @@ namespace Editor
             }
         }
 
-        private sealed class TreeNodeState
-        {
-            public TreeNodeState(HashSet<T> collapsed, HashSet<T> expanded)
-            {
-                Collapsed = collapsed ?? throw new ArgumentNullException(nameof(collapsed));
-                Expanded  = expanded ?? throw new ArgumentNullException(nameof(expanded));
-            }
-
-            public HashSet<T> Collapsed { get; }
-
-            public HashSet<T> Expanded { get; }
-        }
-
         #region Sorting
 
         private void SortTreeItems()
@@ -329,7 +316,7 @@ namespace Editor
             // deep sorting will screw ids and therefore expanded nodes, save this information
 
             Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
-            var state = SaveExpandedNodes();
+            SaveExpandedNodes(out var collapsed, out var expanded);
             Profiler.EndSample();
 
             // perform the actual sorting
@@ -345,7 +332,7 @@ namespace Editor
             // restore the collapsed/expanded state of tree view items but in a FAST manner
 
             Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(LoadExpandedNodes)}");
-            LoadExpandedNodes(state);
+            LoadExpandedNodes(collapsed, expanded);
             Profiler.EndSample();
 
             // finally, get this stupid control to redraw itself
@@ -355,17 +342,18 @@ namespace Editor
             Profiler.EndSample();
         }
 
-        private TreeNodeState SaveExpandedNodes()
+        private void SaveExpandedNodes(out HashSet<T> collapsed, out HashSet<T> expanded)
         {
+            collapsed = new HashSet<T>();
+            expanded  = new HashSet<T>();
+
             // if we were to use some of their dumb methods, this would take ages because they're poorly written
 
             var controller = viewController;
 
             Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
 
-            var items     = Flatten(RootItems!, s => s.children);
-            var collapsed = new HashSet<T>();
-            var expanded  = new HashSet<T>();
+            var items = Flatten(RootItems!, s => s.children);
 
             foreach (var item in items)
             {
@@ -382,11 +370,9 @@ namespace Editor
             }
 
             Profiler.EndSample();
-
-            return new TreeNodeState(collapsed, expanded);
         }
 
-        private void LoadExpandedNodes(TreeNodeState state)
+        private void LoadExpandedNodes(HashSet<T> collapsed, HashSet<T> expanded)
         {
             // their shitty methods take exponentially longer as you have more nodes in the tree
             // as they're pure garbage, they simply freeze the UI for an astonishingly long time
@@ -406,7 +392,7 @@ namespace Editor
 
             var controller = viewController;
 
-            var expand = state.Expanded.Count > state.Collapsed.Count;
+            var expand = expanded.Count > collapsed.Count;
 
             if (expand)
             {
@@ -414,7 +400,7 @@ namespace Editor
                 controller.ExpandAll();
                 Profiler.EndSample();
 
-                foreach (var data in state.Collapsed)
+                foreach (var data in collapsed)
                 {
                     var id = dictionary[data];
 
@@ -429,7 +415,7 @@ namespace Editor
                 controller.CollapseAll();
                 Profiler.EndSample();
 
-                foreach (var data in state.Expanded)
+                foreach (var data in expanded)
                 {
                     var id = dictionary[data];
 
