@@ -321,21 +321,17 @@ namespace Editor
 
         private void SortTreeItems()
         {
-            // deep sorting will screw ids and therefore expanded nodes, save this information
+            // deep sorting will screw ids/expanded/selection, save this information
+
+            var selection = selectedItems.Cast<T>().ToList();
 
             Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
             SaveExpandedNodes(out var collapsed, out var expanded);
             Profiler.EndSample();
 
-            // perform the actual sorting
+            // perform the actual sorting, will update our dictionary that we'll soon need
 
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(GetRootItems)}");
-            RootItems = GetRootItems();
-            Profiler.EndSample();
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SetRootItems)}");
-            SetRootItems(RootItems);
-            Profiler.EndSample();
+            Reload();
 
             // restore the collapsed/expanded state of tree view items but in a FAST manner
 
@@ -343,11 +339,16 @@ namespace Editor
             LoadExpandedNodes(collapsed, expanded);
             Profiler.EndSample();
 
-            // finally, get this stupid control to redraw itself
+            // get this stupid control to redraw itself
 
             Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
             RefreshItems();
             Profiler.EndSample();
+
+            // finally, restore the nodes previously selected by user
+
+            SetSelectionById(selection.Select(s => NodesDictionary![s]));
+        }
         }
 
         private void SaveExpandedNodes(out HashSet<T> collapsed, out HashSet<T> expanded)
