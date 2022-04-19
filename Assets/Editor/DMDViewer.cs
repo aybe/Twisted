@@ -210,7 +210,7 @@ namespace Editor
             if (evt.keyCode is not KeyCode.DownArrow)
                 return;
 
-            TreeView.Q<ScrollView>().contentContainer.Focus(); // shamelessly stolen from source
+            TreeView.Focus();
         }
 
         private void OnToolbarSearchFieldValueChanged(ChangeEvent<string> evt)

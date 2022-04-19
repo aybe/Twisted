@@ -47,6 +47,11 @@ namespace Editor
 
         #region Public methods
 
+        public new void Focus() // let's just pile up on their 'new' specialty
+        {
+            this.Q<ScrollView>().contentContainer.Focus();
+        }
+
         public int GetNodeId(T node)
         {
             if (node == null)
@@ -348,7 +353,8 @@ namespace Editor
             // finally, restore the nodes previously selected by user
 
             SetSelectionById(selection.Select(s => NodesDictionary![s]));
-        }
+
+            Focus(); // and get FUCKING focus working as these guys even failed on this
         }
 
         private void SaveExpandedNodes(out HashSet<T> collapsed, out HashSet<T> expanded)
