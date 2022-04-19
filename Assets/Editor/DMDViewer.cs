@@ -14,7 +14,6 @@ namespace Editor
         // TODO column sorting + arrows
         // TODO filtering + toolbar hint
         // TODO context menus
-        // TODO try fix horizontal scroll bar
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
         // TODO what becomes primary column should be left aligned
@@ -22,7 +21,6 @@ namespace Editor
         // TODO
         // BUG when tree view loses focus, one of its expander may turn blue at any time
         // BUG tree view keyboard expand/collapse may stop working for no reason at all
-        // BUG horizontal scroll bar flickers and partially hides selected item at bottom
         // BUG 
         // BUG multi-column sort destroys expand state
         // BUG 
@@ -126,6 +124,17 @@ namespace Editor
             TreeView.SetColumns(DMDTreeView.GetColumns());
 
             TreeView.onSelectionChange += OnTreeViewSelectionChange;
+
+            // instead of their buggy implementation, always show scrolling, that's cleaner
+
+            var scrollView = TreeView.Q<ScrollView>();
+
+            const ScrollerVisibility visibility = ScrollerVisibility.AlwaysVisible;
+
+            scrollView.horizontalScrollerVisibility = visibility;
+            scrollView.verticalScrollerVisibility   = visibility;
+
+            // and also some fixes put in USS side as things aren't even properly centered
         }
 
         private void CleanupTreeView()
