@@ -45,48 +45,6 @@ namespace Editor
             columnSortingChanged -= OnColumnSortingChanged;
         }
 
-        public void SetColumns(GenericTreeViewColumn<T>[] collection)
-        {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-
-            if (collection.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(collection));
-
-            columnSortingChanged -= OnColumnSortingChanged;
-
-            foreach (var column in collection)
-            {
-                columns.Add(column.GetColumn());
-            }
-
-
-            columnSortingChanged += OnColumnSortingChanged;
-
-            Columns = collection;
-        }
-
-        public void SetSearchFilter(string? searchFilter)
-        {
-            SearchFilter = searchFilter;
-            Reload();
-        }
-
-        public int GetNodeId(T node)
-        {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            return NodesDictionary is null ? -1 : NodesDictionary[node];
-        }
-
-        public void SetRoot(T? node)
-        {
-            Root = node;
-
-            Reload();
-        }
-
         private void Reload()
         {
             RootItems = GetRootItems();
@@ -257,6 +215,16 @@ namespace Editor
             }
         }
 
+        #region Public methods
+
+        public int GetNodeId(T node)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            return NodesDictionary is null ? -1 : NodesDictionary[node];
+        }
+
         public int GetRowCount()
         {
             return NodesDictionary?.Count ?? throw new InvalidOperationException();
@@ -308,6 +276,42 @@ namespace Editor
                 ScrollToItemById(id);
             }
         }
+
+        public void SetColumns(GenericTreeViewColumn<T>[] collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (collection.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(collection));
+
+            columnSortingChanged -= OnColumnSortingChanged;
+
+            foreach (var column in collection)
+            {
+                columns.Add(column.GetColumn());
+            }
+
+
+            columnSortingChanged += OnColumnSortingChanged;
+
+            Columns = collection;
+        }
+
+        public void SetRoot(T? node)
+        {
+            Root = node;
+
+            Reload();
+        }
+
+        public void SetSearchFilter(string? searchFilter)
+        {
+            SearchFilter = searchFilter;
+            Reload();
+        }
+
+        #endregion
 
         #region Sorting
 
