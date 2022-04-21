@@ -259,10 +259,8 @@ namespace Editor
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
         {
-            if (evt.keyCode is not KeyCode.DownArrow)
-                return;
-
-            TreeView.Focus();
+            if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow)
+                TreeView.Focus();
         }
 
         private void OnToolbarSearchFieldValueChanged(ChangeEvent<string> evt)
