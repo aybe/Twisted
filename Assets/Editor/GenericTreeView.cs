@@ -6,8 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Extensions;
-using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
@@ -40,11 +38,67 @@ namespace Editor
 
         private Task? SortingTask;
 
+        protected GenericTreeView()
+        {
+            // find the content container so that we can register context click events
+            // note that we can't use 'this' as it would screw column headers contexts
+
+            var container = this.Q(className: ScrollView.contentUssClassName);
+            container.AddManipulator(new ContextualMenuManipulator(ContextualMenuBuilder));
+        }
+
         private string? SearchFilter { get; set; }
+
+        public TreeViewContextMenuHandler<T>? ContextMenuHandler { get; set; }
 
         public void Dispose()
         {
             columnSortingChanged -= OnColumnSortingChanged;
+        }
+
+        private void ContextualMenuBuilder(ContextualMenuPopulateEvent evt)
+        {
+            // I've decided to use this approach which, I believe, is the least intrusive way to implement this
+            // and it follows what appears to be the newest crap in their junk API: ContextualMenuPopulateEvent
+            // this has many benefits, it works on the entire row and doesn't steal focus like in IMGUI version
+            // now the downside is that we have to rely on user data because TreeNode is by nature not bindable
+
+            if (ContextMenuHandler is null)
+            {
+                return;
+            }
+
+            // get the row container that holds the controls representing a cell
+
+            var target = evt.triggerEvent.target as VisualElement ?? throw new InvalidOperationException();
+
+            while (target != null)
+            {
+                if (target.ClassListContains(MultiColumnController.rowContainerUssClassName))
+                    break;
+
+                target = target.parent;
+            }
+
+            if (target is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            // get user data from the first control found that represents a cell
+
+            var element = target.Q(className: GenericTreeViewColumn<T>.ControlUssClassName);
+
+            if (element is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            // invoke user callback to populate context menu, it will be displayed immediately after that
+
+            var node = element.userData as T ?? throw new InvalidOperationException();
+
+            ContextMenuHandler.Invoke(node, evt.menu);
         }
 
         #region Public methods

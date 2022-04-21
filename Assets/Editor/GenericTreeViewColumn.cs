@@ -9,6 +9,8 @@ namespace Editor
 {
     public class GenericTreeViewColumn<T> where T : TreeNode
     {
+        public const string ControlUssClassName = "generic-tree-view-cell-control";
+
         public GenericTreeViewColumn()
         {
             Optional    = true;
@@ -69,15 +71,20 @@ namespace Editor
 
             void BindCell(VisualElement element, int index)
             {
-                var node = GetNode(element, index);
-                var data = ValueGetter?.Invoke(node);
-                var text = ValueFormatter?.Invoke(data) ?? data?.ToString();
-                ((Label)element).text = text;
+                var node  = GetNode(element, index);
+                var data  = ValueGetter?.Invoke(node);
+                var text  = ValueFormatter?.Invoke(data) ?? data?.ToString();
+                var label = element as Label ?? throw new InvalidOperationException();
+                label.text = text;
+                label.userData = node;
+                label.AddToClassList(ControlUssClassName);
             }
 
             void UnbindCell(VisualElement element, int index)
             {
-                ((Label)element).text = default;
+                var label = element as Label ?? throw new InvalidOperationException();
+                label.text     = default;
+                label.userData = default;
             }
 
             void DestroyCell(VisualElement element)
