@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 namespace Editor
 {
     public sealed class DMDViewer : EditorWindow
-        // TODO context menus
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
         // TODO what becomes primary column should be left aligned
@@ -117,6 +116,8 @@ namespace Editor
             TreeView.SetColumns(DMDTreeView.GetColumns());
 
             TreeView.onSelectionChange += OnTreeViewSelectionChange;
+
+            TreeView.ContextMenuHandler = OnTreeViewContextMenuHandler;
 
             // instead of their buggy implementation, always show scrolling, that's cleaner
 
@@ -323,6 +324,24 @@ namespace Editor
             var node = ToolbarBreadcrumbsNodes[index];
 
             TreeView.SelectNode(node, true, true);
+        }
+
+        private void OnTreeViewContextMenuHandler(DMDNode node, DropdownMenu menu)
+        {
+            menu.AppendAction("Dump/Hexadecimal", _ =>
+            {
+                Model.DumpHexadecimal(node);
+            });
+
+            menu.AppendAction("Dump/Hierarchy (Backward)", _ =>
+            {
+                Model.DumpHierarchyBackward(node);
+            });
+
+            menu.AppendAction("Dump/Hierarchy (Forward)", _ =>
+            {
+                Model.DumpHierarchyForward(node);
+            });
         }
 
         private void OnTreeViewSelectionChange(IEnumerable<object> objects)
