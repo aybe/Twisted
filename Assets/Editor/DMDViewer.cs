@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Twisted.Graphics;
 using UnityEditor;
@@ -230,11 +231,22 @@ namespace Editor
 
         #region Event handlers
 
+        [SuppressMessage("ReSharper", "SwitchStatementMissingSomeEnumCasesNoDefault")]
         private void OnRootKeyDown(KeyDownEvent evt)
         {
-            if (evt.keyCode is KeyCode.F && evt.ctrlKey)
+            switch (evt.keyCode)
             {
-                ToolbarSearchField.Focus();
+                case KeyCode.F when evt.ctrlKey:
+
+                    // ensure that CTRL+F always do something, i.e. start editing when field is focused but is not editing
+
+                    var element = rootVisualElement.focusController.focusedElement != ToolbarSearchField
+                        ? ToolbarSearchField
+                        : ToolbarSearchField.Q(className: "unity-text-element--inner-input-field-component");
+
+                    element.Focus();
+
+                    break;
             }
         }
 
