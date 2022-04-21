@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Extensions;
+using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
@@ -47,9 +49,23 @@ namespace Editor
 
         #region Public methods
 
-        public new void Focus() // let's just pile up on their 'new' specialty
+        public new void Focus() // because their stupid method can't even focus properly
         {
-            this.Q<ScrollView>().contentContainer.Focus();
+            // depending selection and search history the selection might become null
+            // thus, when control gets focus, navigation will not work until 2nd time
+            // ensure that something is selected so that navigation works on 1st time
+
+            if (selectedItem is null)
+            {
+                var node = RootItems?.FirstOrDefault().data;
+
+                if (node != null)
+                {
+                    SelectNode(node, true, true);
+                }
+            }
+
+            this.Q<ScrollView>().contentContainer.Focus(); // now focus this correctly
         }
 
         public int GetNodeId(T node)
