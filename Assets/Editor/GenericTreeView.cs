@@ -422,7 +422,12 @@ namespace Editor
 
             // finally, restore the nodes previously selected by user
 
-            SetSelectionById(selection.Select(s => NodesDictionary![s]));
+            if (selection.Any())
+            {
+                var dictionary = NodesDictionary!;
+
+                SetSelectionById(selection.Select(s => dictionary[s]));
+            }
 
             Focus(); // and get FUCKING focus working as these guys even failed on this
         }
