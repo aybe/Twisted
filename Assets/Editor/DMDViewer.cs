@@ -284,7 +284,10 @@ namespace Editor
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
-            EditorApplication.delayCall += () => Preview.FrameSelection();
+            if (Model.UseSelectionFraming)
+            {
+                EditorApplication.delayCall += () => Preview.FrameSelection();
+            }
         }
 
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
