@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using Twisted;
 using Twisted.Graphics;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -25,9 +28,16 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
+        private static DMDPreview Preview => Singleton<DMDPreview>.instance;
+
         private void OnDisable()
         {
             CleanupTreeView();
+        }
+
+        private void OnDestroy()
+        {
+            DestroyImmediate(Preview.gameObject); // don't leave garbage on scene
         }
 
         public void CreateGUI()
@@ -347,6 +357,8 @@ namespace Editor
         private void OnTreeViewSelectionChanged(object sender, TreeViewSelectionChangedEventArgs<DMDNode> e)
         {
             UpdateToolbarBreadcrumbs();
+
+            Preview.SetNode(Model.DMDFactory!, e.Items.FirstOrDefault() as DMDNode00FF, Model.UseModelSplitting, Model.UseSelectionFraming);
         }
 
         #endregion
