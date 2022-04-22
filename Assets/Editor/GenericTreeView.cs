@@ -414,20 +414,24 @@ namespace Editor
             LoadExpandedNodes(collapsed, expanded);
             Profiler.EndSample();
 
-            // get this stupid control to redraw itself
-
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
-            RefreshItems();
-            Profiler.EndSample();
-
-            // finally, restore the nodes previously selected by user
+            // restore the nodes previously selected by user
 
             if (selection.Any())
             {
                 var dictionary = NodesDictionary!;
 
                 SetSelectionById(selection.Select(s => dictionary[s]));
+
+                // bring something into view or it'll look weird, not perfect because their method sucks
+
+                ScrollToItemById(dictionary[selection.First()]);
             }
+
+            // finally, get this stupid control to redraw itself
+
+            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
+            RefreshItems();
+            Profiler.EndSample();
 
             Focus(); // and get FUCKING focus working as these guys even failed on this
         }
