@@ -17,7 +17,7 @@ namespace Editor
         public bool UseDistinctFiltering;
 
         [SerializeField]
-        public bool UseSelectionFraming;
+        public bool UseSelectionFraming = true;
 
         [SerializeField]
         public bool UseModelSplitting;
