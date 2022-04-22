@@ -59,6 +59,9 @@ namespace Editor
         private ToolbarToggle ToolbarSelectionFraming =>
             rootVisualElement.Q<ToolbarToggle>("toolbarToggleSelectionFraming");
 
+        private ToolbarToggle ToolbarModelSplitting =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarToggleModelSplitting");
+
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
 
@@ -118,6 +121,10 @@ namespace Editor
             ToolbarSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
 
             ToolbarSelectionFraming.RegisterValueChangedCallback(OnToolbarSelectionFramingValueChanged);
+
+            ToolbarModelSplitting.BindProperty(Model.UseModelSplittingProperty);
+
+            ToolbarModelSplitting.RegisterValueChangedCallback(OnToolbarModelSplittingValueChanged);
 
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
 
@@ -278,6 +285,11 @@ namespace Editor
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
             EditorApplication.delayCall += () => Preview.FrameSelection();
+        }
+
+        private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
+        {
+            TreeView.SetSelection(TreeView.GetSelection());
         }
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
