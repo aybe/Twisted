@@ -115,7 +115,7 @@ namespace Editor
 
             TreeView.SetColumns(DMDTreeView.GetColumns());
 
-            TreeView.onSelectionChange += OnTreeViewSelectionChange;
+            TreeView.SelectionChanged += OnTreeViewSelectionChanged;
 
             TreeView.ContextMenuHandler = OnTreeViewContextMenuHandler;
 
@@ -133,7 +133,7 @@ namespace Editor
 
         private void CleanupTreeView()
         {
-            TreeView.onSelectionChange -= OnTreeViewSelectionChange;
+            TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
 
             TreeView.Dispose(); // for columns callback
         }
@@ -344,7 +344,7 @@ namespace Editor
             });
         }
 
-        private void OnTreeViewSelectionChange(IEnumerable<object> objects)
+        private void OnTreeViewSelectionChanged(object sender, TreeViewSelectionChangedEventArgs<DMDNode> e)
         {
             UpdateToolbarBreadcrumbs();
         }
