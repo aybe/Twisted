@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 namespace Editor
@@ -61,6 +62,15 @@ namespace Editor
 
         private ToolbarToggle ToolbarModelSplitting =>
             rootVisualElement.Q<ToolbarToggle>("toolbarToggleModelSplitting");
+
+        private ToolbarToggle ToolbarToggleTexturing =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarToggleTexturing");
+
+        private ToolbarToggle ToolbarToggleVertexColors =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarToggleVertexColors");
+
+        private ToolbarToggle ToolbarTogglePolygonColoring =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
 
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
@@ -126,11 +136,36 @@ namespace Editor
 
             ToolbarModelSplitting.RegisterValueChangedCallback(OnToolbarModelSplittingValueChanged);
 
+            InitializeToolbarToggle(ToolbarToggleTexturing,       Model.UseTexturingProperty,     OnToolbarToggleTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarToggleVertexColors,    Model.UseVertexColorsProperty,  OnToolbarToggleVertexColorsValueChanged);
+            InitializeToolbarToggle(ToolbarTogglePolygonColoring, Model.UsePolygonColorsProperty, OnToolbarTogglePolygonColoringValueChanged);
+            
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
 
             ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
         }
 
+        private static void InitializeToolbarToggle(
+            ToolbarToggle toggle, SerializedProperty property, EventCallback<ChangeEvent<bool>> callback)
+        {
+            if (toggle == null)
+                throw new ArgumentNullException(nameof(toggle));
+            
+            if (property == null)
+                throw new ArgumentNullException(nameof(property));
+            
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+
+            toggle.BindProperty(property);
+            
+            toggle.RegisterValueChangedCallback(callback);
+            
+            using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
+
+            callback(@event);
+        }
+        
         private void InitializeTreeView()
         {
             TreeView.selectionType = SelectionType.Single;
@@ -293,6 +328,21 @@ namespace Editor
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
         {
             TreeView.SetSelection(TreeView.GetSelection());
+        }
+
+        private void OnToolbarToggleTexturingValueChanged(ChangeEvent<bool> evt)
+        {
+            Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_TEXTURE"), evt.newValue);
+        }
+
+        private void OnToolbarToggleVertexColorsValueChanged(ChangeEvent<bool> evt)
+        {
+            Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX"), evt.newValue);
+        }
+
+        private void OnToolbarTogglePolygonColoringValueChanged(ChangeEvent<bool> evt)
+        {
+            Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON"), evt.newValue);
         }
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
