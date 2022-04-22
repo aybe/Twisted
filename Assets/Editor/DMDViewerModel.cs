@@ -23,7 +23,7 @@ namespace Editor
         public bool UseModelSplitting;
 
         [SerializeField]
-        public bool UseTexturing;
+        public bool UseTexturing = true;
 
         [SerializeField]
         public bool UseVertexColors;
