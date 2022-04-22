@@ -126,6 +126,22 @@ namespace Editor
             this.Q<ScrollView>().contentContainer.Focus(); // now focus this correctly
         }
 
+        public IEnumerable<T> GetSelection()
+        {
+            var nodes = selectedItems.Cast<T>().ToArray();
+
+            return nodes;
+        }
+
+        public void SetSelection(IEnumerable<T> items)
+        {
+            var dictionary = NodesDictionary ?? throw new InvalidOperationException();
+
+            var indices = items.Select(s => dictionary[s]).ToArray();
+
+            SetSelection(indices);
+        }
+
         public int GetNodeId(T node)
         {
             if (node == null)
