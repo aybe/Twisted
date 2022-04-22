@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Unity.Extensions;
 using UnityEngine.Profiling;
 using UnityEngine.UIElements;
@@ -40,6 +41,8 @@ namespace Editor
 
         protected GenericTreeView()
         {
+            onSelectionChange += OnSelectionChange;
+
             // find the content container so that we can register context click events
             // note that we can't use 'this' as it would screw column headers contexts
 
@@ -54,6 +57,7 @@ namespace Editor
         public void Dispose()
         {
             columnSortingChanged -= OnColumnSortingChanged;
+            onSelectionChange    -= OnSelectionChange;
         }
 
         private void ContextualMenuBuilder(ContextualMenuPopulateEvent evt)
@@ -520,6 +524,24 @@ namespace Editor
             }
 
             // the main cause of all that is that these newbies don't know how to use LINQ reasonably
+        }
+
+        #endregion
+
+        #region SelectionChanged
+
+        [PublicAPI]
+        public event EventHandler<TreeViewSelectionChangedEventArgs<T>>? SelectionChanged;
+
+        private void OnSelectionChange(IEnumerable<object> objects)
+        {
+            OnSelectionChanged(new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
+        }
+        
+        [PublicAPI]
+        protected virtual void OnSelectionChanged(TreeViewSelectionChangedEventArgs<T> e)
+        {
+            SelectionChanged?.Invoke(this, e);
         }
 
         #endregion
