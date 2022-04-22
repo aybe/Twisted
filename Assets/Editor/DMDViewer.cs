@@ -56,6 +56,9 @@ namespace Editor
         private ToolbarButton ToolbarOpenFileButton =>
             rootVisualElement.Q<ToolbarButton>("toolbarOpenFileButton");
 
+        private ToolbarToggle ToolbarSelectionFraming =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarToggleSelectionFraming");
+
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
 
@@ -111,6 +114,10 @@ namespace Editor
         private void InitializeToolbar()
         {
             ToolbarOpenFileButton.clicked += OnToolbarOpenFile;
+
+            ToolbarSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
+
+            ToolbarSelectionFraming.RegisterValueChangedCallback(OnToolbarSelectionFramingValueChanged);
 
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
 
@@ -266,6 +273,11 @@ namespace Editor
             Model.OpenFile();
             UpdateControls();
             UpdateTitle();
+        }
+
+        private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
+        {
+            EditorApplication.delayCall += () => Preview.FrameSelection();
         }
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
