@@ -331,7 +331,9 @@ namespace Editor
 
         private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
         {
-            TreeView.SetSearchFilterEqualityComparer(evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null);
+            TreeView.SearchFilterComparer = evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null;
+            TreeView.Rebuild();
+
             UpdateToolbarSearchLabel();
         }
 
@@ -365,7 +367,7 @@ namespace Editor
         {
             var element = evt.target as VisualElement ?? throw new InvalidOperationException();
 
-            var valid = TreeView.IsValidSearchFilter(evt.newValue);
+            var valid = TreeView.SearchFilterValidate(evt.newValue);
 
             if (valid)
             {
@@ -393,7 +395,8 @@ namespace Editor
 
             if (valid)
             {
-                TreeView.SetSearchFilter(evt.newValue);
+                TreeView.SearchFilter = evt.newValue;
+                TreeView.Rebuild();
             }
 
             UpdateToolbarSearchLabel();

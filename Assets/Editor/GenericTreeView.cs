@@ -117,10 +117,9 @@ namespace Editor
             Rebuild();
         }
 
-        public new void Rebuild() // let's pile up on their favorite 'new' keyword... and sweep that shit under the rug
+        /// <inheritdoc cref="BaseVerticalCollectionView.Rebuild" />
+        public new void Rebuild() // let's pile up on their favorite 'new' keyword
         {
-            // here we basically build their items, our nodes map and run their initialization sequence
-
             Builder.Rebuild();
 
             base.Rebuild();
@@ -186,36 +185,27 @@ namespace Editor
 
         #region Search
 
+        /// <summary>
+        ///     Gets or sets the search filter for this instance.
+        /// </summary>
+        /// <remarks>
+        ///     Call <see cref="Rebuild" /> after to apply changes.
+        /// </remarks>
         public string? SearchFilter { get; set; }
 
-        public IEqualityComparer<T>? SearchFilterEqualityComparer { get; set; }
+        /// <summary>
+        ///     Gets or sets the search filter comparer for this instance.
+        /// </summary>
+        /// <remarks>
+        ///     Call <see cref="Rebuild" /> after to apply changes.
+        /// </remarks>
+        public IEqualityComparer<T>? SearchFilterComparer { get; set; }
 
-        public string? GetSearchFilter()
-        {
-            return SearchFilter;
-        }
-
-        public void SetSearchFilter(string? value)
-        {
-            SearchFilter = value;
-
-            Rebuild();
-        }
-
-        public IEqualityComparer<T>? GetSearchFilterEqualityComparer()
-        {
-            return SearchFilterEqualityComparer;
-        }
-
-        public void SetSearchFilterEqualityComparer(IEqualityComparer<T>? equalityComparer)
-        {
-            SearchFilterEqualityComparer = equalityComparer;
-
-            Rebuild();
-        }
-
+        /// <summary>
+        ///     Gets whether the search filter is a valid regular expression pattern.
+        /// </summary>
         [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-        public bool IsValidSearchFilter(string value)
+        public bool SearchFilterValidate(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

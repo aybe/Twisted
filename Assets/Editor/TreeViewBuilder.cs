@@ -137,9 +137,9 @@ namespace Editor
                 sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
             }
 
-            if (View.SearchFilterEqualityComparer is not null)
+            if (View.SearchFilterComparer is not null)
             {
-                sort = sort.Distinct(View.SearchFilterEqualityComparer);
+                sort = sort.Distinct(View.SearchFilterComparer);
             }
 
             return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
