@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Unity.Extensions;
 using UnityEngine.UIElements;
 
@@ -38,9 +36,12 @@ namespace Editor
             ContextMenuManipulatorContainer.AddManipulator(ContextMenuManipulator);
 
             Builder = new TreeViewBuilder<T>(this);
+            Sorter  = new TreeViewSorter<T>(this);
         }
 
-        private TreeViewBuilder<T> Builder { get; }
+        internal TreeViewBuilder<T> Builder { get; }
+
+        private TreeViewSorter<T> Sorter { get; }
 
         #region General stuff
 
@@ -48,7 +49,7 @@ namespace Editor
 
         public void Dispose()
         {
-            columnSortingChanged -= SortChanged;
+            columnSortingChanged -= Sorter.OnSortChanged;
 
             onSelectionChange -= SelectionChangedCallback;
 
@@ -93,14 +94,14 @@ namespace Editor
             if (collection.Length is 0)
                 throw new ArgumentException("Value cannot be an empty collection.", nameof(collection));
 
-            columnSortingChanged -= SortChanged;
+            columnSortingChanged -= Sorter.OnSortChanged;
 
             foreach (var column in collection)
             {
                 columns.Add(column.GetColumn());
             }
 
-            columnSortingChanged += SortChanged;
+            columnSortingChanged += Sorter.OnSortChanged;
 
             Columns = collection;
         }
@@ -116,7 +117,7 @@ namespace Editor
             Rebuild();
         }
 
-        private new void Rebuild() // let's pile up on their favorite 'new' keyword... and sweep that shit under the rug
+        public new void Rebuild() // let's pile up on their favorite 'new' keyword... and sweep that shit under the rug
         {
             // here we basically build their items, our nodes map and run their initialization sequence
 
@@ -127,116 +128,6 @@ namespace Editor
 
         #endregion
 
-        #region Sorting
-
-        private Task? SortBackgroundTask { get; set; }
-
-        private void SortChanged()
-        {
-            // these code monkeys will raise this event N headers + 2 times in a row for NO FUCKING REASON
-            // this, unless you hold a FUCKING modifier such as Shift or Ctrl, obviously, not explained...
-            // now let's protect ourselves from their stupid shit by using a task with a rudimentary guard
-
-            // this, along our manual handling brings back SMOOTH performance like there was in IMGUI tree
-
-            if (SortBackgroundTask?.IsCompleted == false)
-                return;
-
-            SortBackgroundTask = Task.Factory.StartNew(
-                Sort,
-                CancellationToken.None,
-                TaskCreationOptions.None,
-                TaskScheduler.FromCurrentSynchronizationContext() // this is WPF-like, cross-thread stuff
-            );
-        }
-
-        private void Sort()
-        {
-            // the deep sorting will screw ids/expanded/selection, first, save this information
-
-            var selection = GetSelection();
-
-            SortSaveExpanded(out var collapsed, out var expanded);
-
-            // perform the actual sorting, this will also update our dictionary that we'll need
-
-            Rebuild();
-
-            // restore the collapsed/expanded state of the tree view items but in a FAST manner
-
-            SortLoadExpanded(collapsed, expanded);
-
-            if (selection.Any())
-            {
-                // now it's time to restore the selection that was previously made by the user
-
-                SetSelectionById(selection.Select(s => Builder.GetNodeIdentifier(s)));
-
-                // scroll to something or it'll suck, not perfect because of their incompetence
-
-                ScrollToItemById(Builder.GetNodeIdentifier(selection.First()));
-            }
-
-            // redraw control and use our own focus because these morons even failed on this...
-
-            RefreshItems();
-
-            Focus();
-        }
-
-        private void SortSaveExpanded(out HashSet<T> collapsed, out HashSet<T> expanded)
-        {
-            // using their stuff at the bare minimum as it's complete junk that is unbelievably slow
-
-            collapsed = new HashSet<T>();
-            expanded  = new HashSet<T>();
-
-            var controller = viewController;
-
-            foreach (var item in Builder)
-            {
-                var data = item.data;
-
-                if (controller.IsExpanded(item.id))
-                {
-                    expanded.Add(data);
-                }
-                else
-                {
-                    collapsed.Add(data);
-                }
-            }
-        }
-
-        private void SortLoadExpanded(HashSet<T> collapsed, HashSet<T> expanded)
-            // here we use a simple but effective approach that scale well for 10K+ tree nodes
-        {
-            // now really stupid: we'd do it in whichever way that will take the shortest time
-            // this, because their crap is exponentially longer as there are nodes in the tree
-
-            var controller = viewController;
-
-            if (expanded.Count > collapsed.Count)
-            {
-                controller.ExpandAll();
-
-                foreach (var data in collapsed)
-                {
-                    controller.CollapseItem(Builder.GetNodeIdentifier(data), false);
-                }
-            }
-            else
-            {
-                controller.CollapseAll();
-
-                foreach (var data in expanded)
-                {
-                    controller.ExpandItem(Builder.GetNodeIdentifier(data), false, false);
-                }
-            }
-        }
-
-        #endregion
 
         #region Selection
 
