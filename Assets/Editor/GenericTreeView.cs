@@ -36,15 +36,15 @@ namespace Editor
                                               ?? throw new InvalidOperationException("Content container could not be found.");
 
             ContextMenuManipulatorContainer.AddManipulator(ContextMenuManipulator);
+
+            Builder = new TreeViewBuilder<T>(this);
         }
+
+        private TreeViewBuilder<T> Builder { get; }
 
         #region General stuff
 
-        private List<TreeViewItemData<T>>? Items { get; set; } // their junk struct
-
-        private T? Node { get; set; } // root node
-
-        private Dictionary<T, int>? Nodes { get; set; } // for fast ID retrieval
+        public T? Node { get; set; } // root node
 
         public void Dispose()
         {
@@ -63,7 +63,7 @@ namespace Editor
 
             if (selectedItem is null)
             {
-                var node = Items?.FirstOrDefault().data;
+                var node = Builder.FirstOrDefault().data;
 
                 if (node != null)
                 {
@@ -76,24 +76,14 @@ namespace Editor
 
         public int GetRowCount()
         {
-            ThrowIfNodesIsNull();
-
-            return Nodes!.Count;
-        }
-
-        private void ThrowIfNodesIsNull()
-        {
-            if (Nodes is null)
-            {
-                throw new InvalidOperationException($"This instance hasn't been assigned a root node using {nameof(SetRootNode)}.");
-            }
+            return Builder.GetNodeCount();
         }
 
         #endregion
 
         #region Columns
 
-        private GenericTreeViewColumn<T>[]? Columns { get; set; }
+        internal GenericTreeViewColumn<T>[]? Columns { get; private set; }
 
         public void SetColumns(GenericTreeViewColumn<T>[] collection)
         {
@@ -119,178 +109,6 @@ namespace Editor
 
         #region Building
 
-        private static List<TSource> GetList<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
-            // flatten a hierarchy
-        {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
-
-            if (children is null)
-                throw new ArgumentNullException(nameof(children));
-
-            var list = new List<TSource>();
-
-            var stack = new Stack<TSource>();
-
-            foreach (var source in collection)
-            {
-                stack.Push(source);
-            }
-
-            while (stack.Count > 0)
-            {
-                var pop = stack.Pop();
-
-                list.Add(pop);
-
-                foreach (var child in children(pop).Reverse())
-                {
-                    stack.Push(child);
-                }
-            }
-
-            return list;
-        }
-
-        private List<TreeViewItemData<T>> GetRootItems()
-        {
-            if (Columns is null || Columns.Length is 0)
-            {
-                throw new InvalidOperationException($"This instance hasn't been assigned columns using {nameof(SetColumns)}.");
-            }
-
-            if (Node is null)
-            {
-                return new List<TreeViewItemData<T>>(); // until root gets assigned, keep user and their private shit happy
-            }
-
-            // here we use a dictionary because we'll query this (rows * columns) times and that will sum up really quickly
-
-            var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
-            var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
-
-            var items = string.IsNullOrWhiteSpace(SearchFilter)
-                ? GetRootItemsTree(descriptions, dictionary)
-                : GetRootItemsList(descriptions, dictionary);
-
-            return items;
-        }
-
-        private List<TreeViewItemData<T>> GetRootItemsList(
-            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
-        {
-            if (descriptions is null)
-                throw new ArgumentNullException(nameof(descriptions));
-
-            if (dictionary is null)
-                throw new ArgumentNullException(nameof(dictionary));
-
-            var nodes = new List<T>();
-            var stack = new Stack<T>(new[] { Node! });
-            var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
-
-            while (stack.Count > 0)
-            {
-                var pop = stack.Pop();
-
-                foreach (var column in Columns!)
-                {
-                    var o = column.ValueGetter?.Invoke(pop);
-                    var s = column.ValueFormatter?.Invoke(o);
-                    var b = s != null && regex.IsMatch(s);
-
-                    if (b is false)
-                        continue;
-
-                    nodes.Add(pop);
-                    break;
-                }
-
-                foreach (var child in pop.Cast<T>().Reverse())
-                {
-                    stack.Push(child);
-                }
-            }
-
-            var sort = nodes.AsEnumerable();
-
-            foreach (var description in descriptions)
-            {
-                var column = dictionary[description.columnName];
-                var getter = column.ValueGetter;
-
-                if (getter is null)
-                {
-                    throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
-                }
-
-                sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
-            }
-
-            if (SearchFilterEqualityComparer is not null)
-            {
-                sort = sort.Distinct(SearchFilterEqualityComparer);
-            }
-
-            return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
-        }
-
-        private List<TreeViewItemData<T>> GetRootItemsTree(
-            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
-        {
-            if (descriptions is null)
-                throw new ArgumentNullException(nameof(descriptions));
-
-            if (dictionary is null)
-                throw new ArgumentNullException(nameof(dictionary));
-
-            var list = new List<TreeViewItemData<T>>();
-
-            var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
-
-            stack.Push((Node!, null));
-
-            var id = 0;
-
-            while (stack.Count > 0)
-            {
-                var (node, container) = stack.Pop();
-
-                var item = new TreeViewItemData<T>(id++, node);
-
-                if (container is null)
-                {
-                    list.Add(item);
-                }
-                else
-                {
-                    ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
-                }
-
-                var children = node.Cast<T>().Reverse();
-
-                foreach (var description in descriptions)
-                {
-                    var column = dictionary[description.columnName];
-                    var getter = column.ValueGetter;
-
-                    if (getter is null)
-                    {
-                        throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
-                    }
-
-                    children = children.Sort(getter, null, description.direction is SortDirection.Descending);
-                }
-
-                foreach (var child in children)
-                {
-                    stack.Push((child, item));
-                }
-            }
-
-            return list;
-        }
-
         public void SetRootNode(T? node)
         {
             Node = node;
@@ -302,11 +120,7 @@ namespace Editor
         {
             // here we basically build their items, our nodes map and run their initialization sequence
 
-            Items = GetRootItems();
-
-            Nodes = GetList(Items, s => s.children).ToDictionary(s => s.data, s => s.id);
-
-            SetRootItems(Items);
+            Builder.Rebuild();
 
             base.Rebuild();
         }
@@ -354,15 +168,13 @@ namespace Editor
 
             if (selection.Any())
             {
-                var dictionary = Nodes!;
-
                 // now it's time to restore the selection that was previously made by the user
 
-                SetSelectionById(selection.Select(s => dictionary[s]));
+                SetSelectionById(selection.Select(s => Builder.GetNodeIdentifier(s)));
 
                 // scroll to something or it'll suck, not perfect because of their incompetence
 
-                ScrollToItemById(dictionary[selection.First()]);
+                ScrollToItemById(Builder.GetNodeIdentifier(selection.First()));
             }
 
             // redraw control and use our own focus because these morons even failed on this...
@@ -381,9 +193,7 @@ namespace Editor
 
             var controller = viewController;
 
-            var items = GetList(Items!, s => s.children);
-
-            foreach (var item in items)
+            foreach (var item in Builder)
             {
                 var data = item.data;
 
@@ -401,10 +211,6 @@ namespace Editor
         private void SortLoadExpanded(HashSet<T> collapsed, HashSet<T> expanded)
             // here we use a simple but effective approach that scale well for 10K+ tree nodes
         {
-            // build a dictionary to be able to retrieve newly assigned IDs to tree view items
-
-            var ids = GetList(Items!, s => s.children).ToDictionary(s => s.data, s => s.id);
-
             // now really stupid: we'd do it in whichever way that will take the shortest time
             // this, because their crap is exponentially longer as there are nodes in the tree
 
@@ -416,7 +222,7 @@ namespace Editor
 
                 foreach (var data in collapsed)
                 {
-                    controller.CollapseItem(ids[data], false);
+                    controller.CollapseItem(Builder.GetNodeIdentifier(data), false);
                 }
             }
             else
@@ -425,7 +231,7 @@ namespace Editor
 
                 foreach (var data in expanded)
                 {
-                    controller.ExpandItem(ids[data], false, false);
+                    controller.ExpandItem(Builder.GetNodeIdentifier(data), false, false);
                 }
             }
         }
@@ -482,26 +288,16 @@ namespace Editor
 
         private int GetNodeId(T node)
         {
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
-            ThrowIfNodesIsNull();
-
-            if (!Nodes!.TryGetValue(node, out var id))
-            {
-                throw new ArgumentOutOfRangeException(nameof(node), node, "The node is neither the root node nor a child of it.");
-            }
-
-            return id;
+            return Builder.GetNodeIdentifier(node);
         }
 
         #endregion
 
         #region Search
 
-        private string? SearchFilter { get; set; }
+        public string? SearchFilter { get; set; }
 
-        private IEqualityComparer<T>? SearchFilterEqualityComparer { get; set; }
+        public IEqualityComparer<T>? SearchFilterEqualityComparer { get; set; }
 
         public string? GetSearchFilter()
         {
