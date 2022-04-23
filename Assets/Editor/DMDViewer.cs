@@ -53,23 +53,23 @@ namespace Editor
 
         #region Controls
 
-        private ToolbarButton ToolbarOpenFileButton =>
-            rootVisualElement.Q<ToolbarButton>("toolbarOpenFileButton");
+        private ToolbarButton ToolbarOpenFile =>
+            rootVisualElement.Q<ToolbarButton>("toolbarOpenFile");
 
         private ToolbarToggle ToolbarSelectionFraming =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarToggleSelectionFraming");
+            rootVisualElement.Q<ToolbarToggle>("toolbarSelectionFraming");
 
         private ToolbarToggle ToolbarModelSplitting =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarToggleModelSplitting");
+            rootVisualElement.Q<ToolbarToggle>("toolbarModelSplitting");
 
-        private ToolbarToggle ToolbarToggleTexturing =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarToggleTexturing");
+        private ToolbarToggle ToolbarTexturing =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
 
-        private ToolbarToggle ToolbarToggleVertexColors =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarToggleVertexColors");
+        private ToolbarToggle ToolbarVertexColors =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");
 
-        private ToolbarToggle ToolbarTogglePolygonColoring =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarTogglePolygonColoring");
+        private ToolbarToggle ToolbarPolygonColoring =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColoring");
 
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
@@ -125,7 +125,7 @@ namespace Editor
 
         private void InitializeToolbar()
         {
-            ToolbarOpenFileButton.clicked += OnToolbarOpenFile;
+            ToolbarOpenFile.clicked += OnToolbarOpenFile;
 
             ToolbarSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
 
@@ -135,10 +135,10 @@ namespace Editor
 
             ToolbarModelSplitting.RegisterValueChangedCallback(OnToolbarModelSplittingValueChanged);
 
-            InitializeToolbarToggle(ToolbarToggleTexturing,       Model.UseTexturingProperty,     OnToolbarToggleTexturingValueChanged);
-            InitializeToolbarToggle(ToolbarToggleVertexColors,    Model.UseVertexColorsProperty,  OnToolbarToggleVertexColorsValueChanged);
-            InitializeToolbarToggle(ToolbarTogglePolygonColoring, Model.UsePolygonColorsProperty, OnToolbarTogglePolygonColoringValueChanged);
-            
+            InitializeToolbarToggle(ToolbarTexturing,       Model.UseTexturingProperty,     OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarVertexColors,    Model.UseVertexColorsProperty,  OnToolbarVertexColorsValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonColoring, Model.UsePolygonColorsProperty, OnToolbarPolygonColoringValueChanged);
+
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
 
             ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
@@ -149,22 +149,22 @@ namespace Editor
         {
             if (toggle == null)
                 throw new ArgumentNullException(nameof(toggle));
-            
+
             if (property == null)
                 throw new ArgumentNullException(nameof(property));
-            
+
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
             toggle.BindProperty(property);
-            
+
             toggle.RegisterValueChangedCallback(callback);
-            
+
             using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
 
             callback(@event);
         }
-        
+
         private void InitializeTreeView()
         {
             TreeView.selectionType = SelectionType.Single;
@@ -329,17 +329,17 @@ namespace Editor
             TreeView.SetSelection(TreeView.GetSelection());
         }
 
-        private void OnToolbarToggleTexturingValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarTexturingValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_TEXTURE"), evt.newValue);
         }
 
-        private void OnToolbarToggleVertexColorsValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarVertexColorsValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX"), evt.newValue);
         }
 
-        private void OnToolbarTogglePolygonColoringValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarPolygonColoringValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON"), evt.newValue);
         }

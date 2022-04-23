@@ -2,13 +2,13 @@
     <Style src="project://database/Assets/Editor/DMDViewer.uss?fileID=7433441132597879392&amp;guid=73695c672c5041845b7ec1bca5cd0cf4&amp;type=3#DMDViewer" />
     <ui:VisualElement class="root">
         <uie:Toolbar class="toolbar">
-            <uie:ToolbarButton tabindex="-1" display-tooltip-when-elided="true" name="toolbarOpenFileButton" class="toolbar-button" style="background-image: resource(&apos;Icons/Folder&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable distinct filtering for search mode." name="toolbarToggleDistinctFiltering" class="toolbar-toggle" style="background-image: resource(&apos;Icons/FilterByType&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable selection framing." name="toolbarToggleSelectionFraming" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Camera Icon&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable splitting of models as polygons." name="toolbarToggleModelSplitting" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid Icon&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable texturing." name="toolbarToggleTexturing" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Texture2D Icon&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable vertex colors." name="toolbarToggleVertexColors" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material Icon&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon family coloring." name="toolbarTogglePolygonColoring" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
+            <uie:ToolbarButton tabindex="-1" display-tooltip-when-elided="true" name="toolbarOpenFile" class="toolbar-button" style="background-image: resource(&apos;Icons/Folder&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable distinct filtering for search mode." name="toolbarDistinctFiltering" class="toolbar-toggle" style="background-image: resource(&apos;Icons/FilterByType&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable selection framing." name="toolbarSelectionFraming" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Camera Icon&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable splitting of models as polygons." name="toolbarModelSplitting" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid Icon&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable texturing." name="toolbarTexturing" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Texture2D Icon&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable vertex colors." name="toolbarVertexColors" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material Icon&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon family coloring." name="toolbarPolygonColoring" class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
             <uie:ToolbarSpacer class="toolbar-spacer" />
             <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="toolbarSearchLabel" class="toolbar-label" />
             <uie:ToolbarSearchField focusable="true" name="toolbarSearchField" class="toolbar-search-field" />
