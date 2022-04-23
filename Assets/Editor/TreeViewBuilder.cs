@@ -58,7 +58,7 @@ namespace Editor
 
             List<TreeViewItemData<T>> items;
 
-            if (View.Node is null)
+            if (View.RootNode is null)
             {
                 items = new List<TreeViewItemData<T>>();
             }
@@ -96,7 +96,7 @@ namespace Editor
                 throw new ArgumentNullException(nameof(dictionary));
 
             var nodes = new List<T>();
-            var stack = new Stack<T>(new[] { View.Node! });
+            var stack = new Stack<T>(new[] { View.RootNode! });
             var regex = new Regex(View.SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
             while (stack.Count > 0)
@@ -158,7 +158,7 @@ namespace Editor
 
             var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
 
-            stack.Push((View.Node!, null));
+            stack.Push((View.RootNode!, null));
 
             var id = 0;
 

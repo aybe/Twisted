@@ -8,54 +8,102 @@ using UnityEngine.UIElements;
 
 namespace Editor
 {
-    // some general notes about the masterpiece of shit that this tree view is
-
+    public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
     // it's also unbelievably buggy but from them this isn't a surprise at all
-
     // worst being the column sorting stuff, that was literally freezing Unity
-
     // to deep sort 10K+ nodes: theirs = ~30 second, mine = less than a second
-
-    public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     {
         protected GenericTreeView()
         {
             // hook to this so that we can provide GetSelection<T> and SetSelection<T>
 
-            onSelectionChange += SelectionChangedCallback;
+            onSelectionChange += OnSelectionChanged;
 
             // find the content container so that we can register context click events
             // note that we can't use 'this' as it would screw column headers contexts
 
-            ContextMenuManipulator = new ContextualMenuManipulator(ContextMenuBuilder);
+            ContextMenu = new ContextualMenuManipulator(OnContextMenuPopulate);
 
-            ContextMenuManipulatorContainer = this.Q(className: ScrollView.contentUssClassName)
-                                              ?? throw new InvalidOperationException("Content container could not be found.");
+            ContextMenuHost = this.Q(className: ScrollView.contentUssClassName)
+                              ?? throw new InvalidOperationException("Content container could not be found.");
 
-            ContextMenuManipulatorContainer.AddManipulator(ContextMenuManipulator);
+            ContextMenuHost.AddManipulator(ContextMenu);
 
             Builder = new TreeViewBuilder<T>(this);
             Sorter  = new TreeViewSorter<T>(this);
         }
 
-        internal TreeViewBuilder<T> Builder { get; }
+        #region IDisposable
 
-        private TreeViewSorter<T> Sorter { get; }
-
-        #region General stuff
-
-        public T? Node { get; set; } // root node
-
+        /// <inheritdoc />
         public void Dispose()
         {
             columnSortingChanged -= Sorter.OnSortChanged;
 
-            onSelectionChange -= SelectionChangedCallback;
+            onSelectionChange -= OnSelectionChanged;
 
-            ContextMenuManipulatorContainer.RemoveManipulator(ContextMenuManipulator);
+            ContextMenuHost.RemoveManipulator(ContextMenu);
         }
 
+        #endregion
+
+        #region Public events
+
+        /// <summary>
+        ///     Occurs when the selection has changed.
+        /// </summary>
+        public event EventHandler<TreeViewSelectionChangedEventArgs<T>>? SelectionChanged;
+
+        #endregion
+
+        #region Private properties
+
+        internal TreeViewBuilder<T> Builder { get; }
+
+        private TreeViewSorter<T> Sorter { get; }
+
+        internal GenericTreeViewColumn<T>[]? Columns { get; private set; }
+
+        private ContextualMenuManipulator ContextMenu { get; }
+
+        private VisualElement? ContextMenuHost { get; }
+
+        #endregion
+
+        #region Public properties
+
+        /// <summary>
+        ///     Gets or sets the context menu handler for this instance.
+        /// </summary>
+        public TreeViewContextMenuHandler<T>? ContextMenuHandler { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the root node for this instance.
+        /// </summary>
+        public T? RootNode { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the search filter for this instance.
+        /// </summary>
+        /// <remarks>
+        ///     Call <see cref="Rebuild" /> after to apply changes.
+        /// </remarks>
+        public string? SearchFilter { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the search filter comparer for this instance.
+        /// </summary>
+        /// <remarks>
+        ///     Call <see cref="Rebuild" /> after to apply changes.
+        /// </remarks>
+        public IEqualityComparer<T>? SearchFilterComparer { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        /// <inheritdoc cref="VisualElement.Focus" />
         public new void Focus() // because their stupid method can't even focus right
         {
             // depending selection and search history the selection might become null
@@ -75,17 +123,26 @@ namespace Editor
             this.Q<ScrollView>().contentContainer.Focus(); // do focus this correctly
         }
 
+        /// <summary>
+        ///     Gets the number of visible rows for this instance.
+        /// </summary>
+        /// <returns></returns>
         public int GetRowCount()
         {
             return Builder.GetNodeCount();
         }
 
-        #endregion
+        /// <inheritdoc cref="BaseVerticalCollectionView.Rebuild" />
+        public new void Rebuild() // let's go pile up on their favorite 'new' keyword
+        {
+            Builder.Rebuild();
 
-        #region Columns
+            base.Rebuild();
+        }
 
-        internal GenericTreeViewColumn<T>[]? Columns { get; private set; }
-
+        /// <summary>
+        ///     Gets or sets the columns for this instance.
+        /// </summary>
         public void SetColumns(GenericTreeViewColumn<T>[] collection)
         {
             if (collection is null)
@@ -106,37 +163,10 @@ namespace Editor
             Columns = collection;
         }
 
-        #endregion
-
-        #region Building
-
-        public void SetRootNode(T? node)
-        {
-            Node = node;
-
-            Rebuild();
-        }
-
-        /// <inheritdoc cref="BaseVerticalCollectionView.Rebuild" />
-        public new void Rebuild() // let's pile up on their favorite 'new' keyword
-        {
-            Builder.Rebuild();
-
-            base.Rebuild();
-        }
-
-        #endregion
-
-
-        #region Selection
-
-        public event EventHandler<TreeViewSelectionChangedEventArgs<T>>? SelectionChanged;
-
-        private void SelectionChangedCallback(IEnumerable<object> objects)
-        {
-            SelectionChanged?.Invoke(this, new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
-        }
-
+        /// <summary>
+        ///     Gets the selected nodes for this instance.
+        /// </summary>
+        /// <returns></returns>
         public IReadOnlyList<T> GetSelection()
         {
             var nodes = selectedItems.Cast<T>().ToArray();
@@ -144,13 +174,19 @@ namespace Editor
             return nodes;
         }
 
+        /// <summary>
+        ///     Sets the selected nodes for this instance.
+        /// </summary>
         public void SetSelection(IEnumerable<T> nodes)
         {
-            var indices = nodes.Select(GetNodeId).ToArray();
+            var indices = nodes.Select(node => Builder.GetNodeIdentifier(node)).ToArray();
 
             SetSelection(indices);
         }
 
+        /// <summary>
+        ///     Selects a node for this instance.
+        /// </summary>
         public void SelectNode(T node, bool notify, bool scroll)
         {
             if (node is null)
@@ -159,7 +195,7 @@ namespace Editor
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            var id = GetNodeId(node);
+            var id = Builder.GetNodeIdentifier(node);
 
             if (notify)
             {
@@ -175,31 +211,6 @@ namespace Editor
                 ScrollToItemById(id);
             }
         }
-
-        private int GetNodeId(T node)
-        {
-            return Builder.GetNodeIdentifier(node);
-        }
-
-        #endregion
-
-        #region Search
-
-        /// <summary>
-        ///     Gets or sets the search filter for this instance.
-        /// </summary>
-        /// <remarks>
-        ///     Call <see cref="Rebuild" /> after to apply changes.
-        /// </remarks>
-        public string? SearchFilter { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the search filter comparer for this instance.
-        /// </summary>
-        /// <remarks>
-        ///     Call <see cref="Rebuild" /> after to apply changes.
-        /// </remarks>
-        public IEqualityComparer<T>? SearchFilterComparer { get; set; }
 
         /// <summary>
         ///     Gets whether the search filter is a valid regular expression pattern.
@@ -226,15 +237,9 @@ namespace Editor
 
         #endregion
 
-        #region Context menu
+        #region Private methods
 
-        private ContextualMenuManipulator ContextMenuManipulator { get; }
-
-        private VisualElement? ContextMenuManipulatorContainer { get; }
-
-        public TreeViewContextMenuHandler<T>? ContextMenuHandler { get; set; }
-
-        private void ContextMenuBuilder(ContextualMenuPopulateEvent evt)
+        private void OnContextMenuPopulate(ContextualMenuPopulateEvent evt)
         {
             // I've decided to use this approach which, I believe, is the least intrusive way to implement this
             // and it follows what appears to be the newest crap in their junk API: ContextualMenuPopulateEvent
@@ -277,6 +282,11 @@ namespace Editor
             var node = element.userData as T ?? throw new InvalidOperationException("Cell has no user data.");
 
             ContextMenuHandler.Invoke(node, evt.menu);
+        }
+
+        private void OnSelectionChanged(IEnumerable<object> objects)
+        {
+            SelectionChanged?.Invoke(this, new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
         }
 
         #endregion

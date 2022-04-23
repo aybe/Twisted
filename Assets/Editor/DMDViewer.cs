@@ -211,13 +211,17 @@ namespace Editor
 
             var dmd = Model.DMDFactory?.DMD;
 
-            TreeView.SetRootNode(dmd); // more subtle than you think: it initializes their internal shit
+            TreeView.RootNode = dmd;
+            
+            TreeView.Rebuild();
 
-            TreeView.sortColumnDescriptions.Clear(); // clean up garbage from previous file, if any
+            // clean up garbage from previous file, if any
 
-            TreeView.CollapseAll(); // also but stupid method NRE unless root is set, hence why here
+            TreeView.sortColumnDescriptions.Clear();
 
-            // show or hide depending DMD, because dumb ass tree will NRE when clicked but is empty
+            TreeView.CollapseAll();
+
+            // show or hide tree depending DMD, because dumb ass tree will NRE if clicked but empty
 
             var visible = dmd is not null;
 
@@ -225,15 +229,13 @@ namespace Editor
 
             ToolbarBreadcrumbsHost.visible = visible;
 
-            // update relevant controls
+            // update our controls and select something to update breadcrumbs or they'll look weird
 
             UpdateToolbarSearchLabel();
 
-            // select something to get breadcrumbs populated else the interface will look like shit
-
             if (dmd is not null)
             {
-                TreeView.SelectNode(dmd, true, true); // this will trigger UpdateToolbarBreadcrumbs
+                TreeView.SelectNode(dmd, true, true);
             }
         }
 
