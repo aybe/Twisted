@@ -206,7 +206,7 @@ namespace Editor
 
             var dmd = Model.DMDFactory?.DMD;
 
-            TreeView.SetRoot(dmd); // more subtle than you think: it initializes their internal shit
+            TreeView.SetRootNode(dmd); // more subtle than you think: it initializes their internal shit
 
             TreeView.sortColumnDescriptions.Clear(); // clean up garbage from previous file, if any
 
@@ -354,7 +354,7 @@ namespace Editor
         {
             var element = evt.target as VisualElement ?? throw new InvalidOperationException();
 
-            var valid = TreeView.IsSearchPatternValid(evt.newValue);
+            var valid = TreeView.IsValidSearchFilter(evt.newValue);
 
             if (valid)
             {

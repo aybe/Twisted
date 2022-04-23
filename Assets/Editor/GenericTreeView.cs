@@ -5,109 +5,57 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Unity.Extensions;
-using UnityEngine.Profiling;
 using UnityEngine.UIElements;
 
 namespace Editor
 {
-    // some general notes about the masterpiece of shit that this tree view is:
+    // some general notes about the masterpiece of shit that this tree view is
 
     // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
-    // it's also unbelievably buggy but from them this isn't a surprise at all...
+    // it's also unbelievably buggy but from them this isn't a surprise at all
 
-    // it looks like it's been inspired from IMGUI since the same silly design
-    // forces one to roll-out surprisingly similar fixes for it to work right
-    // at least the IMGUI version was fast even though it was a pain to use...
+    // worst being the column sorting stuff, that was literally freezing Unity
 
-    // the most astonishing is the column sorting and all of their stuff around
-    // that is needed for implementing a decent multi-column deep sort; in short,
-    // you can't trust much of their code either because it's buggy, slow or both
-
-    // e.g. deep sort 10K+ nodes: theirs = ~30 seconds, mine = less than a second
+    // to deep sort 10K+ nodes: theirs = ~30 second, mine = less than a second
 
     public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     {
-        private GenericTreeViewColumn<T>[]? Columns;
-
-        private Dictionary<T, int>? NodesDictionary;
-
-        private T? Root;
-
-        private List<TreeViewItemData<T>>? RootItems;
-
-        private Task? SortingTask;
-
         protected GenericTreeView()
         {
-            onSelectionChange += OnSelectionChange;
+            // hook to this so that we can provide GetSelection<T> and SetSelection<T>
+
+            onSelectionChange += SelectionChangedCallback;
 
             // find the content container so that we can register context click events
             // note that we can't use 'this' as it would screw column headers contexts
 
-            var container = this.Q(className: ScrollView.contentUssClassName);
-            container.AddManipulator(new ContextualMenuManipulator(ContextualMenuBuilder));
+            ContextMenuManipulator = new ContextualMenuManipulator(ContextMenuBuilder);
+
+            ContextMenuManipulatorContainer = this.Q(className: ScrollView.contentUssClassName)
+                                              ?? throw new InvalidOperationException("Content container could not be found.");
+
+            ContextMenuManipulatorContainer.AddManipulator(ContextMenuManipulator);
         }
 
-        private string? SearchFilter { get; set; }
+        #region General stuff
 
-        public TreeViewContextMenuHandler<T>? ContextMenuHandler { get; set; }
+        private List<TreeViewItemData<T>>? Items { get; set; } // their junk struct
+
+        private T? Node { get; set; } // root node
+
+        private Dictionary<T, int>? Nodes { get; set; } // for fast ID retrieval
 
         public void Dispose()
         {
-            columnSortingChanged -= OnColumnSortingChanged;
-            onSelectionChange    -= OnSelectionChange;
+            columnSortingChanged -= SortChanged;
+
+            onSelectionChange -= SelectionChangedCallback;
+
+            ContextMenuManipulatorContainer.RemoveManipulator(ContextMenuManipulator);
         }
 
-        private void ContextualMenuBuilder(ContextualMenuPopulateEvent evt)
-        {
-            // I've decided to use this approach which, I believe, is the least intrusive way to implement this
-            // and it follows what appears to be the newest crap in their junk API: ContextualMenuPopulateEvent
-            // this has many benefits, it works on the entire row and doesn't steal focus like in IMGUI version
-            // now the downside is that we have to rely on user data because TreeNode is by nature not bindable
-
-            if (ContextMenuHandler is null)
-            {
-                return;
-            }
-
-            // get the row container that holds the controls representing a cell
-
-            var target = evt.triggerEvent.target as VisualElement ?? throw new InvalidOperationException();
-
-            while (target != null)
-            {
-                if (target.ClassListContains(MultiColumnController.rowContainerUssClassName))
-                    break;
-
-                target = target.parent;
-            }
-
-            if (target is null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            // get user data from the first control found that represents a cell
-
-            var element = target.Q(className: GenericTreeViewColumn<T>.ControlUssClassName);
-
-            if (element is null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            // invoke user callback to populate context menu, it will be displayed immediately after that
-
-            var node = element.userData as T ?? throw new InvalidOperationException();
-
-            ContextMenuHandler.Invoke(node, evt.menu);
-        }
-
-        #region Public methods
-
-        public new void Focus() // because their stupid method can't even focus properly
+        public new void Focus() // because their stupid method can't even focus right
         {
             // depending selection and search history the selection might become null
             // thus, when control gets focus, navigation will not work until 2nd time
@@ -115,7 +63,7 @@ namespace Editor
 
             if (selectedItem is null)
             {
-                var node = RootItems?.FirstOrDefault().data;
+                var node = Items?.FirstOrDefault().data;
 
                 if (node != null)
                 {
@@ -123,129 +71,61 @@ namespace Editor
                 }
             }
 
-            this.Q<ScrollView>().contentContainer.Focus(); // now focus this correctly
-        }
-
-        public IEnumerable<T> GetSelection()
-        {
-            var nodes = selectedItems.Cast<T>().ToArray();
-
-            return nodes;
-        }
-
-        public void SetSelection(IEnumerable<T> items)
-        {
-            var dictionary = NodesDictionary ?? throw new InvalidOperationException();
-
-            var indices = items.Select(s => dictionary[s]).ToArray();
-
-            SetSelection(indices);
-        }
-
-        public int GetNodeId(T node)
-        {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            return NodesDictionary is null ? -1 : NodesDictionary[node];
+            this.Q<ScrollView>().contentContainer.Focus(); // do focus this correctly
         }
 
         public int GetRowCount()
         {
-            return NodesDictionary?.Count ?? throw new InvalidOperationException();
+            ThrowIfNodesIsNull();
+
+            return Nodes!.Count;
         }
 
-        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-        public bool IsSearchPatternValid(string pattern)
+        private void ThrowIfNodesIsNull()
         {
-            if (string.IsNullOrWhiteSpace(pattern))
+            if (Nodes is null)
             {
-                return true;
-            }
-
-            try
-            {
-                new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public void SelectNode(T node, bool notify, bool scroll)
-        {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            var id = GetNodeId(node);
-
-            if (id is -1)
-            {
-                throw new InvalidOperationException();
-            }
-
-            if (notify)
-            {
-                SetSelectionById(id);
-            }
-            else
-            {
-                SetSelectionByIdWithoutNotify(new[] { id });
-            }
-
-            if (scroll)
-            {
-                ScrollToItemById(id);
+                throw new InvalidOperationException($"This instance hasn't been assigned a root node using {nameof(SetRootNode)}.");
             }
         }
+
+        #endregion
+
+        #region Columns
+
+        private GenericTreeViewColumn<T>[]? Columns { get; set; }
 
         public void SetColumns(GenericTreeViewColumn<T>[] collection)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
-            if (collection.Length == 0)
+            if (collection.Length is 0)
                 throw new ArgumentException("Value cannot be an empty collection.", nameof(collection));
 
-            columnSortingChanged -= OnColumnSortingChanged;
+            columnSortingChanged -= SortChanged;
 
             foreach (var column in collection)
             {
                 columns.Add(column.GetColumn());
             }
 
-
-            columnSortingChanged += OnColumnSortingChanged;
+            columnSortingChanged += SortChanged;
 
             Columns = collection;
         }
 
-        public void SetRoot(T? node)
-        {
-            Root = node;
-
-            Reload();
-        }
-
-        public void SetSearchFilter(string? searchFilter)
-        {
-            SearchFilter = searchFilter;
-            Reload();
-        }
-
         #endregion
 
-        #region Private methods
+        #region Building
 
-        private static List<TSource> Flatten<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
+        private static List<TSource> GetList<TSource>(IEnumerable<TSource> collection, Func<TSource, IEnumerable<TSource>> children)
+            // flatten a hierarchy
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
-            if (children == null)
+            if (children is null)
                 throw new ArgumentNullException(nameof(children));
 
             var list = new List<TSource>();
@@ -272,202 +152,231 @@ namespace Editor
             return list;
         }
 
-        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
         private List<TreeViewItemData<T>> GetRootItems()
         {
-            // another damn fine struct from Unity with, among other things, everything useful being internal
-
-            if (Columns is null)
+            if (Columns is null || Columns.Length is 0)
             {
-                return new List<TreeViewItemData<T>>();
+                throw new InvalidOperationException($"This instance hasn't been assigned columns using {nameof(SetColumns)}.");
             }
+
+            if (Node is null)
+            {
+                return new List<TreeViewItemData<T>>(); // until root gets assigned, keep user and their private shit happy
+            }
+
+            // here we use a dictionary because we'll query this (rows * columns) times and that will sum up really quickly
 
             var descriptions = sortedColumns as SortColumnDescription[] ?? sortedColumns.ToArray();
             var dictionary   = descriptions.ToDictionary(s => s.columnName, s => Columns.Single(t => t.Name == s.columnName));
 
-            if (string.IsNullOrWhiteSpace(SearchFilter))
+            var items = string.IsNullOrWhiteSpace(SearchFilter)
+                ? GetRootItemsTree(descriptions, dictionary)
+                : GetRootItemsList(descriptions, dictionary);
+
+            return items;
+        }
+
+        private List<TreeViewItemData<T>> GetRootItemsList(
+            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
+        {
+            if (descriptions is null)
+                throw new ArgumentNullException(nameof(descriptions));
+
+            if (dictionary is null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+            var nodes = new List<T>();
+            var stack = new Stack<T>(new[] { Node! });
+            var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+            while (stack.Count > 0)
             {
-                var list = new List<TreeViewItemData<T>>();
+                var pop = stack.Pop();
 
-                if (Root is null)
+                foreach (var column in Columns!)
                 {
-                    return list;
+                    var o = column.ValueGetter?.Invoke(pop);
+                    var s = column.ValueFormatter?.Invoke(o);
+                    var b = s != null && regex.IsMatch(s);
+
+                    if (b is false)
+                        continue;
+
+                    nodes.Add(pop);
+                    break;
                 }
 
-                var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
-
-                stack.Push((Root, null));
-
-
-                var id = 0;
-
-                while (stack.Count > 0)
+                foreach (var child in pop.Cast<T>().Reverse())
                 {
-                    var (node, container) = stack.Pop();
-
-                    var item = new TreeViewItemData<T>(id++, node);
-
-                    if (container is null)
-                    {
-                        list.Add(item);
-                    }
-                    else
-                    {
-                        ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
-                    }
-
-                    var children = node.Cast<T>().Reverse();
-
-
-                    foreach (var description in descriptions)
-                    {
-                        var column = dictionary[description.columnName];
-                        var getter = column.ValueGetter ?? throw new InvalidOperationException();
-                        var order  = description.direction is SortDirection.Descending;
-
-                        children = children.Sort(getter, null, order);
-                    }
-
-                    foreach (var child in children)
-                    {
-                        stack.Push((child, item));
-                    }
+                    stack.Push(child);
                 }
-                return list;
             }
-            else
+
+            var sort = nodes.AsEnumerable();
+
+            foreach (var description in descriptions)
             {
-                if (Root is null)
+                var column = dictionary[description.columnName];
+                var getter = column.ValueGetter;
+
+                if (getter is null)
                 {
-                    return new List<TreeViewItemData<T>>();
+                    throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
                 }
 
-                var nodes = new List<T>();
-                var stack = new Stack<T>(new[] { Root });
-                var regex = new Regex(SearchFilter!, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
+            }
 
-                while (stack.Count > 0)
+            return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
+        }
+
+        private List<TreeViewItemData<T>> GetRootItemsTree(
+            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
+        {
+            if (descriptions is null)
+                throw new ArgumentNullException(nameof(descriptions));
+
+            if (dictionary is null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+            var list = new List<TreeViewItemData<T>>();
+
+            var stack = new Stack<(T Node, TreeViewItemData<T>? Container)>();
+
+            stack.Push((Node!, null));
+
+            var id = 0;
+
+            while (stack.Count > 0)
+            {
+                var (node, container) = stack.Pop();
+
+                var item = new TreeViewItemData<T>(id++, node);
+
+                if (container is null)
                 {
-                    var pop = stack.Pop();
-
-                    foreach (var column in Columns)
-                    {
-                        var o = column.ValueGetter?.Invoke(pop);
-                        var s = column.ValueFormatter?.Invoke(o);
-                        var b = s != null && regex.IsMatch(s);
-
-                        if (b is false)
-                            continue;
-
-                        nodes.Add(pop);
-                        break;
-                    }
-
-                    foreach (var child in pop.Cast<T>().Reverse())
-                    {
-                        stack.Push(child);
-                    }
+                    list.Add(item);
+                }
+                else
+                {
+                    ((IList<TreeViewItemData<T>>)container.Value.children).Add(item);
                 }
 
-                var sort = nodes.AsEnumerable();
+                var children = node.Cast<T>().Reverse();
 
                 foreach (var description in descriptions)
                 {
                     var column = dictionary[description.columnName];
-                    var getter = column.ValueGetter ?? throw new InvalidOperationException();
-                    var order  = description.direction is SortDirection.Descending;
+                    var getter = column.ValueGetter;
 
-                    sort = sort.Sort(getter, null, order);
+                    if (getter is null)
+                    {
+                        throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
+                    }
+
+                    children = children.Sort(getter, null, description.direction is SortDirection.Descending);
                 }
 
-                return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
+                foreach (var child in children)
+                {
+                    stack.Push((child, item));
+                }
             }
+
+            return list;
         }
 
-        private void OnColumnSortingChanged()
+        public void SetRootNode(T? node)
         {
-            // these code monkey will raise N headers + 2 times in a row... for no fucking reason
-            // that is unless you hold a fucking modifier such as Shift or Ctrl, not explained...
-
-            // protect ourselves from their stupid shit by using a task with a rudimentary guard
-
-            if (SortingTask?.IsCompleted == false)
-                return;
-
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext(); // just like in WPF
-
-            SortingTask = Task.Factory.StartNew(SortTreeItems, CancellationToken.None, TaskCreationOptions.None, scheduler);
-        }
-
-        private void Reload()
-        {
-            RootItems = GetRootItems();
-
-            NodesDictionary = Flatten(RootItems, s => s.children).ToDictionary(s => s.data, s => s.id);
-
-            SetRootItems(RootItems);
+            Node = node;
 
             Rebuild();
+        }
+
+        private new void Rebuild() // let's pile up on their favorite 'new' keyword... and sweep that shit under the rug
+        {
+            // here we basically build their items, our nodes map and run their initialization sequence
+
+            Items = GetRootItems();
+
+            Nodes = GetList(Items, s => s.children).ToDictionary(s => s.data, s => s.id);
+
+            SetRootItems(Items);
+
+            base.Rebuild();
         }
 
         #endregion
 
         #region Sorting
 
-        private void SortTreeItems()
+        private Task? SortBackgroundTask { get; set; }
+
+        private void SortChanged()
         {
-            // deep sorting will screw ids/expanded/selection, save this information
+            // these code monkeys will raise this event N headers + 2 times in a row for NO FUCKING REASON
+            // this, unless you hold a FUCKING modifier such as Shift or Ctrl, obviously, not explained...
+            // now let's protect ourselves from their stupid shit by using a task with a rudimentary guard
 
-            var selection = selectedItems.Cast<T>().ToList();
+            // this, along our manual handling brings back SMOOTH performance like there was in IMGUI tree
 
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(SaveExpandedNodes)}");
-            SaveExpandedNodes(out var collapsed, out var expanded);
-            Profiler.EndSample();
+            if (SortBackgroundTask?.IsCompleted == false)
+                return;
 
-            // perform the actual sorting, will update our dictionary that we'll soon need
+            SortBackgroundTask = Task.Factory.StartNew(
+                Sort,
+                CancellationToken.None,
+                TaskCreationOptions.None,
+                TaskScheduler.FromCurrentSynchronizationContext() // this is WPF-like, cross-thread stuff
+            );
+        }
 
-            Reload();
+        private void Sort()
+        {
+            // the deep sorting will screw ids/expanded/selection, first, save this information
 
-            // restore the collapsed/expanded state of tree view items but in a FAST manner
+            var selection = GetSelection();
 
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(LoadExpandedNodes)}");
-            LoadExpandedNodes(collapsed, expanded);
-            Profiler.EndSample();
+            SortSaveExpanded(out var collapsed, out var expanded);
 
-            // restore the nodes previously selected by user
+            // perform the actual sorting, this will also update our dictionary that we'll need
+
+            Rebuild();
+
+            // restore the collapsed/expanded state of the tree view items but in a FAST manner
+
+            SortLoadExpanded(collapsed, expanded);
 
             if (selection.Any())
             {
-                var dictionary = NodesDictionary!;
+                var dictionary = Nodes!;
+
+                // now it's time to restore the selection that was previously made by the user
 
                 SetSelectionById(selection.Select(s => dictionary[s]));
 
-                // bring something into view or it'll look weird, not perfect because their method sucks
+                // scroll to something or it'll suck, not perfect because of their incompetence
 
                 ScrollToItemById(dictionary[selection.First()]);
             }
 
-            // finally, get this stupid control to redraw itself
+            // redraw control and use our own focus because these morons even failed on this...
 
-            Profiler.BeginSample($"{nameof(SortTreeItems)}: {nameof(RefreshItems)}");
             RefreshItems();
-            Profiler.EndSample();
 
-            Focus(); // and get FUCKING focus working as these guys even failed on this
+            Focus();
         }
 
-        private void SaveExpandedNodes(out HashSet<T> collapsed, out HashSet<T> expanded)
+        private void SortSaveExpanded(out HashSet<T> collapsed, out HashSet<T> expanded)
         {
+            // using their stuff at the bare minimum as it's complete junk that is unbelievably slow
+
             collapsed = new HashSet<T>();
             expanded  = new HashSet<T>();
 
-            // if we were to use some of their dumb methods, this would take ages because they're poorly written
-
             var controller = viewController;
 
-            Profiler.BeginSample($"{nameof(SaveExpandedNodes)}: GetExpandedNodes");
-
-            var items = Flatten(RootItems!, s => s.children);
+            var items = GetList(Items!, s => s.children);
 
             foreach (var item in items)
             {
@@ -482,82 +391,196 @@ namespace Editor
                     collapsed.Add(data);
                 }
             }
-
-            Profiler.EndSample();
         }
 
-        private void LoadExpandedNodes(HashSet<T> collapsed, HashSet<T> expanded)
+        private void SortLoadExpanded(HashSet<T> collapsed, HashSet<T> expanded)
+            // here we use a simple but effective approach that scale well for 10K+ tree nodes
         {
-            // their shitty methods take exponentially longer as you have more nodes in the tree
-            // as they're pure garbage, they simply freeze the UI for an astonishingly long time
-            // here we use a very simple approach that works and scales well for 10K+ tree nodes
-
             // build a dictionary to be able to retrieve newly assigned IDs to tree view items
 
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: flatten items");
-            var items = Flatten(RootItems!, s => s.children);
-            Profiler.EndSample();
+            var ids = GetList(Items!, s => s.children).ToDictionary(s => s.data, s => s.id);
 
-            Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: data -> id map");
-            var dictionary = items.ToDictionary(s => s.data, s => s.id);
-            Profiler.EndSample();
-
-            // now downright fucking stupid: do it in whichever way that will take the shortest time
+            // now really stupid: we'd do it in whichever way that will take the shortest time
+            // this, because their crap is exponentially longer as there are nodes in the tree
 
             var controller = viewController;
 
-            var expand = expanded.Count > collapsed.Count;
-
-            if (expand)
+            if (expanded.Count > collapsed.Count)
             {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandAll)}");
                 controller.ExpandAll();
-                Profiler.EndSample();
 
                 foreach (var data in collapsed)
                 {
-                    var id = dictionary[data];
-
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseItem)}");
-                    controller.CollapseItem(id, false);
-                    Profiler.EndSample();
+                    controller.CollapseItem(ids[data], false);
                 }
             }
             else
             {
-                Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.CollapseAll)}");
                 controller.CollapseAll();
-                Profiler.EndSample();
 
                 foreach (var data in expanded)
                 {
-                    var id = dictionary[data];
-
-                    Profiler.BeginSample($"{nameof(LoadExpandedNodes)}: {nameof(controller.ExpandItem)}");
-                    controller.ExpandItem(id, false, false);
-                    Profiler.EndSample();
+                    controller.ExpandItem(ids[data], false, false);
                 }
             }
-
-            // the main cause of all that is that these newbies don't know how to use LINQ reasonably
         }
 
         #endregion
 
-        #region SelectionChanged
+        #region Selection
 
-        [PublicAPI]
         public event EventHandler<TreeViewSelectionChangedEventArgs<T>>? SelectionChanged;
 
-        private void OnSelectionChange(IEnumerable<object> objects)
+        private void SelectionChangedCallback(IEnumerable<object> objects)
         {
-            OnSelectionChanged(new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
+            SelectionChanged?.Invoke(this, new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
         }
-        
-        [PublicAPI]
-        protected virtual void OnSelectionChanged(TreeViewSelectionChangedEventArgs<T> e)
+
+        public IReadOnlyList<T> GetSelection()
         {
-            SelectionChanged?.Invoke(this, e);
+            var nodes = selectedItems.Cast<T>().ToArray();
+
+            return nodes;
+        }
+
+        public void SetSelection(IEnumerable<T> nodes)
+        {
+            var indices = nodes.Select(GetNodeId).ToArray();
+
+            SetSelection(indices);
+        }
+
+        public void SelectNode(T node, bool notify, bool scroll)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            var id = GetNodeId(node);
+
+            if (notify)
+            {
+                SetSelectionById(id);
+            }
+            else
+            {
+                SetSelectionByIdWithoutNotify(new[] { id });
+            }
+
+            if (scroll)
+            {
+                ScrollToItemById(id);
+            }
+        }
+
+        private int GetNodeId(T node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            ThrowIfNodesIsNull();
+
+            if (!Nodes!.TryGetValue(node, out var id))
+            {
+                throw new ArgumentOutOfRangeException(nameof(node), node, "The node is neither the root node nor a child of it.");
+            }
+
+            return id;
+        }
+
+        #endregion
+
+        #region Search
+
+        private string? SearchFilter { get; set; }
+
+        public string? GetSearchFilter()
+        {
+            return SearchFilter;
+        }
+
+        public void SetSearchFilter(string? value)
+        {
+            SearchFilter = value;
+
+            Rebuild();
+        }
+
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public bool IsValidSearchFilter(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return true;
+            }
+
+            try
+            {
+                new Regex(value, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Context menu
+
+        private ContextualMenuManipulator ContextMenuManipulator { get; }
+
+        private VisualElement? ContextMenuManipulatorContainer { get; }
+
+        public TreeViewContextMenuHandler<T>? ContextMenuHandler { get; set; }
+
+        private void ContextMenuBuilder(ContextualMenuPopulateEvent evt)
+        {
+            // I've decided to use this approach which, I believe, is the least intrusive way to implement this
+            // and it follows what appears to be the newest crap in their junk API: ContextualMenuPopulateEvent
+            // this has many benefits, it works on the entire row and doesn't steal focus like in IMGUI version
+            // now the downside is that we have to rely on user data because TreeNode is by nature not bindable
+
+            if (ContextMenuHandler is null)
+            {
+                return; // user may not choose to use context menu, in this case there's no point in doing work
+            }
+
+            // get the row container that holds the controls representing a cell
+
+            var target = evt.triggerEvent.target as VisualElement ?? throw new InvalidOperationException();
+
+            while (target != null)
+            {
+                if (target.ClassListContains(MultiColumnController.rowContainerUssClassName))
+                    break;
+
+                target = target.parent;
+            }
+
+            if (target is null)
+            {
+                throw new InvalidOperationException("Row container could not be found.");
+            }
+
+            // get user data from the first control found that represents a cell
+
+            var element = target.Q(className: GenericTreeViewColumn<T>.ControlUssClassName);
+
+            if (element is null)
+            {
+                throw new InvalidOperationException("Cell control could not be found.");
+            }
+
+            // invoke user callback to populate context menu, it will be displayed immediately after that
+
+            var node = element.userData as T ?? throw new InvalidOperationException("Cell has no user data.");
+
+            ContextMenuHandler.Invoke(node, evt.menu);
         }
 
         #endregion
