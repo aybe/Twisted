@@ -332,6 +332,7 @@ namespace Editor
         private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
         {
             TreeView.SetSearchFilterEqualityComparer(evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null);
+            UpdateToolbarSearchLabel();
         }
 
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
