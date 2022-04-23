@@ -44,8 +44,8 @@ namespace Editor
         {
             InitializeModel();
             InitializeRoot();
-            InitializeToolbar();
             InitializeTreeView();
+            InitializeToolbar();
 
             UpdateControls();
             UpdateTitle();
@@ -55,6 +55,9 @@ namespace Editor
 
         private ToolbarButton ToolbarOpenFile =>
             rootVisualElement.Q<ToolbarButton>("toolbarOpenFile");
+
+        private ToolbarToggle ToolbarDistinctFiltering =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarDistinctFiltering");
 
         private ToolbarToggle ToolbarSelectionFraming =>
             rootVisualElement.Q<ToolbarToggle>("toolbarSelectionFraming");
@@ -126,6 +129,8 @@ namespace Editor
         private void InitializeToolbar()
         {
             ToolbarOpenFile.clicked += OnToolbarOpenFile;
+
+            InitializeToolbarToggle(ToolbarDistinctFiltering, Model.UseDistinctFilteringProperty, OnToolbarDistinctFilteringValueChanged);
 
             ToolbarSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
 
@@ -322,6 +327,11 @@ namespace Editor
             {
                 EditorApplication.delayCall += () => Preview.FrameSelection();
             }
+        }
+
+        private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
+        {
+            TreeView.SetSearchFilterEqualityComparer(evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null);
         }
 
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)

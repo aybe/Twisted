@@ -227,6 +227,11 @@ namespace Editor
                 sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
             }
 
+            if (SearchFilterEqualityComparer is not null)
+            {
+                sort = sort.Distinct(SearchFilterEqualityComparer);
+            }
+
             return sort.Select((s, t) => new TreeViewItemData<T>(t, s)).ToList();
         }
 
@@ -496,6 +501,8 @@ namespace Editor
 
         private string? SearchFilter { get; set; }
 
+        private IEqualityComparer<T>? SearchFilterEqualityComparer { get; set; }
+
         public string? GetSearchFilter()
         {
             return SearchFilter;
@@ -504,6 +511,18 @@ namespace Editor
         public void SetSearchFilter(string? value)
         {
             SearchFilter = value;
+
+            Rebuild();
+        }
+
+        public IEqualityComparer<T>? GetSearchFilterEqualityComparer()
+        {
+            return SearchFilterEqualityComparer;
+        }
+
+        public void SetSearchFilterEqualityComparer(IEqualityComparer<T>? equalityComparer)
+        {
+            SearchFilterEqualityComparer = equalityComparer;
 
             Rebuild();
         }
