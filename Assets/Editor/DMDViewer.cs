@@ -34,7 +34,9 @@ namespace Editor
 
         private void OnDisable()
         {
-            CleanupTreeView();
+            TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
+
+            TreeView.Dispose();
 
             Settings.Save();
         }
@@ -198,13 +200,6 @@ namespace Editor
             scrollView.verticalScrollerVisibility   = visibility;
 
             // and also some fixes put in USS side as things aren't even properly centered
-        }
-
-        private void CleanupTreeView()
-        {
-            TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
-
-            TreeView.Dispose(); // for columns callback
         }
 
         #endregion
