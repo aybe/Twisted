@@ -7,6 +7,10 @@
     -unity-background-scale-mode: scale-to-fit;
 }
 
+.toolbar-button:focus {
+    border-color: rgb(159, 159, 159);
+}
+
 .toolbar-toggle {
     min-width: 27px;
     -unity-background-scale-mode: scale-to-fit;
