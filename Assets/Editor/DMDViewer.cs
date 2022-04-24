@@ -16,12 +16,6 @@ using UnityEngine.UIElements;
 namespace Editor
 {
     public sealed partial class DMDViewer : EditorWindow
-        // TODO save state
-        // TODO when another file is loaded, reset internal tree state
-        // TODO everything missing from legacy viewer
-        // BUG when tree view loses focus, one of its expander may turn blue at any time
-        // BUG tree view keyboard expand/collapse may stop working for no reason at all
-        // BUG when clearing search breadcrumbs are not updated -> hide them
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
