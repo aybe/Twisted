@@ -30,9 +30,13 @@ namespace Editor
 
         private static DMDPreview Preview => Singleton<DMDPreview>.instance;
 
+        private static DMDViewerSettings Settings => DMDViewerSettings.instance;
+
         private void OnDisable()
         {
             CleanupTreeView();
+
+            Settings.Save();
         }
 
         private void OnDestroy()
@@ -108,6 +112,8 @@ namespace Editor
                 Model = CreateInstance<DMDViewerModel>();
             }
 
+            Model.CurrentFile = Settings.LastDatabaseProperty.stringValue;
+
             Model.Initialize();
         }
 
@@ -128,46 +134,58 @@ namespace Editor
 
         private void InitializeToolbar()
         {
+            InitializeToolbarButtons();
+
+            InitializeToolbarToggles();
+
+            InitializeToolbarSearch();
+        }
+
+        private void InitializeToolbarButtons()
+        {
             ToolbarOpenFile.clicked += OnToolbarOpenFile;
+        }
 
-            InitializeToolbarToggle(ToolbarDistinctFiltering, Model.UseDistinctFilteringProperty, OnToolbarDistinctFilteringValueChanged);
+        private void InitializeToolbarToggles()
+        {
+            InitializeToggle(ToolbarDistinctFiltering, Settings.UseFilterDistinctProperty, OnToolbarDistinctFilteringValueChanged);
+            InitializeToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
+            InitializeToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
+            InitializeToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
+            InitializeToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
+            InitializeToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
 
-            ToolbarSelectionFraming.BindProperty(Model.UseSelectionFramingProperty);
+            static void InitializeToggle(
+                ToolbarToggle toggle, SerializedProperty property, EventCallback<ChangeEvent<bool>> callback)
+            {
+                if (toggle is null)
+                    throw new ArgumentNullException(nameof(toggle));
 
-            ToolbarSelectionFraming.RegisterValueChangedCallback(OnToolbarSelectionFramingValueChanged);
+                if (property is null)
+                    throw new ArgumentNullException(nameof(property));
 
-            ToolbarModelSplitting.BindProperty(Model.UseModelSplittingProperty);
+                if (callback is null)
+                    throw new ArgumentNullException(nameof(callback));
 
-            ToolbarModelSplitting.RegisterValueChangedCallback(OnToolbarModelSplittingValueChanged);
+                toggle.BindProperty(property);
 
-            InitializeToolbarToggle(ToolbarTexturing,       Model.UseTexturingProperty,     OnToolbarTexturingValueChanged);
-            InitializeToolbarToggle(ToolbarVertexColors,    Model.UseVertexColorsProperty,  OnToolbarVertexColorsValueChanged);
-            InitializeToolbarToggle(ToolbarPolygonColoring, Model.UsePolygonColorsProperty, OnToolbarPolygonColoringValueChanged);
+                toggle.RegisterValueChangedCallback(callback);
+
+                using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
+
+                callback(@event);
+            }
+        }
+
+        private void InitializeToolbarSearch()
+        {
+            ToolbarSearchField
+                .Q<TextField>(className: ToolbarSearchField.textUssClassName)
+                .BindProperty(Settings.LastFilterProperty);
 
             ToolbarSearchField.RegisterCallback<KeyDownEvent>(OnToolbarSearchFieldKeyDown);
 
             ToolbarSearchField.RegisterValueChangedCallback(OnToolbarSearchFieldValueChanged);
-        }
-
-        private static void InitializeToolbarToggle(
-            ToolbarToggle toggle, SerializedProperty property, EventCallback<ChangeEvent<bool>> callback)
-        {
-            if (toggle == null)
-                throw new ArgumentNullException(nameof(toggle));
-
-            if (property == null)
-                throw new ArgumentNullException(nameof(property));
-
-            if (callback == null)
-                throw new ArgumentNullException(nameof(callback));
-
-            toggle.BindProperty(property);
-
-            toggle.RegisterValueChangedCallback(callback);
-
-            using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
-
-            callback(@event);
         }
 
         private void InitializeTreeView()
@@ -212,7 +230,7 @@ namespace Editor
             var dmd = Model.DMDFactory?.DMD;
 
             TreeView.RootNode = dmd;
-            
+
             TreeView.Rebuild();
 
             // clean up garbage from previous file, if any
@@ -324,6 +342,9 @@ namespace Editor
             UpdateControls();
 
             UpdateTitle();
+
+            Settings.LastDatabaseProperty.stringValue = Model.CurrentFile;
+            Settings.SerializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
