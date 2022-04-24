@@ -245,14 +245,10 @@ namespace Editor
 
             ToolbarBreadcrumbsHost.visible = visible;
 
-            // update our controls and select something to update breadcrumbs or they'll look weird
+            // finally, update our controls
 
             UpdateSearchLabel();
-
-            if (dmd is not null)
-            {
-                TreeView.SelectNode(dmd, true, true);
-            }
+            UpdateBreadcrumbs();
         }
 
         private void UpdateTitle()
