@@ -36,6 +36,53 @@ namespace Editor
 
         private void OnDisable()
         {
+            rootVisualElement
+                .UnregisterCallback<KeyDownEvent>(
+                    OnRootVisualKeyDown
+                );
+
+            ToolbarOpenFile.clicked -= OnToolbarOpenFile;
+
+            ToolbarDistinctFiltering
+                .UnregisterValueChangedCallback(
+                    OnToolbarDistinctFilteringValueChanged
+                );
+
+            ToolbarSelectionFraming
+                .UnregisterValueChangedCallback(
+                    OnToolbarSelectionFramingValueChanged
+                );
+
+            ToolbarModelSplitting
+                .UnregisterValueChangedCallback(
+                    OnToolbarModelSplittingValueChanged
+                );
+
+            ToolbarTexturing
+                .UnregisterValueChangedCallback(
+                    OnToolbarTexturingValueChanged
+                );
+
+            ToolbarVertexColors
+                .UnregisterValueChangedCallback(
+                    OnToolbarVertexColorsValueChanged
+                );
+
+            ToolbarPolygonColoring
+                .UnregisterValueChangedCallback(
+                    OnToolbarPolygonColoringValueChanged
+                );
+
+            ToolbarSearchField
+                .UnregisterValueChangedCallback(
+                    OnToolbarSearchFieldValueChanged
+                );
+
+            ToolbarSearchField
+                .UnregisterCallback<KeyDownEvent>(
+                    OnToolbarSearchFieldKeyDown
+                );
+
             TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
 
             TreeView.Dispose();
@@ -50,12 +97,12 @@ namespace Editor
 
         public void CreateGUI()
         {
-            InitializeRoot();
+            InitializeRootVisual();
             InitializeTreeView();
             InitializeToolbar();
 
             UpdateFactory();
-            UpdateControls();
+            UpdateInterface();
             UpdateTitle();
         }
 
@@ -67,7 +114,7 @@ namespace Editor
             GetWindow<DMDViewer>();
         }
 
-        private void InitializeRoot()
+        private void InitializeRootVisual()
         {
             var root = rootVisualElement;
 
@@ -77,17 +124,13 @@ namespace Editor
 
             root.Add(container);
 
-            // root.Bind(Settings.SerializedObject);
-
-            root.RegisterCallback<KeyDownEvent>(OnRootKeyDown);
+            root.RegisterCallback<KeyDownEvent>(OnRootVisualKeyDown);
         }
 
         private void InitializeToolbar()
         {
             InitializeToolbarButtons();
-
             InitializeToolbarToggles();
-
             InitializeToolbarSearch();
         }
 
@@ -98,33 +141,33 @@ namespace Editor
 
         private void InitializeToolbarToggles()
         {
-            InitializeToggle(ToolbarDistinctFiltering, Settings.UseFilterDistinctProperty, OnToolbarDistinctFilteringValueChanged);
-            InitializeToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
-            InitializeToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
-            InitializeToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
-            InitializeToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
-            InitializeToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
+            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.UseFilterDistinctProperty, OnToolbarDistinctFilteringValueChanged);
+            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
+            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
+            InitializeToolbarToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
+        }
 
-            static void InitializeToggle(
-                ToolbarToggle toggle, SerializedProperty property, EventCallback<ChangeEvent<bool>> callback)
-            {
-                if (toggle is null)
-                    throw new ArgumentNullException(nameof(toggle));
+        private static void InitializeToolbarToggle(
+            ToolbarToggle toggle, SerializedProperty property, EventCallback<ChangeEvent<bool>> callback)
+        {
+            if (toggle is null)
+                throw new ArgumentNullException(nameof(toggle));
 
-                if (property is null)
-                    throw new ArgumentNullException(nameof(property));
+            if (property is null)
+                throw new ArgumentNullException(nameof(property));
 
-                if (callback is null)
-                    throw new ArgumentNullException(nameof(callback));
+            if (callback is null)
+                throw new ArgumentNullException(nameof(callback));
 
-                toggle.BindProperty(property);
+            toggle.BindProperty(property);
 
-                toggle.RegisterValueChangedCallback(callback);
+            toggle.RegisterValueChangedCallback(callback);
 
-                using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
+            using var @event = ChangeEvent<bool>.GetPooled(property.boolValue, property.boolValue);
 
-                callback(@event);
-            }
+            callback(@event);
         }
 
         private void InitializeToolbarSearch()
@@ -166,7 +209,17 @@ namespace Editor
 
         #region Updaters
 
-        private void UpdateControls()
+        private void UpdateFactory()
+        {
+            var path = Settings.LastDatabaseProperty.stringValue;
+
+            if (File.Exists(path))
+            {
+                Factory = DMDFactory.Create(path);
+            }
+        }
+
+        private void UpdateInterface()
         {
             // try populate the tree
 
@@ -192,7 +245,7 @@ namespace Editor
 
             // update our controls and select something to update breadcrumbs or they'll look weird
 
-            UpdateToolbarSearchLabel();
+            UpdateSearchLabel();
 
             if (dmd is not null)
             {
@@ -200,24 +253,17 @@ namespace Editor
             }
         }
 
-        private void UpdateFactory()
+        private void UpdateTitle()
         {
             var path = Settings.LastDatabaseProperty.stringValue;
 
-            if (File.Exists(path))
+            titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
             {
-                Factory = DMDFactory.Create(path);
-            }
+                text = File.Exists(path) ? Path.GetFileName(path) : "DMD Viewer"
+            };
         }
 
-        private void UpdateToolbarSearchLabel()
-        {
-            var count = TreeView.GetRowCount();
-
-            ToolbarSearchLabel.text = count is 0 ? string.Empty : $"{count} item{(count is not 1 ? "s" : string.Empty)}";
-        }
-
-        private void UpdateToolbarBreadcrumbs()
+        private void UpdateBreadcrumbs()
         {
             // update breadcrumbs: clicking, elements, node stack
 
@@ -256,14 +302,11 @@ namespace Editor
             }
         }
 
-        private void UpdateTitle()
+        private void UpdateSearchLabel()
         {
-            var path = Settings.LastDatabaseProperty.stringValue;
+            var count = TreeView.GetRowCount();
 
-            titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
-            {
-                text = File.Exists(path) ? Path.GetFileName(path) : "DMD Viewer"
-            };
+            ToolbarSearchLabel.text = count is 0 ? string.Empty : $"{count} item{(count is not 1 ? "s" : string.Empty)}";
         }
 
         #endregion
@@ -271,7 +314,7 @@ namespace Editor
         #region Event handlers
 
         [SuppressMessage("ReSharper", "SwitchStatementMissingSomeEnumCasesNoDefault")]
-        private void OnRootKeyDown(KeyDownEvent evt)
+        private void OnRootVisualKeyDown(KeyDownEvent evt)
         {
             switch (evt.keyCode)
             {
@@ -300,7 +343,7 @@ namespace Editor
             Settings.SerializedObject.ApplyModifiedPropertiesWithoutUndo();
 
             UpdateFactory();
-            UpdateControls();
+            UpdateInterface();
             UpdateTitle();
         }
 
@@ -317,7 +360,7 @@ namespace Editor
             TreeView.SearchFilterComparer = evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null;
             TreeView.Rebuild();
 
-            UpdateToolbarSearchLabel();
+            UpdateSearchLabel();
         }
 
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
@@ -382,8 +425,8 @@ namespace Editor
                 TreeView.Rebuild();
             }
 
-            UpdateToolbarSearchLabel();
-            UpdateToolbarBreadcrumbs();
+            UpdateSearchLabel();
+            UpdateBreadcrumbs();
         }
 
         private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
@@ -433,7 +476,7 @@ namespace Editor
             if (Factory is null)
                 return;
 
-            UpdateToolbarBreadcrumbs();
+            UpdateBreadcrumbs();
 
             Preview.SetNode(
                 Factory,
