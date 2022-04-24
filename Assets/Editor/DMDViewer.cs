@@ -318,8 +318,11 @@ namespace Editor
 
         private void OnToolbarOpenFile()
         {
-            Model.OpenFile();
+            if (!Model.OpenFile())
+                return;
+
             UpdateControls();
+
             UpdateTitle();
         }
 

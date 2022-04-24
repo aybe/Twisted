@@ -62,18 +62,20 @@ namespace Editor
             UsePolygonColorsProperty     = SerializedObject.FindProperty(nameof(UsePolygonColors));
         }
 
-        public void OpenFile()
+        public bool OpenFile()
         {
             var path = EditorUtility.OpenFilePanel(null, null, "DMD");
 
             if (string.IsNullOrEmpty(path))
             {
-                return;
+                return false;
             }
 
             CurrentFile = path;
 
             InitializeFactory();
+
+            return true;
         }
 
         public void Initialize()
