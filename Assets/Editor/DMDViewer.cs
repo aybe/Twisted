@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 namespace Editor
 {
-    public sealed class DMDViewer : EditorWindow
+    public sealed partial class DMDViewer : EditorWindow
         // TODO save state
         // TODO when another file is loaded, reset internal tree state
         // TODO everything missing from legacy viewer
@@ -25,6 +25,8 @@ namespace Editor
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
+
+        private List<DMDNode> BreadcrumbsNodes { get; } = new();
 
         private DMDFactory? Factory { get; set; }
 
@@ -51,53 +53,11 @@ namespace Editor
             InitializeRoot();
             InitializeTreeView();
             InitializeToolbar();
-            
+
             UpdateFactory();
             UpdateControls();
             UpdateTitle();
         }
-
-        #region Controls
-
-        private ToolbarButton ToolbarOpenFile =>
-            rootVisualElement.Q<ToolbarButton>("toolbarOpenFile");
-
-        private ToolbarToggle ToolbarDistinctFiltering =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarDistinctFiltering");
-
-        private ToolbarToggle ToolbarSelectionFraming =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarSelectionFraming");
-
-        private ToolbarToggle ToolbarModelSplitting =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarModelSplitting");
-
-        private ToolbarToggle ToolbarTexturing =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
-
-        private ToolbarToggle ToolbarVertexColors =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");
-
-        private ToolbarToggle ToolbarPolygonColoring =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColoring");
-
-        private Label ToolbarSearchLabel =>
-            rootVisualElement.Q<Label>("toolbarSearchLabel");
-
-        private ToolbarSearchField ToolbarSearchField =>
-            rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
-
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
-            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
-
-        private Toolbar ToolbarBreadcrumbsHost =>
-            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
-
-        private List<DMDNode> ToolbarBreadcrumbsNodes { get; } = new();
-
-        private DMDTreeView TreeView =>
-            rootVisualElement.Q<DMDTreeView>();
-
-        #endregion
 
         #region Initialization/cleanup
 
@@ -270,21 +230,21 @@ namespace Editor
             while (ToolbarBreadcrumbs.childCount > 0)
             {
                 ToolbarBreadcrumbs.PopItem();
-                ToolbarBreadcrumbsNodes.RemoveAt(ToolbarBreadcrumbsNodes.Count - 1);
+                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
             }
 
             var current = TreeView.selectedItem as DMDNode;
 
             while (current != null)
             {
-                ToolbarBreadcrumbsNodes.Insert(0, current);
+                BreadcrumbsNodes.Insert(0, current);
                 current = current.Parent as DMDNode;
 
                 if (!string.IsNullOrWhiteSpace(ToolbarSearchField.value))
                     current = null;
             }
 
-            foreach (var item in ToolbarBreadcrumbsNodes)
+            foreach (var item in BreadcrumbsNodes)
             {
                 ToolbarBreadcrumbs.PushItem($"0x{item.NodeType:X8}");
             }
@@ -331,14 +291,14 @@ namespace Editor
 
         private void OnToolbarOpenFile()
         {
-            var  path = EditorUtility.OpenFilePanel(null, null, "DMD");
+            var path = EditorUtility.OpenFilePanel(null, null, "DMD");
 
             if (string.IsNullOrEmpty(path))
                 return;
 
             Settings.LastDatabaseProperty.stringValue = path;
             Settings.SerializedObject.ApplyModifiedPropertiesWithoutUndo();
-            
+
             UpdateFactory();
             UpdateControls();
             UpdateTitle();
@@ -434,17 +394,17 @@ namespace Editor
             var parent = target.parent;
             var index  = parent.IndexOf(target);
 
-            for (var i = ToolbarBreadcrumbsNodes.Count - 1; i > index; i--)
+            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
             {
                 var element = parent.ElementAt(i);
                 element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
                 ToolbarBreadcrumbs.PopItem();
-                ToolbarBreadcrumbsNodes.RemoveAt(i);
+                BreadcrumbsNodes.RemoveAt(i);
             }
 
             // sync tree view selection with clicked breadcrumbs
 
-            var node = ToolbarBreadcrumbsNodes[index];
+            var node = BreadcrumbsNodes[index];
 
             TreeView.SelectNode(node, true, true);
         }
@@ -482,6 +442,49 @@ namespace Editor
                 Settings.UseSceneFrameProperty.boolValue
             );
         }
+
+        #endregion
+    }
+
+    public sealed partial class DMDViewer
+    {
+        #region Controls
+
+        private ToolbarButton ToolbarOpenFile =>
+            rootVisualElement.Q<ToolbarButton>("toolbarOpenFile");
+
+        private ToolbarToggle ToolbarDistinctFiltering =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarDistinctFiltering");
+
+        private ToolbarToggle ToolbarSelectionFraming =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarSelectionFraming");
+
+        private ToolbarToggle ToolbarModelSplitting =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarModelSplitting");
+
+        private ToolbarToggle ToolbarTexturing =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
+
+        private ToolbarToggle ToolbarVertexColors =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");
+
+        private ToolbarToggle ToolbarPolygonColoring =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColoring");
+
+        private Label ToolbarSearchLabel =>
+            rootVisualElement.Q<Label>("toolbarSearchLabel");
+
+        private ToolbarSearchField ToolbarSearchField =>
+            rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
+
+        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
+            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
+
+        private Toolbar ToolbarBreadcrumbsHost =>
+            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
+
+        private DMDTreeView TreeView =>
+            rootVisualElement.Q<DMDTreeView>();
 
         #endregion
     }
