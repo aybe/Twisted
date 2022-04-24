@@ -26,7 +26,7 @@ namespace Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private List<DMDNode> BreadcrumbsNodes { get; } = new();
+        private List<DMDNode> Breadcrumbs { get; } = new();
 
         private DMDFactory? Factory { get; set; }
 
@@ -230,21 +230,21 @@ namespace Editor
             while (ToolbarBreadcrumbs.childCount > 0)
             {
                 ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(BreadcrumbsNodes.Count - 1);
+                Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
             }
 
             var current = TreeView.selectedItem as DMDNode;
 
             while (current != null)
             {
-                BreadcrumbsNodes.Insert(0, current);
+                Breadcrumbs.Insert(0, current);
                 current = current.Parent as DMDNode;
 
                 if (!string.IsNullOrWhiteSpace(ToolbarSearchField.value))
                     current = null;
             }
 
-            foreach (var item in BreadcrumbsNodes)
+            foreach (var item in Breadcrumbs)
             {
                 ToolbarBreadcrumbs.PushItem($"0x{item.NodeType:X8}");
             }
@@ -394,17 +394,17 @@ namespace Editor
             var parent = target.parent;
             var index  = parent.IndexOf(target);
 
-            for (var i = BreadcrumbsNodes.Count - 1; i > index; i--)
+            for (var i = Breadcrumbs.Count - 1; i > index; i--)
             {
                 var element = parent.ElementAt(i);
                 element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
                 ToolbarBreadcrumbs.PopItem();
-                BreadcrumbsNodes.RemoveAt(i);
+                Breadcrumbs.RemoveAt(i);
             }
 
             // sync tree view selection with clicked breadcrumbs
 
-            var node = BreadcrumbsNodes[index];
+            var node = Breadcrumbs[index];
 
             TreeView.SelectNode(node, true, true);
         }
