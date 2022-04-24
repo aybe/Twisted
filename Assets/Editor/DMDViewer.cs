@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Twisted;
 using Twisted.Graphics;
+using Unity.Extensions;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -23,10 +24,9 @@ namespace Editor
         // BUG when clearing search breadcrumbs are not updated -> hide them
     {
         [SerializeField]
-        private DMDViewerModel Model = null!;
-
-        [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
+
+        private DMDFactory? Factory { get; set; }
 
         private static DMDPreview Preview => Singleton<DMDPreview>.instance;
 
@@ -46,11 +46,11 @@ namespace Editor
 
         public void CreateGUI()
         {
-            InitializeModel();
             InitializeRoot();
             InitializeTreeView();
             InitializeToolbar();
-
+            
+            UpdateFactory();
             UpdateControls();
             UpdateTitle();
         }
@@ -105,18 +105,6 @@ namespace Editor
             GetWindow<DMDViewer>();
         }
 
-        private void InitializeModel()
-        {
-            if (Model == null)
-            {
-                Model = CreateInstance<DMDViewerModel>();
-            }
-
-            Model.CurrentFile = Settings.LastDatabaseProperty.stringValue;
-
-            Model.Initialize();
-        }
-
         private void InitializeRoot()
         {
             var root = rootVisualElement;
@@ -127,7 +115,7 @@ namespace Editor
 
             root.Add(container);
 
-            root.Bind(Model.SerializedObject);
+            // root.Bind(Settings.SerializedObject);
 
             root.RegisterCallback<KeyDownEvent>(OnRootKeyDown);
         }
@@ -227,7 +215,7 @@ namespace Editor
         {
             // try populate the tree
 
-            var dmd = Model.DMDFactory?.DMD;
+            var dmd = Factory?.DMD;
 
             TreeView.RootNode = dmd;
 
@@ -254,6 +242,16 @@ namespace Editor
             if (dmd is not null)
             {
                 TreeView.SelectNode(dmd, true, true);
+            }
+        }
+
+        private void UpdateFactory()
+        {
+            var path = Settings.LastDatabaseProperty.stringValue;
+
+            if (File.Exists(path))
+            {
+                Factory = DMDFactory.Create(path);
             }
         }
 
@@ -305,9 +303,11 @@ namespace Editor
 
         private void UpdateTitle()
         {
+            var path = Settings.LastDatabaseProperty.stringValue;
+
             titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
             {
-                text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
+                text = File.Exists(path) ? Path.GetFileName(path) : "DMD Viewer"
             };
         }
 
@@ -336,20 +336,22 @@ namespace Editor
 
         private void OnToolbarOpenFile()
         {
-            if (!Model.OpenFile())
+            var  path = EditorUtility.OpenFilePanel(null, null, "DMD");
+
+            if (string.IsNullOrEmpty(path))
                 return;
 
-            UpdateControls();
-
-            UpdateTitle();
-
-            Settings.LastDatabaseProperty.stringValue = Model.CurrentFile;
+            Settings.LastDatabaseProperty.stringValue = path;
             Settings.SerializedObject.ApplyModifiedPropertiesWithoutUndo();
+            
+            UpdateFactory();
+            UpdateControls();
+            UpdateTitle();
         }
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
-            if (Model.UseSelectionFraming)
+            if (Settings.UseSceneFrameProperty.boolValue)
             {
                 EditorApplication.delayCall += () => Preview.FrameSelection();
             }
@@ -473,9 +475,17 @@ namespace Editor
 
         private void OnTreeViewSelectionChanged(object sender, TreeViewSelectionChangedEventArgs<DMDNode> e)
         {
+            if (Factory is null)
+                return;
+
             UpdateToolbarBreadcrumbs();
 
-            Preview.SetNode(Model.DMDFactory!, e.Items.FirstOrDefault() as DMDNode00FF, Model.UseModelSplitting, Model.UseSelectionFraming);
+            Preview.SetNode(
+                Factory,
+                e.Items.FirstOrDefault() as DMDNode00FF,
+                Settings.UseModelTextureProperty.boolValue,
+                Settings.UseSceneFrameProperty.boolValue
+            );
         }
 
         #endregion
