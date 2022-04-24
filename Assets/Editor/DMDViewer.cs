@@ -239,6 +239,8 @@ namespace Editor
 
             ToolbarBreadcrumbsHost.visible = visible;
 
+            ToolbarBreadcrumbsHost.style.display = DisplayStyle.None; // TODO remove as it's useless
+
             // finally, update our controls
 
             UpdateSearchLabel();
