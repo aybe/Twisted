@@ -456,17 +456,18 @@ namespace Editor
         {
             menu.AppendAction("Dump/Hexadecimal", _ =>
             {
-                Model.DumpHexadecimal(node);
+                var data = string.Concat(node.GetObjectData().Select(s => s.ToString("X2")));
+                EditorGUIUtility.systemCopyBuffer = data;
             });
 
             menu.AppendAction("Dump/Hierarchy (Backward)", _ =>
             {
-                Model.DumpHierarchyBackward(node);
+                EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyBackward();
             });
 
             menu.AppendAction("Dump/Hierarchy (Forward)", _ =>
             {
-                Model.DumpHierarchyForward(node);
+                EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyForward();
             });
         }
 

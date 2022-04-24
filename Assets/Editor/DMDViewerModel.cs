@@ -91,20 +91,5 @@ namespace Editor
             }
         }
 
-        public void DumpHexadecimal(DMDNode node)
-        {
-            var data = string.Concat(node.GetObjectData().Select(s => s.ToString("X2")));
-            EditorGUIUtility.systemCopyBuffer = data;
-        }
-
-        public void DumpHierarchyBackward(DMDNode node)
-        {
-            EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyBackward();
-        }
-
-        public void DumpHierarchyForward(DMDNode node)
-        {
-            EditorGUIUtility.systemCopyBuffer = node.PrintHierarchyForward();
-        }
     }
 }
