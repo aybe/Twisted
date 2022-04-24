@@ -349,7 +349,7 @@ namespace Editor
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
-            if (Settings.UseSceneFrameProperty.boolValue)
+            if (Settings.UseSceneFrameProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
                 EditorApplication.delayCall += () => Preview.FrameSelection();
             }
