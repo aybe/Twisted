@@ -193,6 +193,8 @@ namespace Editor
 
             TreeView.ContextMenuHandler = OnTreeViewContextMenuHandler;
 
+            TreeView.SearchFilter = Settings.LastFilterProperty.stringValue;
+
             // instead of their buggy implementation, always show scrolling, that's cleaner
 
             var scrollView = TreeView.Q<ScrollView>();
