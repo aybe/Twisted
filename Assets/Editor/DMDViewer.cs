@@ -305,7 +305,7 @@ namespace Editor
 
         private void UpdateTitle()
         {
-            titleContent = new GUIContent(DMDViewerStyles.WindowTitle)
+            titleContent = new GUIContent(EditorGUIUtility.IconContent("CustomTool"))
             {
                 text = File.Exists(Model.CurrentFile) ? Path.GetFileName(Model.CurrentFile) : "DMD Viewer"
             };
