@@ -112,9 +112,7 @@ namespace Editor
 
             if (selectedItem is null)
             {
-                var node = Builder.FirstOrDefault().data;
-
-                if (node != null)
+                if (GetItemDataForIndex<T>(0) is { } node)
                 {
                     SelectNode(node, true, true);
                 }
