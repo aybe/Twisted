@@ -104,21 +104,9 @@ namespace Editor
         #region Public methods
 
         /// <inheritdoc cref="VisualElement.Focus" />
-        public new void Focus() // because their stupid method can't even focus right
+        public new void Focus() // how the fuck they even managed to fail on that?
         {
-            // depending selection and search history the selection might become null
-            // thus, when control gets focus, navigation will not work until 2nd time
-            // ensure that something is selected so that navigation works on 1st time
-
-            if (selectedItem is null)
-            {
-                if (GetItemDataForIndex<T>(0) is { } node)
-                {
-                    SelectNode(node, true, true);
-                }
-            }
-
-            this.Q<ScrollView>().contentContainer.Focus(); // do focus this correctly
+            this.Q<ScrollView>().contentContainer.Focus();
         }
 
         /// <summary>

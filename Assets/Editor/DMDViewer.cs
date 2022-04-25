@@ -379,8 +379,22 @@ namespace Editor
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
         {
-            if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow)
-                TreeView.Focus();
+            if (evt.keyCode is not (KeyCode.UpArrow or KeyCode.DownArrow))
+                return;
+
+            TreeView.Focus();
+
+            // depending selection and search history the selection might become null
+            // thus, when control gets focus, navigation will not work until 2nd time
+            // ensure that something is selected so that navigation works on 1st time
+
+            if (TreeView.selectedItem is not null)
+                return;
+
+            if (TreeView.GetItemDataForIndex<DMDNode>(0) is { } node)
+            {
+                TreeView.SelectNode(node, true, true);
+            }
         }
 
         private void OnToolbarSearchFieldValueChanged(ChangeEvent<string> evt)

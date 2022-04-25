@@ -67,7 +67,7 @@ namespace Editor
 
             View.RefreshItems(); // now redraw the control or we'll get a nice broken interface
 
-            View.Focus(); // use our own focus because these morons even failed implementing it
+            View.Focus();
         }
 
         private void SortSaveExpanded(out HashSet<T> collapsed, out HashSet<T> expanded)
