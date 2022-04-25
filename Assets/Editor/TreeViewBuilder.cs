@@ -87,7 +87,7 @@ namespace Editor
         }
 
         private List<TreeViewItemData<T>> RebuildList(
-            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
+            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, TreeViewColumn<T>> dictionary)
         {
             if (descriptions is null)
                 throw new ArgumentNullException(nameof(descriptions));
@@ -131,7 +131,7 @@ namespace Editor
 
                 if (getter is null)
                 {
-                    throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
+                    throw new NullReferenceException($"{nameof(TreeViewColumn<T>.ValueGetter)} is null.");
                 }
 
                 sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
@@ -146,7 +146,7 @@ namespace Editor
         }
 
         private List<TreeViewItemData<T>> RebuildTree(
-            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, GenericTreeViewColumn<T>> dictionary)
+            SortColumnDescription[] descriptions, IReadOnlyDictionary<string, TreeViewColumn<T>> dictionary)
         {
             if (descriptions is null)
                 throw new ArgumentNullException(nameof(descriptions));
@@ -186,7 +186,7 @@ namespace Editor
 
                     if (getter is null)
                     {
-                        throw new NullReferenceException($"{nameof(GenericTreeViewColumn<T>.ValueGetter)} is null.");
+                        throw new NullReferenceException($"{nameof(TreeViewColumn<T>.ValueGetter)} is null.");
                     }
 
                     children = children.Sort(getter, null, description.direction is SortDirection.Descending);

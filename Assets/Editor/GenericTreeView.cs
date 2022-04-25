@@ -63,7 +63,7 @@ namespace Editor
 
         private TreeViewSorter<T> Sorter { get; }
 
-        internal GenericTreeViewColumn<T>[]? Columns { get; private set; }
+        internal TreeViewColumn<T>[]? Columns { get; private set; }
 
         private ContextualMenuManipulator ContextMenu { get; }
 
@@ -141,7 +141,7 @@ namespace Editor
         /// <summary>
         ///     Gets or sets the columns for this instance.
         /// </summary>
-        public void SetColumns(GenericTreeViewColumn<T>[] collection)
+        public void SetColumns(TreeViewColumn<T>[] collection)
         {
             if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
@@ -268,7 +268,7 @@ namespace Editor
 
             // get user data from the first control found that represents a cell
 
-            var element = target.Q(className: GenericTreeViewColumn<T>.ControlUssClassName);
+            var element = target.Q(className: TreeViewColumn<T>.ControlUssClassName);
 
             if (element is null)
             {

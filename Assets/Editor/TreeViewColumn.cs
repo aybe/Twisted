@@ -7,11 +7,11 @@ using UnityEngine.UIElements;
 
 namespace Editor
 {
-    public class GenericTreeViewColumn<T> where T : TreeNode
+    public class TreeViewColumn<T> where T : TreeNode
     {
         public const string ControlUssClassName = "generic-tree-view-cell-control";
 
-        public GenericTreeViewColumn()
+        public TreeViewColumn()
         {
             Optional    = true;
             Resizable   = true;

@@ -8,11 +8,11 @@ namespace Editor
     internal sealed class DMDTreeView : GenericTreeView<DMDNode>
     {
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        public static GenericTreeViewColumn<DMDNode>[] GetColumns()
+        public static TreeViewColumn<DMDNode>[] GetColumns()
         {
             return new[]
             {
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Node",
                     Name           = "Node",
@@ -21,7 +21,7 @@ namespace Editor
                     ValueFormatter = s => $"{s}",
                     MinWidth       = 150.0f
                 },
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Type 1",
                     Name           = "Type 1",
@@ -30,7 +30,7 @@ namespace Editor
                     ValueFormatter = s => s is uint u1 ? $"0x{u1:X4}" : null,
                     MinWidth       = 60.0f
                 },
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Type 2",
                     Name           = "Type 2",
@@ -39,7 +39,7 @@ namespace Editor
                     ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
                     MinWidth       = 60.0f
                 },
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Position",
                     Name           = "Position",
@@ -48,7 +48,7 @@ namespace Editor
                     ValueFormatter = s => $"{s}",
                     MinWidth       = 75.0f
                 },
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Length",
                     Name           = "Length",
@@ -57,7 +57,7 @@ namespace Editor
                     ValueFormatter = s => $"{s}",
                     MinWidth       = 75.0f
                 },
-                new GenericTreeViewColumn<DMDNode>
+                new TreeViewColumn<DMDNode>
                 {
                     Title          = "Polygons",
                     Name           = "Polygons",
