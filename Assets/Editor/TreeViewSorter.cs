@@ -9,12 +9,12 @@ namespace Editor
 {
     internal sealed class TreeViewSorter<T> where T : TreeNode
     {
-        public TreeViewSorter(GenericTreeView<T> view)
+        public TreeViewSorter(TreeView<T> view)
         {
             View = view ?? throw new ArgumentNullException(nameof(view));
         }
 
-        private GenericTreeView<T> View { get; }
+        private TreeView<T> View { get; }
 
         private Task? BackgroundTask { get; set; }
 

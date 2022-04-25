@@ -8,13 +8,13 @@ using UnityEngine.UIElements;
 
 namespace Editor
 {
-    public class GenericTreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
+    public class TreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
     // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
     // it's also unbelievably buggy but from them this isn't a surprise at all
     // worst being the column sorting stuff, that was literally freezing Unity
     // to deep sort 10K+ nodes: theirs = ~30 second, mine = less than a second
     {
-        protected GenericTreeView()
+        protected TreeView()
         {
             // hook to this so that we can provide GetSelection<T> and SetSelection<T>
 

@@ -24,7 +24,7 @@ namespace Editor
                 if (element is null)
                     throw new ArgumentNullException(nameof(element));
 
-                var view = element.GetParent<GenericTreeView<T>>() ?? throw new InvalidOperationException();
+                var view = element.GetParent<TreeView<T>>() ?? throw new InvalidOperationException();
                 var item = view.viewController.GetItemForIndex(index);
                 var node = item as T ?? throw new InvalidOperationException();
 

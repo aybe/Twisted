@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Editor
 {
-    internal sealed class DMDTreeView : GenericTreeView<DMDNode>
+    internal sealed class DMDTreeView : TreeView<DMDNode>
     {
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public static TreeViewColumn<DMDNode>[] GetColumns()

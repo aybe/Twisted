@@ -10,12 +10,12 @@ namespace Editor
 {
     internal sealed class TreeViewBuilder<T> : IEnumerable<TreeViewItemData<T>> where T : TreeNode
     {
-        public TreeViewBuilder(GenericTreeView<T> view)
+        public TreeViewBuilder(TreeView<T> view)
         {
             View = view ?? throw new ArgumentNullException(nameof(view));
         }
 
-        private GenericTreeView<T> View { get; }
+        private TreeView<T> View { get; }
 
         private List<TreeViewItemData<T>> Items { get; } = new();
 
