@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,8 @@ namespace Twisted.Formats.Database
 
         public long Length { get; private set; }
 
-        public byte[] GetObjectData()
+        [SuppressMessage("ReSharper", "ReturnTypeCanBeEnumerable.Global")]
+        public IReadOnlyList<byte> GetObjectData()
         {
             return ObjectData.ToArray();
         }
