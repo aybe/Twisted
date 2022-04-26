@@ -29,6 +29,8 @@ namespace Twisted.Formats.Database
 
         public long Length { get; private set; }
 
+        protected virtual uint BaseAddress => (Root as DMDNode)!.BaseAddress;
+
         [SuppressMessage("ReSharper", "ReturnTypeCanBeEnumerable.Global")]
         public IReadOnlyList<byte> GetObjectData()
         {
@@ -57,14 +59,14 @@ namespace Twisted.Formats.Database
             return $"{GetType().Name}, {nameof(NodeType)}: 0x{NodeType:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}";
         }
 
-        protected static uint ReadAddress(BinaryReader reader, bool validate = true)
+        protected uint ReadAddress(BinaryReader reader, bool validate = true)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
             var position = reader.BaseStream.Position;
             var address1 = reader.ReadUInt32(Endianness.LE);
-            var address2 = address1 - DMD.BaseAddress;
+            var address2 = address1 - BaseAddress;
 
             if (validate)
             {
@@ -74,7 +76,7 @@ namespace Twisted.Formats.Database
             return address2;
         }
 
-        protected static uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
+        protected uint[] ReadAddresses(BinaryReader reader, int count, bool validate = true)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));

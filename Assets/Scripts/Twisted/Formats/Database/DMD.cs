@@ -6,8 +6,6 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMD : DMDNode
     {
-        public const uint BaseAddress = 0x800188B8;
-
         public DMD(BinaryReader reader)
             : base(null, reader)
         {
@@ -23,11 +21,7 @@ namespace Twisted.Formats.Database
 
             DateTimeOffset.FromUnixTimeSeconds(reader.ReadInt32(Endianness.LE));
 
-            // TODO the base address could be passed to base node and benefit both versions
-
-            var baseAddress = reader.ReadUInt32(Endianness.LE);
-            if (baseAddress != BaseAddress)
-                throw new InvalidDataException($"Invalid base address: 0x{baseAddress:X8}.");
+            BaseAddress = reader.ReadUInt32(Endianness.LE);
 
             reader.BaseStream.Position = ReadAddress(reader);
 
@@ -38,5 +32,7 @@ namespace Twisted.Formats.Database
 
             ReadNodes(this, reader, addresses);
         }
+
+        protected override uint BaseAddress { get; }
     }
 }
