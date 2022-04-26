@@ -50,12 +50,12 @@
     width: 100px;
 }
 
-DMDTreeView > ScrollView > VisualElement > .unity-scroller--vertical {
+DMDViewerTreeView > ScrollView > VisualElement > .unity-scroller--vertical {
     width: 14px;
     opacity: 1;
 }
 
-DMDTreeView > ScrollView > .unity-scroller--horizontal {
+DMDViewerTreeView > ScrollView > .unity-scroller--horizontal {
     height: 14px;
     opacity: 1;
 }

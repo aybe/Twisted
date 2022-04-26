@@ -16,6 +16,6 @@
         <uie:Toolbar name="toolbarBreadcrumbsHost">
             <uie:ToolbarBreadcrumbs name="toolbarBreadcrumbs" />
         </uie:Toolbar>
-        <Editor.DMDTreeView focusable="true"/>
+        <Editor.DMDViewerTreeView focusable="true"/>
     </ui:VisualElement>
 </ui:UXML>

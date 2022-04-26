@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace Twisted.Editor
 {
-    internal sealed class DMDTreeView : TreeView<DMDNode>
+    internal sealed class DMDViewerTreeView : TreeView<DMDNode>
     {
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public static TreeViewColumn<DMDNode>[] GetColumns()
@@ -70,7 +70,7 @@ namespace Twisted.Editor
             };
         }
 
-        public new class UxmlFactory : UxmlFactory<DMDTreeView, UxmlTraits>
+        public new class UxmlFactory : UxmlFactory<DMDViewerTreeView, UxmlTraits>
         {
         }
     }

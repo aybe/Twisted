@@ -181,7 +181,7 @@ namespace Twisted.Editor
 
             TreeView.sortingEnabled = true;
 
-            TreeView.SetColumns(DMDTreeView.GetColumns());
+            TreeView.SetColumns(DMDViewerTreeView.GetColumns());
 
             TreeView.SelectionChanged += OnTreeViewSelectionChanged;
 
@@ -534,8 +534,8 @@ namespace Twisted.Editor
         private Toolbar ToolbarBreadcrumbsHost =>
             rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
 
-        private DMDTreeView TreeView =>
-            rootVisualElement.Q<DMDTreeView>();
+        private DMDViewerTreeView TreeView =>
+            rootVisualElement.Q<DMDViewerTreeView>();
 
         #endregion
     }
