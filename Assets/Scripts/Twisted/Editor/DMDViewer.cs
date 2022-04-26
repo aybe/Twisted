@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using Twisted.Controls;
 using Twisted.Formats.Database;
-using Unity.Extensions;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
-using Unity.Extensions.General;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -171,7 +170,7 @@ namespace Twisted.Editor
                     mesh.SetUVs(2, colors2);
                     mesh.SetTriangles(indices, 0);
 
-                    var go = gameObject.CreateChild(meshName);
+                    var go = new GameObject(meshName) { transform = { parent = gameObject.transform } };
                     var mf = go.AddComponent<MeshFilter>();
                     var mc = go.AddComponent<MeshCollider>();
                     var mr = go.AddComponent<MeshRenderer>();
