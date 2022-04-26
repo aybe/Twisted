@@ -15,7 +15,7 @@ namespace Twisted.Editor
 {
     [ExecuteAlways]
     [Singleton(Automatic = true)]
-    public sealed class DMDPreview : MonoBehaviour, ISingleton
+    public sealed class DMDViewerPreview : MonoBehaviour, ISingleton
     {
         public void FrameSelection()
         {

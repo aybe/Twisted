@@ -24,7 +24,7 @@ namespace Twisted.Editor
 
         private DMDViewerFactory? Factory { get; set; }
 
-        private static DMDPreview Preview => Singleton<DMDPreview>.instance;
+        private static DMDViewerPreview Preview => Singleton<DMDViewerPreview>.instance;
 
         private static DMDViewerSettings Settings => DMDViewerSettings.instance;
 
