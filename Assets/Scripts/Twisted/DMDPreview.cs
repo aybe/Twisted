@@ -175,12 +175,10 @@ namespace Twisted
                     var mf = go.AddComponent<MeshFilter>();
                     var mc = go.AddComponent<MeshCollider>();
                     var mr = go.AddComponent<MeshRenderer>();
-                    var pb = go.AddComponent<DMDPreviewBatch>();
 
                     mf.sharedMesh     = mesh;
                     mc.sharedMesh     = mesh;
                     mr.sharedMaterial = sharedMaterial;
-                    pb.Polygons       = list.Select(s => string.Concat(s.GetObjectData().Select(t => t.ToString("X2")))).ToList();
                 }
             }
 
