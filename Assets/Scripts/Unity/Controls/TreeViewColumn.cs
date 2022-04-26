@@ -5,7 +5,7 @@ using Unity.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Unity.Controls
 {
     public class TreeViewColumn<T> where T : TreeNode
     {

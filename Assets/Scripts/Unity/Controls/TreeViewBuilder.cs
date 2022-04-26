@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Unity.Extensions;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Unity.Controls
 {
     internal sealed class TreeViewBuilder<T> : IEnumerable<TreeViewItemData<T>> where T : TreeNode
     {

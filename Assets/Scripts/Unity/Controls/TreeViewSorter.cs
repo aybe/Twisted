@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.Extensions;
 
-namespace Editor
+namespace Unity.Controls
 {
     internal sealed class TreeViewSorter<T> where T : TreeNode
     {

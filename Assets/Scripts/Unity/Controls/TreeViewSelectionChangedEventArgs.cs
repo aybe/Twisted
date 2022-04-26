@@ -1,7 +1,7 @@
 ﻿using System;
 using Unity.Extensions;
 
-namespace Editor
+namespace Unity.Controls
 {
     public sealed class TreeViewSelectionChangedEventArgs<T> : EventArgs where T : TreeNode
     {

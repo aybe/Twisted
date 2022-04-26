@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Unity.Controls
 {
     public static class TreeViewSampleData
     {
