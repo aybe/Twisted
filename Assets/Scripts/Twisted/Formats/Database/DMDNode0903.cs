@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine.Assertions;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0903 : DMDNode
     {

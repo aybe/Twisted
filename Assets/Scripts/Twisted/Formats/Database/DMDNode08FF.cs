@@ -1,19 +1,17 @@
 ﻿using System;
 using System.IO;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
-    public sealed class DMDNode07FF : DMDNode
+    public sealed class DMDNode08FF : DMDNode
     {
-        public DMDNode07FF(DMDNode? parent, BinaryReader reader)
+        public DMDNode08FF(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            var bytes = reader.ReadBytes(52);
-
-            // TODO matrix ???
+            var bytes = reader.ReadBytes(84);
 
             SetupBinaryObject(reader);
         }

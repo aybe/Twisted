@@ -6,7 +6,7 @@ using Unity.Extensions;
 using Unity.Extensions.Binary;
 using UnityEngine.Assertions;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
     public abstract class DMDNode : TreeNode, IBinaryObject
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using Twisted.Formats.Graphics3D;
 using Unity.Extensions.Binary;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
     public sealed class DMDNode00FF : DMDNode
     {

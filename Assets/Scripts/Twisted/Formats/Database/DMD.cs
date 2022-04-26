@@ -2,7 +2,7 @@
 using System.IO;
 using Unity.Extensions.Binary;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
     public sealed class DMD : DMDNode
     {

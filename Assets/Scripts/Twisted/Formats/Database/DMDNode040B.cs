@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
     public sealed class DMDNode040B : DMDNode
     {

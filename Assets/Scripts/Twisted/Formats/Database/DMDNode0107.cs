@@ -1,23 +1,25 @@
 ﻿using System;
 using System.IO;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Database
 {
-    public sealed class DMDNode020X : DMDNode
+    public sealed class DMDNode0107 : DMDNode
     {
-        public DMDNode020X(DMDNode? parent, BinaryReader reader)
+        public DMDNode0107(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            var bytes = reader.ReadBytes(16);
+            var bytes = reader.ReadBytes(20);
 
-            // TODO int32 x, y, z
+            // TODO int32 x, y, z, unknown
 
-            var count = bytes[12];
+            var count = bytes[16];
 
             var addresses = ReadAddresses(reader, count);
+
+            // TODO there may be 76 more bytes in here
 
             SetupBinaryObject(reader);
 
