@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Unity.CodeEditor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,9 +11,13 @@ namespace Twisted.Editor.Extensions
     internal sealed class ProjectGenerationSettingsProvider : SettingsProvider
     {
         private SerializedProperty Nullable = null!;
+
         private SerializedProperty NullableWarningsDisabled = null!;
+
         private SerializedProperty PreserveProjectStructure = null!;
+
         private SerializedProperty RemoveRootNamespace = null!;
+
         private SerializedObject SerializedObject = null!;
 
         private ProjectGenerationSettingsProvider(string path, SettingsScope scopes, IEnumerable<string>? keywords = null)
@@ -60,7 +65,7 @@ namespace Twisted.Editor.Extensions
                         DrawBoolProperty(RemoveRootNamespace, Styles.RemoveRootNamespace);
                     }
 #pragma warning restore CS0162
-                    
+
                     if (cs.changed)
                     {
                         SerializedObject.ApplyModifiedProperties();
@@ -72,7 +77,7 @@ namespace Twisted.Editor.Extensions
 
                 if (GUILayout.Button("Regenerate Project Files", GUILayout.Width(width)))
                 {
-                    Unity.CodeEditor.CodeEditor.CurrentEditor.SyncAll();
+                    CodeEditor.CurrentEditor.SyncAll();
                 }
             }
         }

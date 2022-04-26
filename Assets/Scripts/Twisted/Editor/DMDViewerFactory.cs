@@ -20,7 +20,7 @@ namespace Twisted.Editor
             DMD = dmd ?? throw new ArgumentNullException(nameof(dmd));
             TMS = tms ?? throw new ArgumentNullException(nameof(tms));
         }
-        
+
         [PublicAPI]
         public DMD DMD { get; }
 
@@ -186,7 +186,7 @@ namespace Twisted.Editor
             };
 
             var picRect = new RectInt(info.Page.Position.x, info.Page.Position.y, picWidth, 256);
-            var palRect = new RectInt(info.Palette.x, info.Palette.y, palWidth, 1);
+            var palRect = new RectInt(info.Palette.x,       info.Palette.y,       palWidth, 1);
             var texture = FrameBuffer.GetTexture(picFormat, buffer, picRect, buffer, palRect, mode);
 
             return texture;

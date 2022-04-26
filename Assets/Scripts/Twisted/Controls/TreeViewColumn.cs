@@ -74,7 +74,7 @@ namespace Twisted.Controls
                 var data  = ValueGetter?.Invoke(node);
                 var text  = ValueFormatter?.Invoke(data) ?? data?.ToString();
                 var label = element as Label ?? throw new InvalidOperationException();
-                label.text = text;
+                label.text     = text;
                 label.userData = node;
                 label.AddToClassList(ControlUssClassName);
             }

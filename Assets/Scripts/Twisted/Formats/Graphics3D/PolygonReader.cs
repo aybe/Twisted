@@ -29,8 +29,8 @@ namespace Twisted.Formats.Graphics3D
             return polygons;
         }
 
-        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Code coverage")]
-        [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
+        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
+        [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
         private static Polygon ReadPolygon(BinaryReader reader, uint type, uint vertices, uint normals)
         {
             if (reader == null)

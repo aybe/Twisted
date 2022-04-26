@@ -6,6 +6,7 @@ namespace Twisted.Formats.Binary
     public enum Endianness
     {
         BE,
+
         LE
     }
 }

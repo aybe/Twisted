@@ -47,7 +47,7 @@ namespace Twisted.Formats.Graphics2D
             Disable  = disable;
 
             // BUG there are non-standard texture pages, only log an error and see how texture atlas behaves then
-            
+
             var xMax = 1024 - GetPixelWidth(this);
 
             if (position.x > xMax)

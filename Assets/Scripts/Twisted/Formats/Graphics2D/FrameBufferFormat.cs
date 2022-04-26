@@ -9,8 +9,11 @@ namespace Twisted.Formats.Graphics2D
     public enum FrameBufferFormat
     {
         Indexed4,
+
         Indexed8,
+
         Direct15,
+
         Direct24
     }
 }

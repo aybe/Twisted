@@ -5,6 +5,7 @@ namespace Twisted.Formats.Binary
     public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEquatable<BinaryStreamRegion>
     {
         public readonly long Position;
+
         public readonly long Length;
 
         internal BinaryStreamRegion(long position, long length)

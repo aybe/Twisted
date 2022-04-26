@@ -85,7 +85,7 @@ namespace Twisted.Editor.Extensions
                         foreach (var element in root.Descendants().Where(s => s.Name.LocalName is "Compile" or "None"))
                         {
                             var include = element.Attribute("Include");
-                            if (include is null) 
+                            if (include is null)
                                 continue;
 
                             var substring = include.Value[(directoryName!.Length + 1)..];

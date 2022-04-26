@@ -43,10 +43,10 @@ namespace Twisted.Formats.Graphics2D
             {
                 var fr = GetRotation(transform);
                 var fs = GetScale(transform);
-                var m1 = Matrix4x4.TRS(new Vector3(-0.5f, -0.5f), Quaternion.identity, Vector3.one);
-                var m2 = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, fs);
-                var m3 = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0.0f, 0.0f, fr), Vector3.one);
-                var m4 = Matrix4x4.TRS(new Vector3(+0.5f, +0.5f), Quaternion.identity, Vector3.one);
+                var m1 = Matrix4x4.TRS(new Vector3(-0.5f, -0.5f), Quaternion.identity,              Vector3.one);
+                var m2 = Matrix4x4.TRS(Vector3.zero,              Quaternion.identity,              fs);
+                var m3 = Matrix4x4.TRS(Vector3.zero,              Quaternion.Euler(0.0f, 0.0f, fr), Vector3.one);
+                var m4 = Matrix4x4.TRS(new Vector3(+0.5f, +0.5f), Quaternion.identity,              Vector3.one);
                 var m5 = m4 * m3 * m2 * m1;
 
                 matrices.Add(transform, m5);

@@ -3,6 +3,7 @@
     public enum BinaryStreamRegionKind
     {
         Reading,
+
         Writing
     }
 }

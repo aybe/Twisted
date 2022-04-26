@@ -3,6 +3,7 @@
     public enum BinaryStreamRegionType
     {
         Ignored,
+
         Visited
     }
 }

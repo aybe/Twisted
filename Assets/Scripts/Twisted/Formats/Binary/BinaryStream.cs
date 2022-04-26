@@ -146,6 +146,7 @@ namespace Twisted.Formats.Binary
             if (!enumerator.MoveNext()) // empty sequence, negate
             {
                 yield return new BinaryStreamRegion(0, length);
+
                 yield break;
             }
 
@@ -198,6 +199,7 @@ namespace Twisted.Formats.Binary
                 if (pos > ending) // gap
                 {
                     yield return new BinaryStreamRegion(origin, ending - origin);
+
                     origin = pos;
                     ending = pos + len;
                 }
