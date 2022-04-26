@@ -11,7 +11,7 @@ using Vector4 = System.Numerics.Vector4;
 
 namespace Twisted.Formats.Graphics3D
 {
-    public abstract class Polygon : IBinaryObject
+    public abstract class Polygon
     {
         protected Polygon(
             BinaryReader reader,

@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
 {
-    public abstract class DMDNode : TreeNode, IBinaryObject
+    public abstract class DMDNode : TreeNode
     {
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
         protected DMDNode(DMDNode? parent, BinaryReader reader) : base(parent)
