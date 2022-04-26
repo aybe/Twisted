@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using JetBrains.Annotations;
-using Twisted.Formats.Graphics2D;
 using Unity.Extensions.Binary;
 
-namespace Twisted.Graphics
+namespace Twisted.Formats.Graphics2D
 {
-    public sealed class TMS : IReadOnlyList<Tim>
+    public sealed class Tms : IReadOnlyList<Tim>
     {
-        public TMS([NotNull] BinaryReader reader)
+        public Tms([NotNull] BinaryReader reader)
         {
             if (reader is null)
                 throw new ArgumentNullException(nameof(reader));

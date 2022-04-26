@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
-using Twisted.Graphics;
 using Unity.Extensions.Graphics;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,7 +16,7 @@ namespace Twisted
 {
     public sealed class DMDFactory
     {
-        private DMDFactory([NotNull] DMD dmd, [NotNull] TMS tms)
+        private DMDFactory([NotNull] DMD dmd, [NotNull] Tms tms)
         {
             DMD = dmd ?? throw new ArgumentNullException(nameof(dmd));
             TMS = tms ?? throw new ArgumentNullException(nameof(tms));
@@ -25,7 +24,7 @@ namespace Twisted
 
         public DMD DMD { get; }
 
-        public TMS TMS { get; }
+        public Tms TMS { get; }
 
         public FrameBuffer FrameBuffer { get; set; }
 
@@ -38,7 +37,7 @@ namespace Twisted
             using var reader2 = new BinaryReader(new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, ".TMS"))));
 
             var dmd = new DMD(reader1);
-            var tms = new TMS(reader2);
+            var tms = new Tms(reader2);
 
             return new DMDFactory(dmd, tms);
         }
