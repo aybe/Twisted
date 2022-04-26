@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     /// <summary>
     ///     PlayStation 16-bit semi-transparent color.

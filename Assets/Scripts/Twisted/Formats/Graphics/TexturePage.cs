@@ -3,7 +3,7 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     [PublicAPI]
     public readonly struct TexturePage

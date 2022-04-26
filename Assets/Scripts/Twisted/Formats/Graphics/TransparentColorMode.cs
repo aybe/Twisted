@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     [Flags]
     [PublicAPI]

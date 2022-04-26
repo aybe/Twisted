@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     /// <summary>
     ///     Base class for a frame buffer object.

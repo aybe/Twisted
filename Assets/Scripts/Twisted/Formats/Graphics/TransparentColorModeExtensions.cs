@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     [PublicAPI]
     public static class TransparentColorModeExtensions

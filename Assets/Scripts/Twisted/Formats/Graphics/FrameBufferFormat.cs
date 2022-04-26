@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     /// <summary>
     ///     Specifies the pixel format for a frame buffer object.

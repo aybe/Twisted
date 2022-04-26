@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 using Unity.Extensions.Binary;
 using RectInt = UnityEngine.RectInt;
 
-namespace Unity.PlayStation.Graphics
+namespace Twisted.Formats.Graphics
 {
     [PublicAPI]
     public sealed class Tim
