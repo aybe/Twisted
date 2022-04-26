@@ -1,28 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 
 namespace Twisted.Formats.Binary
 {
     public static class BinaryReaderExtensions
     {
-        public static string ReadStringAscii(this BinaryReader reader, int length)
-        {
-            if (reader == null)
-                throw new ArgumentNullException(nameof(reader));
-
-            if (length <= 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-
-            var bytes = reader.ReadBytes(length);
-            if (bytes.Length != length)
-                throw new EndOfStreamException();
-
-            var ascii = Encoding.ASCII.GetString(bytes);
-
-            return ascii;
-        }
-
         public static T ReadObject<T>(this BinaryReader reader, Func<BinaryReader, T> func, long position)
         {
             if (reader == null)
