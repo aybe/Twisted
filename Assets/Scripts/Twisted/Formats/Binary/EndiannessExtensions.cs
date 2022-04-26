@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Globalization;
 using System.IO;
 
-namespace Unity.Extensions.Binary
+namespace Twisted.Formats.Binary
 {
     public static class EndiannessExtensions
     {

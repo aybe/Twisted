@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Unity.Extensions.Binary
+namespace Twisted.Formats.Binary
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum Endianness

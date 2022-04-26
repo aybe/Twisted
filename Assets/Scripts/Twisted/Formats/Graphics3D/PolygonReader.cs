@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Unity.Extensions.Binary;
+using Twisted.Formats.Binary;
 using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Graphics3D

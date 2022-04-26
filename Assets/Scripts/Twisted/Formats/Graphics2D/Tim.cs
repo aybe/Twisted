@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
-using Unity.Extensions.Binary;
+using Twisted.Formats.Binary;
 using RectInt = UnityEngine.RectInt;
 
 namespace Twisted.Formats.Graphics2D

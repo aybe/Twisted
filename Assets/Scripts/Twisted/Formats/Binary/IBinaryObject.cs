@@ -1,4 +1,4 @@
-﻿namespace Unity.Extensions.Binary
+﻿namespace Twisted.Formats.Binary
 {
     public interface IBinaryObject
     {

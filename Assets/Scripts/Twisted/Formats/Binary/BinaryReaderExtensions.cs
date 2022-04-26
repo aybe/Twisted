@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Unity.Extensions.Binary
+namespace Twisted.Formats.Binary
 {
     public static class BinaryReaderExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.Extensions.Binary
+namespace Twisted.Formats.Binary
 {
     public readonly struct BinaryStreamRegion : IComparable<BinaryStreamRegion>, IEquatable<BinaryStreamRegion>
     {
