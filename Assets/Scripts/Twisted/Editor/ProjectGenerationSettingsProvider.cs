@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Twisted.Editor.Extensions
+namespace Twisted.Editor
 {
     internal sealed class ProjectGenerationSettingsProvider : SettingsProvider
     {
