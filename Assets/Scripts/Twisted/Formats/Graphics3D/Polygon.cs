@@ -129,11 +129,6 @@ namespace Twisted.Formats.Graphics3D
 
         public long Length { get; }
 
-        public byte[] GetObjectData()
-        {
-            return Data.ToArray();
-        }
-
         public override string ToString()
         {
             return $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
@@ -162,11 +157,9 @@ namespace Twisted.Formats.Graphics3D
 
             var colors = new Color32[elements!.Value];
 
-            var data = GetObjectData();
-
             for (var i = 0; i < colors.Length; i++)
             {
-                var span = data.AsSpan(position!.Value + i * 4);
+                var span = Data.AsSpan(position!.Value + i * 4);
 
                 var r = span[0];
                 var g = span[1];
@@ -214,18 +207,17 @@ namespace Twisted.Formats.Graphics3D
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
 
-            var data    = GetObjectData();
-            var dataMax = data.Length - 8;
+            var dataMax = Data.Length - 8;
 
             if (position!.Value > dataMax)
                 throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
 
-            var paletteRaw = data.ReadInt16(position.Value + 2, Endianness.LE);
+            var paletteRaw = Data.ReadInt16(position.Value + 2, Endianness.LE);
             var paletteX   = (paletteRaw & 0b00000000_00111111) * 16;
             var paletteY   = (paletteRaw & 0b01111111_11000000) / 64;
             var palette    = new Vector2Int(paletteX, paletteY);
 
-            var pageRaw     = data.ReadInt32(position.Value + 6, Endianness.LE);
+            var pageRaw     = Data.ReadInt32(position.Value + 6, Endianness.LE);
             var pageX       = (pageRaw & 0b_00000000_00001111) * 64;
             var pageY       = (pageRaw & 0b_00000000_00010000) / 16 * 256;
             var pageAlpha   = (pageRaw & 0b_00000000_01100000) / 32;
@@ -250,8 +242,7 @@ namespace Twisted.Formats.Graphics3D
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
 
-            var data    = GetObjectData();
-            var dataMax = data.Length - elements.Value * 4;
+            var dataMax = Data.Length - elements.Value * 4;
 
             if (position!.Value > dataMax)
                 throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
@@ -261,8 +252,8 @@ namespace Twisted.Formats.Graphics3D
             for (var i = 0; i < uvs.Length; i++)
             {
                 var j = position.Value + i * 4;
-                var u = data.ReadByte(j + 0);
-                var v = data.ReadByte(j + 1);
+                var u = Data.ReadByte(j + 0);
+                var v = Data.ReadByte(j + 1);
                 uvs[i] = new Vector2Int(u, v);
             }
 
