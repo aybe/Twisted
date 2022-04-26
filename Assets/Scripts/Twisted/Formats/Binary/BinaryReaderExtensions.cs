@@ -23,27 +23,6 @@ namespace Twisted.Formats.Binary
             return value;
         }
 
-        public static T[] ReadObjects<T>(this BinaryReader reader, Func<BinaryReader, T> func, int count)
-        {
-            if (reader == null)
-                throw new ArgumentNullException(nameof(reader));
-
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-
-            if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count));
-
-            var items = new T[count];
-
-            for (var i = 0; i < count; i++)
-            {
-                items[i] = func(reader);
-            }
-
-            return items;
-        }
-
         public static bool TryRead<T>(this BinaryReader reader, Func<BinaryReader, T> func, out T result)
         {
             if (reader == null)
