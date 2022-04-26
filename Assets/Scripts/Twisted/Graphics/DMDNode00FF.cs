@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Twisted.Formats.Graphics3D;
 using Unity.Extensions.Binary;
 
 namespace Twisted.Graphics
