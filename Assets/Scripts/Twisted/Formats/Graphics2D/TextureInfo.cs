@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Twisted.Formats.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     [PublicAPI]
     public readonly struct TextureInfo

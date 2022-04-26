@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace Twisted.Formats.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     /// <summary>
     ///     Compares by page position, page colors, palette position.

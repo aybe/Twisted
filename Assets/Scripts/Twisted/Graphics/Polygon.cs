@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using Twisted.Formats.Graphics;
+using Twisted.Formats.Graphics2D;
 using Unity.Extensions.Binary;
 using UnityEngine;
 using UnityEngine.Assertions;

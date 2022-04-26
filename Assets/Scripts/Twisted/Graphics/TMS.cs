@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using JetBrains.Annotations;
-using Twisted.Formats.Graphics;
+using Twisted.Formats.Graphics2D;
 using Unity.Extensions.Binary;
 
 namespace Twisted.Graphics

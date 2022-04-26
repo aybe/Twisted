@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Twisted.Formats.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     [PublicAPI]
     public enum TexturePageDisable
