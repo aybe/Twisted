@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Unity.Extensions
+namespace Twisted.Controls
 {
     public static class SortExtensions
     {
