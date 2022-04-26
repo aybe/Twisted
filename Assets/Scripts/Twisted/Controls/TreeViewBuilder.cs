@@ -134,7 +134,7 @@ namespace Twisted.Controls
                     throw new NullReferenceException($"{nameof(TreeViewColumn<T>.ValueGetter)} is null.");
                 }
 
-                sort = sort.Sort(getter, null, description.direction is SortDirection.Descending);
+                sort = Sort(sort, getter, null, description.direction is SortDirection.Descending);
             }
 
             if (View.SearchFilterComparer is not null)
@@ -189,7 +189,7 @@ namespace Twisted.Controls
                         throw new NullReferenceException($"{nameof(TreeViewColumn<T>.ValueGetter)} is null.");
                     }
 
-                    children = children.Sort(getter, null, description.direction is SortDirection.Descending);
+                    children = Sort(children, getter, null, description.direction is SortDirection.Descending);
                 }
 
                 foreach (var child in children)
@@ -232,6 +232,22 @@ namespace Twisted.Controls
             }
 
             return list;
+        }
+
+        private static IOrderedEnumerable<TSource> Sort<TSource, TKey>(
+            IEnumerable<TSource> source, Func<TSource, TKey> selector, IComparer<TKey>? comparer, bool descending)
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+
+            if (selector is null)
+                throw new ArgumentNullException(nameof(selector));
+
+            return source is IOrderedEnumerable<TSource> enumerable
+                ? enumerable.CreateOrderedEnumerable(selector, comparer, @descending)
+                : descending
+                    ? source.OrderByDescending(selector, comparer)
+                    : source.OrderBy(selector, comparer);
         }
     }
 }
