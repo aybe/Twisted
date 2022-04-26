@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Random = UnityEngine.Random;
 
-namespace Twisted
+namespace Twisted.Editor
 {
     [ExecuteAlways]
     [Singleton(Automatic = true)]

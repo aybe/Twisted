@@ -12,7 +12,7 @@ using Unity.Extensions.Graphics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Twisted
+namespace Twisted.Editor
 {
     public sealed class DMDFactory
     {
