@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
-namespace Unity.Extensions.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     internal static class TextureAtlasUtility
     {

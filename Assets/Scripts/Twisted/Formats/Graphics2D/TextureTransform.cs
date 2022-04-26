@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.Extensions.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     [Flags]
     public enum TextureTransform

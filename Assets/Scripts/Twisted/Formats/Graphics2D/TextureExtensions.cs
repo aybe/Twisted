@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Unity.Extensions.Graphics
+namespace Twisted.Formats.Graphics2D
 {
     public static class TextureExtensions
     {

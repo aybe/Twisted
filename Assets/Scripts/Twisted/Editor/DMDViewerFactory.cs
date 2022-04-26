@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
-using Unity.Extensions.Graphics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
