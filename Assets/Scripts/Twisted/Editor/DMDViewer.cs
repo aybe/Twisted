@@ -351,7 +351,7 @@ namespace Twisted.Editor
 
         private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
         {
-            TreeView.SearchFilterComparer = evt.newValue ? DMDViewerNodeEqualityComparer.Instance : null;
+            TreeView.SearchFilterComparer = evt.newValue ? DMDViewerComparer.Instance : null;
             TreeView.Rebuild();
 
             UpdateSearchLabel();
