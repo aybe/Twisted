@@ -38,7 +38,7 @@ namespace Twisted.Editor
             view.Frame(bounds, false);
         }
 
-        public void SetNode(DMDFactory factory, DMDNode00FF? node, bool split = true, bool frame = true)
+        public void SetNode(DMDViewerFactory factory, DMDNode00FF? node, bool split = true, bool frame = true)
         {
             while (transform.childCount > 0)
             {

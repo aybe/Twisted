@@ -22,7 +22,7 @@ namespace Twisted.Editor
 
         private List<DMDNode> Breadcrumbs { get; } = new();
 
-        private DMDFactory? Factory { get; set; }
+        private DMDViewerFactory? Factory { get; set; }
 
         private static DMDPreview Preview => Singleton<DMDPreview>.instance;
 
@@ -211,7 +211,7 @@ namespace Twisted.Editor
 
             if (File.Exists(path))
             {
-                Factory = DMDFactory.Create(path);
+                Factory = DMDViewerFactory.Create(path);
             }
         }
 
