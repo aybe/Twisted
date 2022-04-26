@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace Unity.Extensions.Editor
+namespace Twisted.Editor.Extensions
 {
     [FilePath("ProjectSettings/" + nameof(ProjectGenerationSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class ProjectGenerationSettings : ScriptableSingleton<ProjectGenerationSettings>

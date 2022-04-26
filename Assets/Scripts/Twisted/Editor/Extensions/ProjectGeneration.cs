@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unity.Extensions.Editor
+namespace Twisted.Editor.Extensions
 {
     internal sealed class ProjectGeneration : AssetPostprocessor
     {
