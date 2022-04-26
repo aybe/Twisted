@@ -4,7 +4,7 @@ using Twisted.Controls;
 using Twisted.Formats.Database;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Twisted.Editor
 {
     internal sealed class DMDTreeView : TreeView<DMDNode>
     {

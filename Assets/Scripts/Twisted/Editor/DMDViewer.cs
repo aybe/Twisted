@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using Twisted;
 using Twisted.Controls;
-using Twisted.Editor;
 using Twisted.Formats.Database;
 using Unity.Extensions;
 using Unity.VisualScripting;
@@ -15,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Twisted.Editor
 {
     public sealed partial class DMDViewer : EditorWindow
     {

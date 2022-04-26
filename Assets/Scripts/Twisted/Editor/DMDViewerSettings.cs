@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor
+namespace Twisted.Editor
 {
     [FilePath("UserSettings/DMDViewerSettings.yaml", FilePathAttribute.Location.ProjectFolder)]
     [Serializable]

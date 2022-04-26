@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Twisted.Formats.Database;
 
-namespace Editor
+namespace Twisted.Editor
 {
     internal sealed class DMDViewerNodeEqualityComparer : EqualityComparer<DMDNode>
     {
