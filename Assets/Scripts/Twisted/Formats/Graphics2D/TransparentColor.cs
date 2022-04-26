@@ -93,28 +93,7 @@ namespace Twisted.Formats.Graphics2D
             }
             else
             {
-                if (black)
-                {
-                    if (transparentColor)
-                    {
-                        a = byte.MinValue;
-                    }
-                    else
-                    {
-                        a = byte.MinValue;
-                    }
-                }
-                else
-                {
-                    if (transparentColor)
-                    {
-                        a = byte.MaxValue;
-                    }
-                    else
-                    {
-                        a = byte.MaxValue;
-                    }
-                }
+                a = black ? byte.MinValue : byte.MaxValue;
             }
 
             var r = (byte)Math.Round(R * 255.0d / 31.0d);

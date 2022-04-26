@@ -93,7 +93,7 @@ namespace Twisted.Formats.Database
         [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
         [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression",       Justification = "Code coverage")]
         [SuppressMessage("Style",     "IDE0066:Convert switch statement to expression", Justification = "Code coverage")]
-        public static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
+        private static DMDNode ReadNode(DMDNode? parent, BinaryReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -184,6 +184,7 @@ namespace Twisted.Formats.Database
             // @formatter:on
         }
 
+        [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
         protected static DMDNode[] ReadNodes(DMDNode? parent, BinaryReader reader, uint[] addresses)
         {
             if (reader == null)

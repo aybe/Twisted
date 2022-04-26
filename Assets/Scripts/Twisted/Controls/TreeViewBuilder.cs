@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine.UIElements;
@@ -85,6 +86,7 @@ namespace Twisted.Controls
             }
         }
 
+        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
         private List<TreeViewItemData<T>> RebuildList(
             SortColumnDescription[] descriptions, IReadOnlyDictionary<string, TreeViewColumn<T>> dictionary)
         {
@@ -243,7 +245,7 @@ namespace Twisted.Controls
                 throw new ArgumentNullException(nameof(selector));
 
             return source is IOrderedEnumerable<TSource> enumerable
-                ? enumerable.CreateOrderedEnumerable(selector, comparer, @descending)
+                ? enumerable.CreateOrderedEnumerable(selector, comparer, descending)
                 : descending
                     ? source.OrderByDescending(selector, comparer)
                     : source.OrderBy(selector, comparer);

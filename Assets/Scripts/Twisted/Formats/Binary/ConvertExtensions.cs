@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Twisted.Formats.Binary
 {
+    [PublicAPI]
     public static partial class ConvertExtensions
     {
         public static sbyte ToSByte(this byte value)

@@ -160,13 +160,13 @@ namespace Twisted.Formats.Graphics3D
             if (elements is null != position is null)
                 throw new InvalidOperationException($"Both {nameof(ColorElements)} and {nameof(ColorPosition)} must be overridden.");
 
-            var colors = new Color32[elements.Value];
+            var colors = new Color32[elements!.Value];
 
             var data = GetObjectData();
 
             for (var i = 0; i < colors.Length; i++)
             {
-                var span = data.AsSpan(position.Value + i * 4);
+                var span = data.AsSpan(position!.Value + i * 4);
 
                 var r = span[0];
                 var g = span[1];
@@ -211,13 +211,13 @@ namespace Twisted.Formats.Graphics3D
             if (elements is null != position is null)
                 throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
 
-            if (elements.Value is not (3 or 4))
+            if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
 
             var data    = GetObjectData();
             var dataMax = data.Length - 8;
 
-            if (position.Value > dataMax)
+            if (position!.Value > dataMax)
                 throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
 
             var paletteRaw = data.ReadInt16(position.Value + 2, Endianness.LE);
@@ -247,13 +247,13 @@ namespace Twisted.Formats.Graphics3D
             if (elements is null != position is null)
                 throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
 
-            if (elements.Value is not (3 or 4))
+            if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
 
             var data    = GetObjectData();
             var dataMax = data.Length - elements.Value * 4;
 
-            if (position.Value > dataMax)
+            if (position!.Value > dataMax)
                 throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
 
             var uvs = new Vector2Int[elements.Value];

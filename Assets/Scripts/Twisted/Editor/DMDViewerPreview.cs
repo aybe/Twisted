@@ -55,7 +55,7 @@ namespace Twisted.Editor
             if (node == null)
                 return;
 
-            var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo.Value).ToArray();
+            var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo!.Value).ToArray();
 
             factory.GetTextureAtlas(infos, out var atlas, out var atlasTexture, out var atlasIndices);
 

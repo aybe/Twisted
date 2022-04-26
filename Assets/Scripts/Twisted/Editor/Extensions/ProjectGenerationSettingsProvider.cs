@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,7 +15,7 @@ namespace Twisted.Editor.Extensions
         private SerializedProperty RemoveRootNamespace = null!;
         private SerializedObject SerializedObject = null!;
 
-        private ProjectGenerationSettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null)
+        private ProjectGenerationSettingsProvider(string path, SettingsScope scopes, IEnumerable<string>? keywords = null)
             : base(path, scopes, keywords)
         {
         }
@@ -36,6 +37,7 @@ namespace Twisted.Editor.Extensions
             RemoveRootNamespace = SerializedObject.FindProperty(nameof(ProjectGenerationSettings.RemoveEmptyRootNamespace));
         }
 
+        [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
         public override void OnGUI(string searchContext)
         {
             SerializedObject.Update();
@@ -52,7 +54,6 @@ namespace Twisted.Editor.Extensions
 
                     if (false)
 #pragma warning disable CS0162
-                        // ReSharper disable once HeuristicUnreachableCode
                     {
                         DrawBoolProperty(PreserveProjectStructure, Styles.PreserveProjectStructure);
 

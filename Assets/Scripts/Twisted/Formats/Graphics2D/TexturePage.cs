@@ -56,7 +56,7 @@ namespace Twisted.Formats.Graphics2D
                 Debug.LogError($"X must not be greater than {xMax}.");
             }
 
-            var yMax = 256;
+            const int yMax = 256;
 
             if (position.y > yMax)
             {

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using JetBrains.Annotations;
 
 namespace Twisted.Formats.Binary
 {
+    [PublicAPI]
     public static class EndiannessExtensions
     {
         public static Endianness Endianness { get; } =
@@ -34,6 +37,7 @@ namespace Twisted.Formats.Binary
             return value;
         }
 
+        [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
         public static T ReadEnum<T>(this BinaryReader reader, Endianness endianness) where T : Enum, IConvertible
         {
             if (reader is null)
@@ -150,6 +154,7 @@ namespace Twisted.Formats.Binary
             return value;
         }
 
+        [SuppressMessage("ReSharper", "SwitchStatementHandlesSomeKnownEnumValuesWithDefault")]
         public static void WriteEnum<T>(this BinaryWriter writer, T value, Endianness endianness)
             where T : Enum, IConvertible
         {

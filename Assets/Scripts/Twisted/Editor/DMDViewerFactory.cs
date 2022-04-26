@@ -15,19 +15,22 @@ namespace Twisted.Editor
 {
     public sealed class DMDViewerFactory
     {
-        private DMDViewerFactory([NotNull] DMD dmd, [NotNull] Tms tms)
+        private DMDViewerFactory(DMD dmd, Tms tms)
         {
             DMD = dmd ?? throw new ArgumentNullException(nameof(dmd));
             TMS = tms ?? throw new ArgumentNullException(nameof(tms));
         }
-
+        
+        [PublicAPI]
         public DMD DMD { get; }
 
+        [PublicAPI]
         public Tms TMS { get; }
 
-        public FrameBuffer FrameBuffer { get; set; }
+        [PublicAPI]
+        public FrameBuffer? FrameBuffer { get; set; }
 
-        public static DMDViewerFactory Create([NotNull] string path)
+        public static DMDViewerFactory Create(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
@@ -43,9 +46,9 @@ namespace Twisted.Editor
 
         public void GetTextureAtlas(TextureInfo[] infos, out TextureAtlas atlas, out Texture2D atlasTexture, out IReadOnlyDictionary<TextureInfo, int> atlasIndices)
         {
-            atlas        = default;
-            atlasTexture = default;
-            atlasIndices = default;
+            atlas        = default!;
+            atlasTexture = default!;
+            atlasIndices = default!;
 
             if (infos is null)
                 throw new ArgumentNullException(nameof(infos));

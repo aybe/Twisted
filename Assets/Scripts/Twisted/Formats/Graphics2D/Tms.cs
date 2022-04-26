@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using JetBrains.Annotations;
 using Twisted.Formats.Binary;
 
 namespace Twisted.Formats.Graphics2D
 {
     public sealed class Tms : IReadOnlyList<Tim>
     {
-        public Tms([NotNull] BinaryReader reader)
+        public Tms(BinaryReader reader)
         {
             if (reader is null)
                 throw new ArgumentNullException(nameof(reader));

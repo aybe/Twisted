@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine.Assertions;
 
@@ -6,6 +7,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0903 : DMDNode
     {
+        [SuppressMessage("ReSharper", "UnusedVariable")]
+        [SuppressMessage("Style",     "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public DMDNode0903(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {

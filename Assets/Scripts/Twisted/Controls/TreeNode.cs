@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
 namespace Twisted.Controls
 {
+    [PublicAPI]
     public abstract class TreeNode : IList<TreeNode>
     {
         private TreeNode? _parent;
@@ -15,7 +17,7 @@ namespace Twisted.Controls
             _parent = parent;
         }
 
-        private List<TreeNode> Children { get; } = new List<TreeNode>();
+        private List<TreeNode> Children { get; } = new();
 
         public int Depth
         {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Twisted.Controls
 {
+    [PublicAPI]
     public static class TreeNodeExtensions
     {
         public static string PrintHierarchyBackward(this TreeNode node)
@@ -85,14 +87,7 @@ namespace Twisted.Controls
                         {
                             if (count > 1)
                             {
-                                if (close)
-                                {
-                                    builder.Insert(position, "├───");
-                                }
-                                else
-                                {
-                                    builder.Insert(position, "└───");
-                                }
+                                builder.Insert(position, close ? "├───" : "└───");
                             }
                             else
                             {

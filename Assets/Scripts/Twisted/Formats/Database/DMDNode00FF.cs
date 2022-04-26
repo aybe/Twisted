@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Formats.Binary;
@@ -9,6 +10,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode00FF : DMDNode
     {
+        [SuppressMessage("ReSharper", "UnusedVariable")]
+        [SuppressMessage("Style",     "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public DMDNode00FF(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
@@ -46,14 +49,19 @@ namespace Twisted.Formats.Database
             Polygons = PolygonReader.TryRead(reader, count, PositionVertices, PositionNormals);
         }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public uint PositionVertices { get; }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public uint PositionNormals { get; }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public uint PositionPolygons { get; }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public IReadOnlyList<Polygon> Polygons { get; }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public byte Flags { get; }
 
         public string GetPolygonsString()

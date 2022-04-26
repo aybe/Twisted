@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Twisted.Formats.Binary
 {
+    [PublicAPI]
     public partial class BinaryStream : Stream
     {
         public BinaryStream(Stream input, Encoding? encoding = default, bool leaveOpen = default)
@@ -24,9 +26,9 @@ namespace Twisted.Formats.Binary
             StreamDispose = leaveOpen is false;
         }
 
-        private SortedSet<BinaryStreamRegion> RegionsReading { get; } = new SortedSet<BinaryStreamRegion>();
+        private SortedSet<BinaryStreamRegion> RegionsReading { get; } = new();
 
-        private SortedSet<BinaryStreamRegion> RegionsWriting { get; } = new SortedSet<BinaryStreamRegion>();
+        private SortedSet<BinaryStreamRegion> RegionsWriting { get; } = new();
 
         private Stream Stream { get; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Twisted.Formats.Binary;
 
@@ -6,6 +7,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNodeXXXX : DMDNode
     {
+        [SuppressMessage("ReSharper", "UnusedVariable")]
+        [SuppressMessage("Style",     "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public DMDNodeXXXX(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {

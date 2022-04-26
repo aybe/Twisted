@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine.Assertions;
 
@@ -6,6 +7,7 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0B06 : DMDNode
     {
+        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
         public DMDNode0B06(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {

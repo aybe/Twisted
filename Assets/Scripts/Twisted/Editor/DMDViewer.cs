@@ -361,16 +361,19 @@ namespace Twisted.Editor
             TreeView.SetSelection(TreeView.GetSelection());
         }
 
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnToolbarTexturingValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_TEXTURE"), evt.newValue);
         }
 
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnToolbarVertexColorsValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX"), evt.newValue);
         }
 
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnToolbarPolygonColoringValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON"), evt.newValue);
@@ -459,6 +462,7 @@ namespace Twisted.Editor
             TreeView.SelectNode(node, true, true);
         }
 
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnTreeViewContextMenuHandler(DMDNode node, DropdownMenu menu)
         {
             menu.AppendAction("Dump/Hexadecimal", _ =>

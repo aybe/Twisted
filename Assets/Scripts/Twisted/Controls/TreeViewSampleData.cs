@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine.UIElements;
 
 namespace Twisted.Controls
 {
+    [PublicAPI]
     public static class TreeViewSampleData
     {
         public delegate T SampleDataValue<out T>(int id, int depth);
