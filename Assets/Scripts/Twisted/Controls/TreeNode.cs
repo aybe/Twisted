@@ -153,5 +153,24 @@ namespace Twisted.Controls
 
             Children.RemoveAt(index);
         }
+
+        public List<T> GetParents<T>() where T : TreeNode
+        {
+            var parents = new List<T>();
+
+            var parent = this;
+
+            while (parent is not null)
+            {
+                if (parent is T value)
+                {
+                    parents.Add(value);
+                }
+
+                parent = parent.Parent;
+            }
+
+            return parents;
+        }
     }
 }
