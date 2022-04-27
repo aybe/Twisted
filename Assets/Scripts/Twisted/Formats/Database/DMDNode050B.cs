@@ -6,6 +6,10 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode050B : DMDNode
     {
+        private readonly byte Unknown1;
+
+        private readonly byte Unknown2;
+
         public DMDNode050B(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
@@ -16,19 +20,24 @@ namespace Twisted.Formats.Database
 
             // TODO 32 bytes matrix ???
 
-            // Assert.AreEqual(0, bytes[32]);
+            Unknown1 = bytes[32];
 
             Assert.AreEqual((byte)0, bytes[33]);
 
             var count = bytes[34];
 
-            // Assert.AreEqual(0, bytes[35]);
+            Unknown2 = bytes[35];
 
             var addresses = ReadAddresses(reader, count);
 
             SetupBinaryObject(reader);
 
             ReadNodes(this, reader, addresses);
+        }
+        public IEnumerable<object> GetUnknowns()
+        {
+            yield return Unknown1;
+            yield return Unknown2;
         }
     }
 }
