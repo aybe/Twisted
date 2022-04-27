@@ -125,9 +125,25 @@ namespace Twisted.Controls
         /// <inheritdoc cref="BaseVerticalCollectionView.Rebuild" />
         public new void Rebuild() // let's go pile up on their favorite 'new' keyword
         {
+            // backup the actual selection so that we can restore it after rebuild
+
+            var selection = GetSelection();
+
+            // rebuild the tree, this will filter and sort according current rules
+
             Builder.Rebuild();
 
             base.Rebuild();
+
+            // restore the saved selection, it will reveal an item and looks clean
+
+            var ids = selection.Select(s => Builder.GetNodeIdentifier(s)).ToList();
+
+            ids.RemoveAll(s => s is -1); // because some items may now be filtered
+
+            SetSelectionByIdWithoutNotify(ids);
+
+            // this works properly when transitioning from/to filter/distinct mode
         }
 
         /// <summary>

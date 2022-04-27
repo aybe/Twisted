@@ -41,12 +41,7 @@ namespace Twisted.Controls
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (!Nodes.TryGetValue(node, out var id))
-            {
-                throw new ArgumentOutOfRangeException(nameof(node), node, "The node is neither the root node nor a child of it.");
-            }
-
-            return id;
+            return Nodes.TryGetValue(node, out var id) ? id : -1;
         }
 
         public void Rebuild()
