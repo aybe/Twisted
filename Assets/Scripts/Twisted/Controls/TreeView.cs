@@ -6,6 +6,12 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// these bugs are impossible to fix because these morons failed to do proper testing
+// let's see again in maybe six months or so, if they're not too lazy or 'by design'
+
+// BUG the mouse wheel can fully reveal last item but keyboard navigation cannot
+// BUG expand root item, scroll down, sort: enjoy an incompletely redrawn tree
+
 namespace Twisted.Controls
 {
     public class TreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
