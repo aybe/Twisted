@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Twisted.Controls
@@ -28,6 +29,10 @@ namespace Twisted.Controls
                               ?? throw new InvalidOperationException("Content container could not be found.");
 
             ContextMenuHost.AddManipulator(ContextMenu);
+
+            // register another callback so that we can do an Explorer-like navigation
+
+            ContextMenuHost.RegisterCallback<KeyDownEvent>(OnScrollViewContentContainerKeyDown, TrickleDown.TrickleDown);
 
             Builder = new TreeViewBuilder<T>(this);
             Sorter  = new TreeViewSorter<T>(this);
@@ -272,6 +277,45 @@ namespace Twisted.Controls
         private void OnSelectionChanged(IEnumerable<object> objects)
         {
             SelectionChanged?.Invoke(this, new TreeViewSelectionChangedEventArgs<T>(objects.Cast<T>().ToArray()));
+        }
+
+        [SuppressMessage("ReSharper", "SwitchStatementMissingSomeEnumCasesNoDefault")]
+        private void OnScrollViewContentContainerKeyDown(KeyDownEvent evt)
+        {
+            // Explorer-like keyboard navigation
+
+            switch (evt.keyCode)
+            {
+                case KeyCode.LeftArrow:
+                    if (!viewController.IsExpandedByIndex(selectedIndex))
+                    {
+                        var id = GetParentIdForIndex(selectedIndex);
+
+                        if (id is not -1)
+                        {
+                            var index = viewController.GetIndexForId(id);
+                            SetSelection(index);
+                            ScrollToItem(index);
+                            evt.StopImmediatePropagation();
+                        }
+                    }
+                    break;
+                case KeyCode.RightArrow:
+                    if (viewController.IsExpandedByIndex(selectedIndex))
+                    {
+                        var ids = GetChildrenIdsForIndex(selectedIndex).ToArray();
+
+                        if (ids.Any())
+                        {
+                            var id    = ids.First();
+                            var index = viewController.GetIndexForId(id);
+                            SetSelection(index);
+                            ScrollToItem(index);
+                            evt.StopImmediatePropagation();
+                        }
+                    }
+                    break;
+            }
         }
 
         #endregion
