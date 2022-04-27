@@ -52,8 +52,23 @@ namespace Twisted.Editor
                 DestroyImmediate(tr.gameObject);
             }
 
-            if (node == null)
+            if (node is null)
                 return;
+
+            var parents = node.GetParents<DMDNode050B>();
+
+            if (parents.Count > 1)
+            {
+                throw new NotSupportedException();
+            }
+
+            // TODO preliminary positioning with start arena ground @ 512116 // TODO where are the rotation matrices!?
+
+            const float scale = 1.0f / 200.0f;
+
+            var position = (parents.FirstOrDefault()?.GetVectors().FirstOrDefault() ?? default) * scale;
+
+            position = new Vector3(position.y, position.z, position.x);
 
             var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo!.Value).ToArray();
 
@@ -170,7 +185,7 @@ namespace Twisted.Editor
                     mesh.SetUVs(2, colors2);
                     mesh.SetTriangles(indices, 0);
 
-                    var go = new GameObject(meshName) { transform = { parent = gameObject.transform } };
+                    var go = new GameObject(meshName) { transform = { parent = gameObject.transform, position = position } };
                     var mf = go.AddComponent<MeshFilter>();
                     var mc = go.AddComponent<MeshCollider>();
                     var mr = go.AddComponent<MeshRenderer>();
