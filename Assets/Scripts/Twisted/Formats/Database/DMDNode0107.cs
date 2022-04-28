@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
 {
@@ -12,6 +13,8 @@ namespace Twisted.Formats.Database
                 throw new ArgumentNullException(nameof(reader));
 
             var bytes = reader.ReadBytes(20);
+
+            Assert.AreEqual((byte)0, bytes[19]);
 
             // TODO int32 x, y, z, unknown
 
