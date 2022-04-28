@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -62,13 +63,13 @@ namespace Twisted.Editor
                 throw new NotSupportedException();
             }
 
-            // TODO preliminary positioning with start arena ground @ 512116 // TODO where are the rotation matrices!?
+            // TODO preliminary positioning with start arena ground @ 512116
 
-            const float scale = 1.0f / 200.0f;
+            var mat = parents.FirstOrDefault()?.GetTransform() ?? float4x4.identity;
 
-            var position = (parents.FirstOrDefault()?.GetVectors().FirstOrDefault() ?? default) * scale;
+            var pos = parents.FirstOrDefault()?.GetVectors().FirstOrDefault() ?? default;
 
-            position = new Vector3(position.y, position.z, position.x);
+            pos = math.transform(mat, pos.yzx) * (1.0f / 200.0f);
 
             var infos = node.Polygons.Where(s => s.TextureInfo.HasValue).Select(s => s.TextureInfo!.Value).ToArray();
 
@@ -132,6 +133,8 @@ namespace Twisted.Editor
                                 var m = polygon.Vertices[l];
                                 var n = new Vector3(m.X, m.Y, m.Z);
                                 var o = matrix.MultiplyPoint(n);
+                                o = math.transform(mat, n);
+
                                 vertices.Add(o);
 
                                 if (polygonColors != null)
@@ -185,10 +188,12 @@ namespace Twisted.Editor
                     mesh.SetUVs(2, colors2);
                     mesh.SetTriangles(indices, 0);
 
-                    var go = new GameObject(meshName) { transform = { parent = gameObject.transform, position = position } };
+                    var go = new GameObject(meshName) { transform = { parent = gameObject.transform, position = pos } };
                     var mf = go.AddComponent<MeshFilter>();
                     var mc = go.AddComponent<MeshCollider>();
                     var mr = go.AddComponent<MeshRenderer>();
+
+                    Debug.Log($"position = {go.transform.position}, bounds = {mr.bounds}");
 
                     mf.sharedMesh     = mesh;
                     mc.sharedMesh     = mesh;

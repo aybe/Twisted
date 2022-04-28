@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -9,6 +10,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode050B : DMDNode
     {
+        private readonly float4x4 Transform;
+
         private readonly byte Unknown1;
 
         private readonly byte Unknown2;
@@ -26,7 +29,13 @@ namespace Twisted.Formats.Database
             var i16 = MemoryMarshal.Cast<byte, short>(bytes);
             var i32 = MemoryMarshal.Cast<byte, int>(bytes);
 
-            Vector1 = MathMulVec(i16, i32);
+            var rot = new float3x3(i16[0], i16[1], i16[2], i16[3], i16[4], i16[5], i16[6], i16[7], i16[8]);
+
+            Transform = TRS(float3.zero, rot, new float3(1.0f / 4096.0f)); // 800FE9C4
+
+            var pos = new float3(i32[5], i32[6], i32[7]);
+
+            Vector1 = pos;
 
             Unknown1 = bytes[32];
 
@@ -43,20 +52,7 @@ namespace Twisted.Formats.Database
             ReadNodes(this, reader, addresses);
         }
 
-        private static Vector3 MathMulVec(Span<short> i16, Span<int> i32) // 800FE9C4
-        {
-            var x = i32[5];
-            var y = i32[6];
-            var z = i32[7];
-
-            var u = (x * i16[0] + y * i16[1] + z * i16[2]) / 4096.0f;
-            var v = (x * i16[3] + y * i16[4] + z * i16[5]) / 4096.0f;
-            var w = (x * i16[6] + y * i16[7] + z * i16[8]) / 4096.0f;
-
-            return new Vector3(u, v, w);
-        }
-
-        public IEnumerable<Vector3> GetVectors()
+        public IEnumerable<float3> GetVectors()
         {
             yield return Vector1;
         }
@@ -65,6 +61,21 @@ namespace Twisted.Formats.Database
         {
             yield return Unknown1;
             yield return Unknown2;
+        }
+
+        public float4x4 GetTransform()
+        {
+            return Transform;
+        }
+
+        private static float4x4 TRS(float3 translate, float3x3 rotate, float3 scale)
+        {
+            return math.float4x4(
+                math.float4(rotate.c0 * scale.x, 0.0f),
+                math.float4(rotate.c1 * scale.y, 0.0f),
+                math.float4(rotate.c2 * scale.z, 0.0f),
+                math.float4(translate,           1.0f)
+            );
         }
     }
 }
