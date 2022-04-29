@@ -15,8 +15,8 @@ namespace Twisted.Editor
             {
                 new TreeViewColumn<DMDNode>
                 {
-                    Title          = "Type",
-                    Name           = "Type",
+                    Title          = "Name",
+                    Name           = "Name",
                     MinWidth       = 200.0f,
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
