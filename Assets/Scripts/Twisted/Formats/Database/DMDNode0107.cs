@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Twisted.Formats.Binary;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 
@@ -37,6 +38,17 @@ namespace Twisted.Formats.Database
             SetupBinaryObject(reader);
 
             ReadNodes(this, reader, addresses);
+        }
+
+        public override string? GetNodeInfo()
+        {
+            var role = NodeRole.ReverseEndianness();
+
+            return role switch
+            {
+                0x0001 => "3D environment",
+                _      => null
+            };
         }
     }
 }

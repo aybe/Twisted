@@ -251,5 +251,10 @@ namespace Twisted.Formats.Database
 
             return nodes;
         }
+
+        public virtual string? GetNodeInfo()
+        {
+            return null;
+        }
     }
 }
