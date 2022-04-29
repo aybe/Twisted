@@ -157,8 +157,6 @@ namespace Twisted.Editor
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            var textureEnabled = false;
-
             texture = default;
 
             var polygons = node.Polygons;
@@ -173,16 +171,13 @@ namespace Twisted.Editor
                 var atlasTexture = default(Texture2D?);
                 var atlasIndices = default(IReadOnlyDictionary<TextureInfo, int>?);
 
-                if (textureEnabled)
+                if (group.Key)
                 {
-                    if (group.Key)
-                    {
-                        var infos = group.Select(s => s.TextureInfo!.Value).ToArray();
-                        Debug.Log($"Texture infos: {infos.Length}");
-                        Profiler.BeginSample($"{nameof(DMDViewerPreview)} get atlas");
-                        factory.GetTextureAtlas(infos, out atlas, out atlasTexture, out atlasIndices);
-                        Profiler.EndSample();
-                    }
+                    var infos = group.Select(s => s.TextureInfo!.Value).ToArray();
+                    Debug.Log($"Texture infos: {infos.Length}");
+                    Profiler.BeginSample($"{nameof(DMDViewerPreview)} get atlas");
+                    factory.GetTextureAtlas(infos, out atlas, out atlasTexture, out atlasIndices);
+                    Profiler.EndSample();
                 }
 
                 var vertices = new List<Vector3>();
@@ -226,20 +221,17 @@ namespace Twisted.Editor
 
                             colors2.Add(polygonColor);
 
-                            if (textureEnabled)
+                            if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
                             {
-                                if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
-                                {
-                                    if (atlas is null || atlasIndices is null)
-                                        throw new InvalidOperationException();
+                                if (atlas is null || atlasIndices is null)
+                                    throw new InvalidOperationException();
 
-                                    var id = atlasIndices[polygon.TextureInfo.Value];
-                                    var uv = polygon.TextureUVs[l];
+                                var id = atlasIndices[polygon.TextureInfo.Value];
+                                var uv = polygon.TextureUVs[l];
 
-                                    Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
-                                    uvs.Add(atlas.GetUV(id, uv, false, TextureTransform.FlipY));
-                                    Profiler.EndSample();
-                                }
+                                Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
+                                uvs.Add(atlas.GetUV(id, uv, false, TextureTransform.FlipY));
+                                Profiler.EndSample();
                             }
 
                             indices.Add(indices.Count);
@@ -261,28 +253,24 @@ namespace Twisted.Editor
                     subMesh.SetUVs(2, colors2);
                 }
 
-                if (textureEnabled)
+                if (group.Key)
                 {
-                    if (group.Key)
-                    {
-                        subMesh.SetUVs(0, uvs);
-                    }
-                    else
-                    {
-                        Assert.IsTrue(uvs.Count is 0);
-                    }
-
-                    if (atlas is not null)
-                    {
-                        DestroyImmediate(atlas);
-                    }
-
-                    if (atlasTexture is not null)
-                    {
-                        texture = atlasTexture;
-                    }
+                    subMesh.SetUVs(0, uvs);
+                }
+                else
+                {
+                    Assert.IsTrue(uvs.Count is 0);
                 }
 
+                if (atlas is not null)
+                {
+                    DestroyImmediate(atlas);
+                }
+
+                if (atlasTexture is not null)
+                {
+                    texture = atlasTexture;
+                }
 
                 subMesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
