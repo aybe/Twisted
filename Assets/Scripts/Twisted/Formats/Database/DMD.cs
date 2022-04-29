@@ -36,6 +36,6 @@ namespace Twisted.Formats.Database
 
         protected override uint BaseAddress { get; }
 
-        public override float4x4 LocalTransform { get; } = float4x4.RotateX(math.radians(-90.0f));
+        public override float4x4 LocalTransform { get; init; } = float4x4.RotateX(math.radians(-90.0f));
     }
 }

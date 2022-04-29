@@ -51,7 +51,7 @@ namespace Twisted.Formats.Database
         protected virtual uint BaseAddress => (Root as DMDNode)!.BaseAddress;
 
         [PublicAPI]
-        public virtual float4x4 LocalTransform { get; } = float4x4.identity;
+        public virtual float4x4 LocalTransform { get; init; } = float4x4.identity;
 
         [PublicAPI]
         public float4x4 WorldTransform
