@@ -1,4 +1,5 @@
-﻿using System;
+﻿// #define DMD_DEBUG_POLYGON_COLOR // TODO this should be toggleable from editor
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -171,7 +172,9 @@ namespace Twisted.Formats.Graphics3D
 
                     if (a != ColorType.Value)
                     {
+#if DMD_DEBUG_POLYGON_COLOR // very slow
                         Debug.LogWarning($"{GetType().Name}: {nameof(ColorType)} is 0x{ColorType.Value:X2} but color type data is 0x{a:X2}.");
+#endif
                     }
                 }
 

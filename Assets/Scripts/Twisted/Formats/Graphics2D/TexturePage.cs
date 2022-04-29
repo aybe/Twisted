@@ -1,4 +1,5 @@
-﻿using System;
+﻿// #define DMD_DEBUG_POLYGON_TEXTURE // TODO this should be toggleable from editor
+using System;
 using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -53,7 +54,9 @@ namespace Twisted.Formats.Graphics2D
             if (position.x > xMax)
             {
                 // throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
+#if DMD_DEBUG_POLYGON_TEXTURE // very slow
                 Debug.LogError($"X must not be greater than {xMax}.");
+#endif
             }
 
             const int yMax = 256;
@@ -61,7 +64,9 @@ namespace Twisted.Formats.Graphics2D
             if (position.y > yMax)
             {
                 // throw new ArgumentOutOfRangeException(nameof(position.y), $"Must not be greater than {yMax}.");
+#if DMD_DEBUG_POLYGON_TEXTURE // very slow
                 Debug.LogError($"Y must not be greater than {yMax}.");
+#endif
             }
         }
 
