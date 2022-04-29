@@ -15,57 +15,57 @@ namespace Twisted.Editor
             {
                 new TreeViewColumn<DMDNode>
                 {
-                    Title          = "Node",
-                    Name           = "Node",
+                    Title          = "Type",
+                    Name           = "Type",
+                    MinWidth       = 200.0f,
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 200.0f
+                    ValueFormatter = s => $"{s}"
                 },
                 new TreeViewColumn<DMDNode>
                 {
-                    Title          = "Type 1",
-                    Name           = "Type 1",
-                    MinWidth       = 60.0f
+                    Title          = "Kind",
+                    Name           = "Kind",
+                    MinWidth       = 75.0f,
                     ValueGetter    = s => s.NodeKind,
                     ValueComparer  = s => Comparer<ushort>.Default,
-                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null,
+                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null
                 },
                 new TreeViewColumn<DMDNode>
                 {
-                    Title          = "Type 2",
-                    Name           = "Type 2",
-                    MinWidth       = 60.0f
+                    Title          = "Role",
+                    Name           = "Role",
+                    MinWidth       = 75.0f,
                     ValueGetter    = s => s.NodeRole,
                     ValueComparer  = s => Comparer<ushort>.Default,
-                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null,
+                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null
                 },
                 new TreeViewColumn<DMDNode>
                 {
                     Title          = "Position",
                     Name           = "Position",
+                    MinWidth       = 75.0f,
                     ValueGetter    = s => s.Position,
                     ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 75.0f
+                    ValueFormatter = s => $"{s}"
                 },
                 new TreeViewColumn<DMDNode>
                 {
                     Title          = "Length",
                     Name           = "Length",
+                    MinWidth       = 75.0f,
                     ValueGetter    = s => s.Length,
                     ValueComparer  = s => Comparer<long>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 75.0f
+                    ValueFormatter = s => $"{s}"
                 },
                 new TreeViewColumn<DMDNode>
                 {
                     Title          = "Polygons",
                     Name           = "Polygons",
+                    MinWidth       = 150.0f,
                     ValueGetter    = s => s is DMDNode00FF ff ? ff.GetPolygonsString() : "N/A",
                     ValueComparer  = s => Comparer<string>.Default,
-                    ValueFormatter = s => $"{s}",
-                    MinWidth       = 150.0f
+                    ValueFormatter = s => $"{s}"
                 }
             };
         }
