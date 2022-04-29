@@ -40,6 +40,27 @@ namespace Twisted.Formats.Database
 
         public virtual float4x4 Transform { get; } = float4x4.identity;
 
+        public float4x4 TransformHierarchy
+        {
+            get
+            {
+                var stack = new Stack<float4x4>();
+
+                var value = this;
+
+                while (value != null)
+                {
+                    stack.Push(value.Transform);
+
+                    value = value.Parent as DMDNode;
+                }
+
+                var transform = stack.Aggregate(float4x4.identity, math.mul);
+
+                return transform;
+            }
+        }
+
         protected void SetupBinaryObject(BinaryReader reader)
             // TODO there's a way to do that in ctor but it'd need an extra reader for each node to avoid 'Virtual member call in constructor'
         {
