@@ -10,8 +10,6 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode050B : DMDNode
     {
-        private readonly float4x4 Transform;
-
         private readonly byte Unknown1;
 
         private readonly byte Unknown2;
@@ -52,6 +50,8 @@ namespace Twisted.Formats.Database
             ReadNodes(this, reader, addresses);
         }
 
+        public override float4x4 Transform { get; }
+
         public IEnumerable<float3> GetVectors()
         {
             yield return Vector1;
@@ -63,7 +63,7 @@ namespace Twisted.Formats.Database
             yield return Unknown2;
         }
 
-        public float4x4 GetTransform()
+        public float4x4 GetTransformMatrix()
         {
             return Transform;
         }
