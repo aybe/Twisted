@@ -26,19 +26,19 @@ namespace Twisted.Editor
                 {
                     Title          = "Type 1",
                     Name           = "Type 1",
-                    ValueGetter    = s => (s.NodeType >> 16) & 0xFFFF,
-                    ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u1 ? $"0x{u1:X4}" : null,
                     MinWidth       = 60.0f
+                    ValueGetter    = s => s.NodeKind,
+                    ValueComparer  = s => Comparer<ushort>.Default,
+                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null,
                 },
                 new TreeViewColumn<DMDNode>
                 {
                     Title          = "Type 2",
                     Name           = "Type 2",
-                    ValueGetter    = s => (s.NodeType >> 00) & 0xFFFF,
-                    ValueComparer  = s => Comparer<uint>.Default,
-                    ValueFormatter = s => s is uint u ? $"0x{u:X4}" : null,
                     MinWidth       = 60.0f
+                    ValueGetter    = s => s.NodeRole,
+                    ValueComparer  = s => Comparer<ushort>.Default,
+                    ValueFormatter = s => s is ushort u ? $"0x{u:X4}" : null,
                 },
                 new TreeViewColumn<DMDNode>
                 {
