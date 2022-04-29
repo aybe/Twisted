@@ -28,7 +28,9 @@ namespace Twisted.Formats.Database
 
             var rot = new float3x3(i16[0], i16[1], i16[2], i16[3], i16[4], i16[5], i16[6], i16[7], i16[8]);
 
-            LocalTransform = TRS(float3.zero, rot, new float3(1.0f / 4096.0f)); // 800FE9C4
+            // this gets ground rotated correctly but still apart from each other
+
+            LocalTransform = TRS(float3.zero, rot, new float3(1.0f / 4096.0f)); // 800FE9C4 
 
             var pos = new float3(i32[5], i32[6], i32[7]);
 
