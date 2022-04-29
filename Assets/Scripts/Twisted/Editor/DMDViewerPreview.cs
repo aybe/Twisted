@@ -108,7 +108,7 @@ namespace Twisted.Editor
                 case DMD:
                     break;
                 case DMDNode0010:
-                    throw new NotImplementedException();
+                    break;
                 case DMDNode00FF node00FF:
                     ConfigureModel(factory, node00FF, out var mesh, out var texture);
 
@@ -135,13 +135,13 @@ namespace Twisted.Editor
                 case DMDNode050B: // ground, scenery
                     break;
                 case DMDNode07FF:
-                    throw new NotImplementedException();
+                    break;
                 case DMDNode08FF: // scenery
                     break;
                 case DMDNode0903: // scenery
                     break;
                 case DMDNode0B06:
-                    throw new NotImplementedException();
+                    break;
                 case DMDNodeXXXX: // scenery
                     break;
                 default:
