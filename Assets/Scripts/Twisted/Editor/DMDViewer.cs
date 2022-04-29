@@ -489,12 +489,24 @@ namespace Twisted.Editor
 
             UpdateBreadcrumbs();
 
-            Preview.SetNode(
-                Factory,
-                e.Items.FirstOrDefault() as DMDNode00FF,
-                Settings.UseModelTextureProperty.boolValue,
-                Settings.UseSceneFrameProperty.boolValue
-            );
+            if (e.Items.FirstOrDefault() is DMDNode00FF ff)
+            {
+                Preview.SetNode(
+                    Factory,
+                    ff,
+                    Settings.UseModelTextureProperty.boolValue,
+                    Settings.UseSceneFrameProperty.boolValue
+                );
+            }
+            else
+            {
+                Preview.ConfigureNodes(
+                    Factory,
+                    e.Items,
+                    Settings.UseModelTextureProperty.boolValue,
+                    Settings.UseSceneFrameProperty.boolValue
+                );
+            }
         }
 
         #endregion

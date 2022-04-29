@@ -1,11 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using Unity.Mathematics;
 using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0107 : DMDNode
     {
+        public float3 Vector1 { get; }
+
+        public int Unknown1 { get; }
+
         public DMDNode0107(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
@@ -16,7 +22,11 @@ namespace Twisted.Formats.Database
 
             Assert.AreEqual((byte)0, bytes[19]);
 
-            // TODO int32 x, y, z, unknown
+            var ints = MemoryMarshal.Cast<byte, int>(bytes);
+
+            Vector1 = new float3(ints[0], ints[1], ints[2]);
+
+            Unknown1 = ints[3];
 
             var count = bytes[16];
 
