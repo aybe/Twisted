@@ -47,28 +47,6 @@ namespace Twisted.Editor
         }
 
         [Obsolete]
-        public void FrameSelection()
-        {
-            // this is a consistent framing experience unlike Unity's which may or may not further zoom in/out
-
-            var view = SceneView.lastActiveSceneView;
-
-            if (view == null)
-                return;
-
-            var renderers = gameObject.GetComponentsInChildren<Renderer>();
-            var renderer1 = renderers.FirstOrDefault();
-            var bounds    = renderer1 != null ? renderer1.bounds : new Bounds();
-
-            foreach (var current in renderers)
-            {
-                bounds.Encapsulate(current.bounds);
-            }
-
-            view.Frame(bounds, false);
-        }
-
-        [Obsolete]
         public void SetNode(DMDViewerFactory factory, DMDNode00FF? node, bool split = true, bool frame = true)
         {
             while (transform.childCount > 0)
@@ -248,7 +226,7 @@ namespace Twisted.Editor
 
             if (frame)
             {
-                FrameSelection();
+                SceneViewUtility.Frame(gameObject);
             }
         }
 
@@ -295,7 +273,7 @@ namespace Twisted.Editor
 
             Selection.activeGameObject = gameObject;
 
-            FrameSelection();
+            SceneViewUtility.Frame(gameObject);
         }
 
         private static void ConfigureNode(GameObject parent, DMDNode node, DMDViewerFactory factory)
