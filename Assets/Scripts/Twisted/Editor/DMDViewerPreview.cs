@@ -26,24 +26,24 @@ namespace Twisted.Editor
 
         private void OnEnable()
         {
-            InitializePolygonColors();
+            ConfigurePolygonColors();
+        }
 
-            static void InitializePolygonColors()
-            {
-                var type = typeof(Polygon);
+        private static void ConfigurePolygonColors()
+        {
+            var type = typeof(Polygon);
 
-                var types = type.Assembly.GetTypes().Where(s => s.IsAbstract is false && type.IsAssignableFrom(s)).ToArray();
+            var types = type.Assembly.GetTypes().Where(s => s.IsAbstract is false && type.IsAssignableFrom(s)).ToArray();
 
-                var state = Random.state;
+            var state = Random.state;
 
-                Random.InitState(123456789);
+            Random.InitState(123456789);
 
-                var dictionary = types.ToDictionary(s => s, _ => Random.ColorHSV(0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f));
+            var dictionary = types.ToDictionary(s => s, _ => Random.ColorHSV(0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f));
 
-                Random.state = state;
+            Random.state = state;
 
-                PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
-            }
+            PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
         [Obsolete]
