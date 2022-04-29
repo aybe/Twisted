@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Twisted.Controls;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
@@ -11,6 +13,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
@@ -56,6 +59,27 @@ namespace Twisted.Editor
             if (nodes is null)
                 throw new ArgumentNullException(nameof(nodes));
 
+            if (nodes.Any(s => s.Root != nodes.First().Root))
+            {
+                throw new ArgumentOutOfRangeException(nameof(nodes), "The nodes must all have the same root node.");
+            }
+
+            var infos1 = nodes.SelectMany(GetTextureInfos).ToArray();
+            var infos2 = infos1.Distinct().ToArray();
+
+            var stopwatch = Stopwatch.StartNew();
+            Profiler.BeginSample("TEX ATLAS");
+            factory.GetTextureAtlas(infos2, out var atlas, out var atlasTexture, out var atlasIndices);
+            Profiler.EndSample();
+            Debug.Log($"Atlas generated in {stopwatch.Elapsed} ({infos1.Length} -> {infos2.Length})");
+
+            var texturing = new DMDTexturing(atlas, atlasIndices, atlasTexture);
+
+            if (atlasTexture != null)
+            {
+                File.WriteAllBytes(".temp/atlas.png", atlasTexture.EncodeToPNG());
+            }
+
             // cleanup garbage from previous hierarchy if any
 
             while (transform.childCount > 0)
@@ -78,12 +102,17 @@ namespace Twisted.Editor
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} @ {node.Position}");
 
-                ConfigureNode(child, node, factory);
+                ConfigureNode(child, node, factory, texturing);
 
                 foreach (var item in node.Cast<DMDNode>().Reverse())
                 {
                     stack.Push(new KeyValuePair<DMDNode, GameObject>(item, child));
                 }
+            }
+
+            if (atlas != null)
+            {
+                DestroyImmediate(atlas);
             }
 
             if (frame)
@@ -92,7 +121,7 @@ namespace Twisted.Editor
             }
         }
 
-        private static void ConfigureNode(GameObject parent, DMDNode node, DMDViewerFactory factory)
+        private static void ConfigureNode(GameObject parent, DMDNode node, DMDViewerFactory factory, DMDTexturing texturing)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
@@ -103,6 +132,9 @@ namespace Twisted.Editor
             if (factory == null)
                 throw new ArgumentNullException(nameof(factory));
 
+            if (texturing == null)
+                throw new ArgumentNullException(nameof(texturing));
+
             switch (node)
             {
                 case DMD:
@@ -110,7 +142,7 @@ namespace Twisted.Editor
                 case DMDNode0010:
                     break;
                 case DMDNode00FF node00FF:
-                    ConfigureModel(factory, node00FF, out var mesh, out var texture);
+                    var mesh = ConfigureModel(node00FF, texturing);
 
                     var mc = parent.AddComponent<MeshCollider>();
                     mc.cookingOptions = MeshColliderCookingOptions.None; // BUG [Physics.PhysX] cleaning the mesh failed
@@ -120,7 +152,7 @@ namespace Twisted.Editor
                     mf.sharedMesh = mesh;
 
                     var mr = parent.AddComponent<MeshRenderer>();
-                    mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texture };
+                    mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texturing.AtlasTexture };
 
                     break;
                 case DMDNode0107 node0107:
@@ -149,15 +181,34 @@ namespace Twisted.Editor
             }
         }
 
-        private static void ConfigureModel(DMDViewerFactory factory, DMDNode00FF node, out Mesh mesh, out Texture? texture)
+        private static List<TextureInfo> GetTextureInfos(DMDNode node)
         {
-            if (factory is null)
-                throw new ArgumentNullException(nameof(factory));
-
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            texture = default;
+            var infos = new List<TextureInfo>();
+
+            foreach (var ff in node.TraverseDfs().OfType<DMDNode00FF>())
+            {
+                foreach (var polygon in ff.Polygons)
+                {
+                    if (polygon.TextureInfo.HasValue)
+                    {
+                        infos.Add(polygon.TextureInfo.Value);
+                    }
+                }
+            }
+
+            return infos;
+        }
+
+        private static Mesh ConfigureModel(DMDNode00FF node, DMDTexturing texturing)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            if (texturing is null)
+                throw new ArgumentNullException(nameof(texturing));
 
             var polygons = node.Polygons;
 
@@ -167,19 +218,6 @@ namespace Twisted.Editor
 
             foreach (var group in groups)
             {
-                var atlas        = default(TextureAtlas?);
-                var atlasTexture = default(Texture2D?);
-                var atlasIndices = default(IReadOnlyDictionary<TextureInfo, int>?);
-
-                if (group.Key)
-                {
-                    var infos = group.Select(s => s.TextureInfo!.Value).ToArray();
-                    Debug.Log($"Texture infos: {infos.Length}");
-                    Profiler.BeginSample($"{nameof(DMDViewerPreview)} get atlas");
-                    factory.GetTextureAtlas(infos, out atlas, out atlasTexture, out atlasIndices);
-                    Profiler.EndSample();
-                }
-
                 var vertices = new List<Vector3>();
                 var uvs      = new List<Vector2>();
                 var colors1  = new List<Vector4>();
@@ -223,14 +261,11 @@ namespace Twisted.Editor
 
                             if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
                             {
-                                if (atlas is null || atlasIndices is null)
-                                    throw new InvalidOperationException();
-
-                                var id = atlasIndices[polygon.TextureInfo.Value];
+                                var id = texturing.AtlasIndices[polygon.TextureInfo.Value];
                                 var uv = polygon.TextureUVs[l];
 
                                 Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
-                                uvs.Add(atlas.GetUV(id, uv, false, TextureTransform.FlipY));
+                                uvs.Add(texturing.Atlas.GetUV(id, uv, false, TextureTransform.FlipY));
                                 Profiler.EndSample();
                             }
 
@@ -262,16 +297,6 @@ namespace Twisted.Editor
                     Assert.IsTrue(uvs.Count is 0);
                 }
 
-                if (atlas is not null)
-                {
-                    DestroyImmediate(atlas);
-                }
-
-                if (atlasTexture is not null)
-                {
-                    texture = atlasTexture;
-                }
-
                 subMesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
                 meshes.Add(subMesh);
@@ -281,11 +306,32 @@ namespace Twisted.Editor
 
             var combine = meshes.Select(s => new CombineInstance { mesh = s }).ToArray();
 
-            mesh = new Mesh();
+            var mesh = new Mesh();
 
             mesh.CombineMeshes(combine, false, false, false);
 
             Profiler.EndSample();
+
+            return mesh;
+        }
+
+        private sealed class DMDTexturing
+        {
+            public DMDTexturing(
+                TextureAtlas                          atlas,
+                IReadOnlyDictionary<TextureInfo, int> atlasIndices,
+                Texture2D                             atlasTexture)
+            {
+                Atlas        = atlas;
+                AtlasIndices = atlasIndices;
+                AtlasTexture = atlasTexture;
+            }
+
+            public TextureAtlas Atlas { get; }
+
+            public IReadOnlyDictionary<TextureInfo, int> AtlasIndices { get; }
+
+            public Texture2D AtlasTexture { get; }
         }
     }
 }
