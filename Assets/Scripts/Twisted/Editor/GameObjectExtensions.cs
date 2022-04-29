@@ -5,12 +5,12 @@ namespace Twisted.Editor
 {
     public static class GameObjectExtensions
     {
-        public static GameObject CreateChild(this GameObject parent, string? name = null, PrimitiveType? primitiveType = null)
+        public static GameObject CreateChild(this GameObject parent, string? name = null)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
 
-            var child = primitiveType != null ? GameObject.CreatePrimitive(primitiveType.Value) : new GameObject();
+            var child = new GameObject();
 
             if (name is not null)
             {
