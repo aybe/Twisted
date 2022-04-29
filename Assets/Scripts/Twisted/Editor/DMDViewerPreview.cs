@@ -158,6 +158,8 @@ namespace Twisted.Editor
                 case DMDNode00FF node00FF:
                     var mesh = ConfigureModel(node00FF, texturing);
 
+                    mesh.name = parent.name;
+
                     var mc = parent.AddComponent<MeshCollider>();
                     mc.cookingOptions = MeshColliderCookingOptions.None; // BUG [Physics.PhysX] cleaning the mesh failed
                     mc.sharedMesh     = mesh;
