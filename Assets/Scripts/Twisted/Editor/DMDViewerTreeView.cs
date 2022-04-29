@@ -20,7 +20,7 @@ namespace Twisted.Editor
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}",
-                    MinWidth       = 150.0f
+                    MinWidth       = 200.0f
                 },
                 new TreeViewColumn<DMDNode>
                 {
