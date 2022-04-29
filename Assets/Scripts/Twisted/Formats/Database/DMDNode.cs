@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Twisted.Controls;
 using Twisted.Formats.Binary;
+using Unity.Mathematics;
 using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
@@ -36,6 +37,8 @@ namespace Twisted.Formats.Database
         {
             return ObjectData.ToArray();
         }
+
+        public virtual float4x4 Transform { get; } = float4x4.identity;
 
         protected void SetupBinaryObject(BinaryReader reader)
             // TODO there's a way to do that in ctor but it'd need an extra reader for each node to avoid 'Virtual member call in constructor'
