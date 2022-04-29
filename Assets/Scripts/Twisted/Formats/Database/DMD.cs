@@ -24,6 +24,8 @@ namespace Twisted.Formats.Database
 
             BaseAddress = reader.ReadUInt32(Endianness.LE);
 
+            LocalTransform = float4x4.RotateX(math.radians(-90.0f)); // LocalTransform = math.mul(LocalTransform, float4x4.Scale(0.01f));
+
             reader.BaseStream.Position = ReadAddress(reader);
 
             var addressesCount = reader.ReadInt32(Endianness.LE);
@@ -36,6 +38,6 @@ namespace Twisted.Formats.Database
 
         protected override uint BaseAddress { get; }
 
-        public override float4x4 LocalTransform { get; init; } = float4x4.RotateX(math.radians(-90.0f));
+        public override float4x4 LocalTransform { get; init; }
     }
 }
