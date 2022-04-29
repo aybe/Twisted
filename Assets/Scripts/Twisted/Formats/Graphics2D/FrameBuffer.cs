@@ -123,7 +123,13 @@ namespace Twisted.Formats.Graphics2D
             };
 
             var texSize = new Vector2Int(picWidth, picRect.height);
-            var texData = new Color32[texSize.x * texSize.y];
+
+            var xSize  = texSize.x;            // do not inline!
+            var ySize  = texSize.y;            // do not inline!
+            var width  = picBuffer.Rect.width; // do not inline!
+            var pixels = picBuffer.Pixels;     // do not inline!
+
+            var texData = new Color32[xSize * ySize];
             var picPosX = picRect.position.x;
             var picPosY = picRect.position.y;
             var palTint = palTex != null ? palTex.GetPixels32() : Array.Empty<Color32>();
@@ -131,46 +137,46 @@ namespace Twisted.Formats.Graphics2D
             switch (picFormat)
             {
                 case FrameBufferFormat.Indexed4:
-                    for (var y = 0; y < texSize.y; y++)
+                    for (var y = 0; y < ySize; y++)
                     {
-                        for (var x = 0; x < texSize.x; x++)
+                        for (var x = 0; x < xSize; x++)
                         {
-                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x / 4;
-                            var j = picBuffer.Pixels[i];
-                            texData[(texSize.y - 1 - y) * texSize.x + x] = palTint[(j >> (x % 4 * 4)) & 0xF];
+                            var i = (picPosY + y) * width + picPosX + x / 4;
+                            var j = pixels[i];
+                            texData[(ySize - 1 - y) * xSize + x] = palTint[(j >> (x % 4 * 4)) & 0xF];
                         }
                     }
                     break;
                 case FrameBufferFormat.Indexed8:
-                    for (var y = 0; y < texSize.y; y++)
+                    for (var y = 0; y < ySize; y++)
                     {
-                        for (var x = 0; x < texSize.x; x++)
+                        for (var x = 0; x < xSize; x++)
                         {
-                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x / 2;
-                            var j = picBuffer.Pixels[i];
-                            texData[(texSize.y - 1 - y) * texSize.x + x] = palTint[(j >> (x % 2 * 8)) & 0xFF];
+                            var i = (picPosY + y) * width + picPosX + x / 2;
+                            var j = pixels[i];
+                            texData[(ySize - 1 - y) * xSize + x] = palTint[(j >> (x % 2 * 8)) & 0xFF];
                         }
                     }
                     break;
                 case FrameBufferFormat.Direct15:
-                    for (var y = 0; y < texSize.y; y++)
+                    for (var y = 0; y < ySize; y++)
                     {
-                        for (var x = 0; x < texSize.x; x++)
+                        for (var x = 0; x < xSize; x++)
                         {
-                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x;
-                            var j = picBuffer.Pixels[i];
-                            texData[(texSize.y - 1 - y) * texSize.x + x] = new TransparentColor(j).ToColor(mode);
+                            var i = (picPosY + y) * width + picPosX + x;
+                            var j = pixels[i];
+                            texData[(ySize - 1 - y) * xSize + x] = new TransparentColor(j).ToColor(mode);
                         }
                     }
                     break;
                 case FrameBufferFormat.Direct24:
-                    for (var y = 0; y < texSize.y; y++)
+                    for (var y = 0; y < ySize; y++)
                     {
-                        for (var x = 0; x < texSize.x; x++)
+                        for (var x = 0; x < xSize; x++)
                         {
-                            var i = (picPosY + y) * picBuffer.Rect.width + picPosX + x * 3 / 2;
-                            var j = picBuffer.Pixels[i];
-                            var k = picBuffer.Pixels[i + 1];
+                            var i = (picPosY + y) * width + picPosX + x * 3 / 2;
+                            var j = pixels[i];
+                            var k = pixels[i + 1];
 
                             byte r, g, b;
 
@@ -187,7 +193,7 @@ namespace Twisted.Formats.Graphics2D
                                 b = (byte)((k >> 8) & 0xFF);
                             }
 
-                            texData[(texSize.y - 1 - y) * texSize.x + x] = new Color32(r, g, b, byte.MaxValue);
+                            texData[(ySize - 1 - y) * xSize + x] = new Color32(r, g, b, byte.MaxValue);
                         }
                     }
                     break;
@@ -207,7 +213,7 @@ namespace Twisted.Formats.Graphics2D
                 }
             }
 
-            var texture = new Texture2D(texSize.x, texSize.y);
+            var texture = new Texture2D(xSize, ySize);
 
             texture.SetPixels32(texData);
             texture.Apply();
