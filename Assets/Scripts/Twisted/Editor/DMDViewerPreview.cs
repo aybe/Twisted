@@ -8,7 +8,6 @@ using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
 using Unity.Mathematics;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
@@ -87,12 +86,10 @@ namespace Twisted.Editor
                 }
             }
 
-            if (frame is false)
-                return;
-
-            Selection.activeGameObject = gameObject;
-
-            SceneViewUtility.Frame(gameObject);
+            if (frame)
+            {
+                SceneViewUtility.Frame(gameObject);
+            }
         }
 
         private static void ConfigureNode(GameObject parent, DMDNode node, DMDViewerFactory factory)
