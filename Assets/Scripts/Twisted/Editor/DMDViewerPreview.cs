@@ -77,6 +77,11 @@ namespace Twisted.Editor
 
             if (atlasTexture != null)
             {
+                atlasTexture.filterMode = FilterMode.Point;
+            }
+
+            if (atlasTexture != null)
+            {
                 File.WriteAllBytes(".temp/atlas.png", atlasTexture.EncodeToPNG());
             }
 
