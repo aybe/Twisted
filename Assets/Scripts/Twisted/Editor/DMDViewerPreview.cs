@@ -171,8 +171,7 @@ namespace Twisted.Editor
                     mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texturing.AtlasTexture };
 
                     break;
-                case DMDNode0107 node0107:
-                    parent.transform.position = math.transform(node.WorldTransform, 0.0f); // TODO
+                case DMDNode0107:
                     break;
                 case DMDNode020X: // scenery
                     break;
