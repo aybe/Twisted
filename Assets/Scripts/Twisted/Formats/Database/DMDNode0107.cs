@@ -9,9 +9,9 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0107 : DMDNode
     {
-        public float3 Vector1 { get; }
+        private readonly int Unknown1;
 
-        public int Unknown1 { get; }
+        private readonly float3 Vector1;
 
         public DMDNode0107(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
@@ -38,6 +38,18 @@ namespace Twisted.Formats.Database
             SetupBinaryObject(reader);
 
             ReadNodes(this, reader, addresses);
+        }
+
+        public override float4x4 LocalTransform
+        {
+            get
+            {
+                return NodeRole switch // 8010087C
+                {
+                    1 => float4x4.Translate(Vector1),
+                    _ => float4x4.identity
+                };
+            }
         }
 
         public override string? GetNodeInfo()

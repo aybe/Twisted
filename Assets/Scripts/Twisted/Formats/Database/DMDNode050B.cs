@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
@@ -50,23 +49,7 @@ namespace Twisted.Formats.Database
             ReadNodes(this, reader, addresses);
         }
 
-        public override float4x4 Transform { get; }
-
-        public IEnumerable<float3> GetVectors()
-        {
-            yield return Vector1;
-        }
-
-        public IEnumerable<object> GetUnknowns()
-        {
-            yield return Unknown1;
-            yield return Unknown2;
-        }
-
-        public float4x4 GetTransformMatrix()
-        {
-            return Transform;
-        }
+        public float4x4 Transform { get; }
 
         private static float4x4 TRS(float3 translate, float3x3 rotate, float3 scale)
         {

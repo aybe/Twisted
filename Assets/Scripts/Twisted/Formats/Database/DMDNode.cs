@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Twisted.Controls;
 using Twisted.Formats.Binary;
 using Unity.Mathematics;
@@ -49,15 +50,11 @@ namespace Twisted.Formats.Database
 
         protected virtual uint BaseAddress => (Root as DMDNode)!.BaseAddress;
 
-        [SuppressMessage("ReSharper", "ReturnTypeCanBeEnumerable.Global")]
-        public IReadOnlyList<byte> GetObjectData()
-        {
-            return ObjectData.ToArray();
-        }
+        [PublicAPI]
+        public virtual float4x4 LocalTransform { get; } = float4x4.identity;
 
-        public virtual float4x4 Transform { get; } = float4x4.identity;
-
-        public float4x4 TransformHierarchy
+        [PublicAPI]
+        public float4x4 WorldTransform
         {
             get
             {
@@ -65,9 +62,9 @@ namespace Twisted.Formats.Database
 
                 var value = this;
 
-                while (value != null)
+                while (value is not null)
                 {
-                    stack.Push(value.Transform);
+                    stack.Push(value.LocalTransform);
 
                     value = value.Parent as DMDNode;
                 }
@@ -76,6 +73,12 @@ namespace Twisted.Formats.Database
 
                 return transform;
             }
+        }
+
+        [SuppressMessage("ReSharper", "ReturnTypeCanBeEnumerable.Global")]
+        public IReadOnlyList<byte> GetObjectData()
+        {
+            return ObjectData.ToArray();
         }
 
         protected void SetupBinaryObject(BinaryReader reader)

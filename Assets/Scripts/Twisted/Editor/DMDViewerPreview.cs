@@ -170,7 +170,7 @@ namespace Twisted.Editor
 
                     break;
                 case DMDNode0107 node0107:
-                    parent.transform.position = math.transform(node.TransformHierarchy, node0107.Vector1) * 0.01f; // TODO
+                    parent.transform.position = math.transform(node.WorldTransform, 0.0f); // TODO
                     break;
                 case DMDNode020X: // scenery
                     break;
@@ -228,7 +228,7 @@ namespace Twisted.Editor
 
             var meshes = new List<Mesh>();
             var groups = polygons.GroupBy(s => s.TextureInfo.HasValue).ToArray();
-            var matrix = node.TransformHierarchy;
+            var matrix = node.WorldTransform;
 
             foreach (var group in groups)
             {
