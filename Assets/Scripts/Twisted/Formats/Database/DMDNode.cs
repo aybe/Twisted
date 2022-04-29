@@ -8,6 +8,8 @@ using Twisted.Formats.Binary;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 
+// ReSharper disable CommentTypo
+
 namespace Twisted.Formats.Database
 {
     public abstract class DMDNode : TreeNode
@@ -20,11 +22,26 @@ namespace Twisted.Formats.Database
 
             Position = reader.BaseStream.Position;
             NodeType = reader.ReadUInt32(Endianness.BE);
+            NodeKind = (ushort)((NodeType >> 16) & 0xFFFF);
+            NodeRole = (ushort)((NodeType >> 00) & 0xFFFF);
         }
 
         private byte[] ObjectData { get; set; } = null!;
 
+        /// <summary>
+        ///     <see cref="NodeKind" /> &lt;&lt; 16 | <see cref="NodeRole" /> &lt;&lt; 00.
+        /// </summary>
         public uint NodeType { get; }
+
+        /// <summary>
+        ///     See 'dbScanForInteractiveStuff'.
+        /// </summary>
+        public ushort NodeKind { get; }
+
+        /// <summary>
+        ///     See 'dbProcessInteractives'.
+        /// </summary>
+        public ushort NodeRole { get; }
 
         public long Position { get; }
 
