@@ -107,11 +107,13 @@ namespace Twisted.Editor
             {
                 var (node, parent) = stack.Pop();
 
+
 #if DMD_DEBUG_PREVIEW_SKIP_COMMON_NODES
 
-                // skip some irrelevant nodes to level to simplify hierarchy
-
                 // ReSharper disable CommentTypo
+
+                if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
+                    continue; // not scenery, not ground
 
                 switch (node.NodeType)
                 {
@@ -127,15 +129,18 @@ namespace Twisted.Editor
                     case 0x0107_6400: // thump
                     case 0x0107_6E00: // spectre
                     case 0x0107_7800: // road kill
-                    case 0x6472_0600: // grandstand (only?) low poly (high poly is 0x409C_0000)
-                    case 0x0107_EC04: // HUD elements
                         continue;
                 }
 
-                if ((node.NodeType & 0x040B_9000) is 0x040B_9000) // power ups
+                switch (node.NodeType)
                 {
-                    continue;
+                    case 0x0107_EC04: // HUD elements
+                    case 0x6472_0600: // grandstand (only?) low poly (high poly is 0x409C_0000)
+                        continue;
                 }
+
+                if ((node.NodeType & 0x040B_9000) is 0x040B_9000)
+                    continue; // power up
 
                 // ReSharper restore CommentTypo
 #endif
