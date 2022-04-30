@@ -182,12 +182,12 @@ namespace Twisted.Editor
 
             var info = node.GetNodeInfo();
 
-            Debug.Log(
-                $"Kind = 0x{node.NodeKind:X4}, " +
-                $"Role = 0x{node.NodeRole:X4}, " +
-                $"Position = {node.Position}, " +
-                $"Info = {info.ToStringMarkup(bold: info is not null)}."
-            );
+            if (info is not null)
+            {
+                Debug.Log(
+                    $"Kind = 0x{node.NodeKind:X4}, Role = 0x{node.NodeRole:X4}, Position = {node.Position}, Info = {info}"
+                );
+            }
 
             switch (node)
             {
