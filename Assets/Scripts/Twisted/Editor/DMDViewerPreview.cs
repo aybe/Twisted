@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DMD_DEBUG_PREVIEW_SKIP_COMMON_NODES // TODO this should be toggleable from editor
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -104,6 +106,39 @@ namespace Twisted.Editor
             while (stack.Count > 0)
             {
                 var (node, parent) = stack.Pop();
+
+#if DMD_DEBUG_PREVIEW_SKIP_COMMON_NODES
+
+                // skip some irrelevant nodes to level to simplify hierarchy
+
+                // ReSharper disable CommentTypo
+
+                switch (node.NodeType)
+                {
+                    case 0x0107_0A00: // sweet tooth
+                    case 0x0107_1400: // yellow jacket
+                    case 0x0107_1E00: // darkside
+                    case 0x0107_2800: // hammerhead
+                    case 0x0107_3200: // outlaw
+                    case 0x0107_3C00: // crimson fury
+                    case 0x0107_4600: // warthog
+                    case 0x0107_5000: // mr grimm
+                    case 0x0107_5A00: // pit viper
+                    case 0x0107_6400: // thump
+                    case 0x0107_6E00: // spectre
+                    case 0x0107_7800: // road kill
+                    case 0x6472_0600: // grandstand (only?) low poly (high poly is 0x409C_0000)
+                    case 0x0107_EC04: // HUD elements
+                        continue;
+                }
+
+                if ((node.NodeType & 0x040B_9000) is 0x040B_9000) // power ups
+                {
+                    continue;
+                }
+
+                // ReSharper restore CommentTypo
+#endif
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} @ {node.Position}");
 
