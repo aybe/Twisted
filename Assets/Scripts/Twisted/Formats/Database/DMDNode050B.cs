@@ -2,7 +2,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
@@ -15,6 +14,8 @@ namespace Twisted.Formats.Database
 
         private readonly Vector3 Vector1;
 
+        public readonly float3x3 Rotation;
+
         public DMDNode050B(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
@@ -26,11 +27,7 @@ namespace Twisted.Formats.Database
             var i16 = MemoryMarshal.Cast<byte, short>(bytes);
             var i32 = MemoryMarshal.Cast<byte, int>(bytes);
 
-            var rot = new float3x3(i16[0], i16[1], i16[2], i16[3], i16[4], i16[5], i16[6], i16[7], i16[8]);
-
-            // this gets arena ground elements correct orientation but still apart from each other
-
-            LocalTransform = TRS(float3.zero, rot, new float3(1.0f / 4096.0f)); // 800FE9C4 
+            Rotation = new float3x3(i16[0], i16[1], i16[2], i16[3], i16[4], i16[5], i16[6], i16[7], i16[8]);
 
             var pos = new float3(i32[5], i32[6], i32[7]);
 
@@ -49,16 +46,6 @@ namespace Twisted.Formats.Database
             SetupBinaryObject(reader);
 
             ReadNodes(this, reader, addresses);
-        }
-
-        private static float4x4 TRS(float3 translate, float3x3 rotate, float3 scale)
-        {
-            return math.float4x4(
-                math.float4(rotate.c0 * scale.x, 0.0f),
-                math.float4(rotate.c1 * scale.y, 0.0f),
-                math.float4(rotate.c2 * scale.z, 0.0f),
-                math.float4(translate,           1.0f)
-            );
         }
     }
 }

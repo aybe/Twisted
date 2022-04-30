@@ -8,6 +8,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode020X : DMDNode
     {
+        public readonly float3 Vector1;
+
         public DMDNode020X(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
         {
@@ -22,7 +24,7 @@ namespace Twisted.Formats.Database
 
             var ints = MemoryMarshal.Cast<byte, int>(bytes);
 
-            LocalTransform = float4x4.Translate(new float3(ints[0], ints[1], ints[2]));
+            Vector1 = new float3(ints[0], ints[1], ints[2]);
 
             var count = bytes[12];
 

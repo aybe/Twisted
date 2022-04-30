@@ -51,7 +51,57 @@ namespace Twisted.Formats.Database
         protected virtual uint BaseAddress => (Root as DMDNode)!.BaseAddress;
 
         [PublicAPI]
-        public virtual float4x4 LocalTransform { get; init; } = float4x4.identity;
+        public float4x4 LocalTransform
+        {
+            get
+            {
+                static float4x4 TRS(float3 translate, float3x3 rotate, float3 scale)
+                {
+                    return math.float4x4(
+                        math.float4(rotate.c0 * scale.x, 0.0f),
+                        math.float4(rotate.c1 * scale.y, 0.0f),
+                        math.float4(rotate.c2 * scale.z, 0.0f),
+                        math.float4(translate,           1.0f)
+                    );
+                }
+
+                switch (this)
+                {
+                    case DMD dmd:
+                        return math.mul(float4x4.RotateX(math.radians(-90.0f)), float4x4.Scale(0.1f));
+                    case DMDNode0010 node0010:
+                        break;
+                    case DMDNode00FF node00FF:
+                        break;
+                    case DMDNode0107 node0107:
+                        return float4x4.identity;
+                        return float4x4.Translate(node0107.Vector1);
+                    case DMDNode020X node020X:
+                        return float4x4.identity;
+                        return float4x4.Translate(node020X.Vector1);
+                    case DMDNode0305 node0305:
+                        break;
+                    case DMDNode040B node040B:
+                        return float4x4.Translate(node040B.Vector1);
+                    case DMDNode050B node050B:
+                        return TRS(float3.zero, node050B.Rotation, new float3(1.0f / 4096.0f)); // 800FE9C4 
+                    case DMDNode07FF node07FF:
+                        break;
+                    case DMDNode08FF node08FF:
+                        break;
+                    case DMDNode0903 node0903:
+                        break;
+                    case DMDNode0B06 node0B06:
+                        break;
+                    case DMDNodeXXXX nodeXXXX:
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                return float4x4.identity;
+            }
+        }
 
         [PublicAPI]
         public float4x4 WorldTransform
