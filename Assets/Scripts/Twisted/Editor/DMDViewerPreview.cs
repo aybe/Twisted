@@ -333,11 +333,17 @@ namespace Twisted.Editor
 
                             if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
                             {
-                                var id = texturing.AtlasIndices[polygon.TextureInfo.Value];
+                                var key = polygon.TextureInfo.Value;
+
+                                if (!texturing.AtlasIndices.TryGetValue(key, out var index))
+                                {
+                                    Debug.LogError($"Couldn't find texture in atlas dictionary, Node = {node}, Key = {key}"); // BUG
+                                }
+
                                 var uv = polygon.TextureUVs[l];
 
                                 Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
-                                uvs.Add(texturing.Atlas.GetUV(id, uv, false, TextureTransform.FlipY));
+                                uvs.Add(texturing.Atlas.GetUV(index, uv, false, TextureTransform.FlipY));
                                 Profiler.EndSample();
                             }
 
