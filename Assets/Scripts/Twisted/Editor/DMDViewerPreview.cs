@@ -52,7 +52,7 @@ namespace Twisted.Editor
             PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool split, bool frame)
+        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -111,8 +111,7 @@ namespace Twisted.Editor
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
 
-
-                ConfigureNode(child, node, factory, texturing);
+                ConfigureNode(child, node, texturing);
 
                 foreach (var item in node.Cast<DMDNode>().Reverse())
                 {
@@ -131,16 +130,13 @@ namespace Twisted.Editor
             }
         }
 
-        private static void ConfigureNode(GameObject parent, DMDNode node, DMDViewerFactory factory, DMDTexturing texturing)
+        private static void ConfigureNode(GameObject parent, DMDNode node, DMDTexturing texturing)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
 
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
-
-            if (factory == null)
-                throw new ArgumentNullException(nameof(factory));
 
             if (texturing == null)
                 throw new ArgumentNullException(nameof(texturing));

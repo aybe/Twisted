@@ -492,7 +492,6 @@ namespace Twisted.Editor
             Preview.ConfigureNodes(
                 Factory,
                 e.Items,
-                Settings.UseModelTextureProperty.boolValue,
                 Settings.UseSceneFrameProperty.boolValue
             );
         }
