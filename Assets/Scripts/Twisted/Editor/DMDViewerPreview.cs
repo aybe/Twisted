@@ -269,7 +269,7 @@ namespace Twisted.Editor
 
             var meshes = new List<Mesh>();
             var groups = polygons.GroupBy(s => s.TextureInfo.HasValue).ToArray();
-            var matrix = node.WorldTransform;
+            var matrix = node.GetWorldTransform();
 
             foreach (var group in groups)
             {
