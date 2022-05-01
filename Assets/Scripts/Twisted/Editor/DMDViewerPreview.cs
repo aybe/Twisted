@@ -200,8 +200,17 @@ namespace Twisted.Editor
         [SuppressMessage("ReSharper", "CommentTypo")]
         private static bool ExcludeFromHierarchy(DMDNode node)
         {
+            // NOTE: this is for XARENA1, that might not fully work on other maps for XXXX nodes
+
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
+
+            // anything that is not the 3D environment or the ground, this will drastically reduce hierarchy, e.g. HUD, small objects, etc
+
+            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
+            {
+                return true;
+            }
 
             // the cars are in every DMD file
 
@@ -222,7 +231,7 @@ namespace Twisted.Editor
                     return true;
             }
 
-            // red-colored power up orbs
+            // power ups, these are sprites 08FF, not yet implemented 
 
             switch (node.NodeType)
             {
@@ -232,12 +241,14 @@ namespace Twisted.Editor
                     return true;
             }
 
-            // anything that is not the 3D environment or the ground
+            // low-poly meshes
 
-            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
+            if (node.NodeType is 0x64720600)
             {
                 return true;
             }
+
+            return false;
 
             // multiple XXXX at same depth, pick highest value which is highest LOD
 
