@@ -109,8 +109,8 @@ namespace Twisted.Editor
                 if (ExcludeFromHierarchy(node))
                     continue;
 
+                var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
 
-                var child = parent.CreateChild($"0x{node.NodeType:X8} @ {node.Position}");
 
                 ConfigureNode(child, node, factory, texturing);
 
