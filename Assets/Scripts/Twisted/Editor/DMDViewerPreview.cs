@@ -1,9 +1,8 @@
-﻿#define DMD_DEBUG_PREVIEW_SKIP_COMMON_NODES // TODO this should be toggleable from editor
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Controls;
@@ -107,43 +106,9 @@ namespace Twisted.Editor
             {
                 var (node, parent) = stack.Pop();
 
+                if (ExcludeFromHierarchy(node))
+                    continue;
 
-#if DMD_DEBUG_PREVIEW_SKIP_COMMON_NODES
-
-                // ReSharper disable CommentTypo
-
-                if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
-                    continue; // not scenery, not ground
-
-                switch (node.NodeType)
-                {
-                    case 0x0107_0A00: // sweet tooth
-                    case 0x0107_1400: // yellow jacket
-                    case 0x0107_1E00: // darkside
-                    case 0x0107_2800: // hammerhead
-                    case 0x0107_3200: // outlaw
-                    case 0x0107_3C00: // crimson fury
-                    case 0x0107_4600: // warthog
-                    case 0x0107_5000: // mr grimm
-                    case 0x0107_5A00: // pit viper
-                    case 0x0107_6400: // thump
-                    case 0x0107_6E00: // spectre
-                    case 0x0107_7800: // road kill
-                        continue;
-                }
-
-                switch (node.NodeType)
-                {
-                    case 0x0107_EC04: // HUD elements
-                    case 0x6472_0600: // grandstand (only?) low poly (high poly is 0x409C_0000)
-                        continue;
-                }
-
-                if ((node.NodeType & 0x040B_9000) is 0x040B_9000)
-                    continue; // power up
-
-                // ReSharper restore CommentTypo
-#endif
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} @ {node.Position}");
 
@@ -234,6 +199,58 @@ namespace Twisted.Editor
                 default:
                     throw new ArgumentOutOfRangeException(nameof(node));
             }
+        }
+
+        [SuppressMessage("ReSharper", "CommentTypo")]
+        private static bool ExcludeFromHierarchy(DMDNode node)
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            // the cars are in every DMD file
+
+            switch (node.NodeType)
+            {
+                case 0x0107_0A00: // sweet tooth
+                case 0x0107_1400: // yellow jacket
+                case 0x0107_1E00: // darkside
+                case 0x0107_2800: // hammerhead
+                case 0x0107_3200: // outlaw
+                case 0x0107_3C00: // crimson fury
+                case 0x0107_4600: // warthog
+                case 0x0107_5000: // mr grimm
+                case 0x0107_5A00: // pit viper
+                case 0x0107_6400: // thump
+                case 0x0107_6E00: // spectre
+                case 0x0107_7800: // road kill
+                    return true;
+            }
+
+            // red-colored power up orbs
+
+            switch (node.NodeType)
+            {
+                case 0x040B_9101:
+                case 0x040B_9301:
+                case 0x040B_9C01:
+                    return true;
+            }
+
+            // anything that is not the 3D environment or the ground
+
+            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
+            {
+                return true;
+            }
+
+            // multiple XXXX at same depth, pick highest value which is highest LOD
+
+            if (node is DMDNodeXXXX xxxx && node.NodeKind != xxxx.Parent!.OfType<DMDNodeXXXX>().Max(s => s.NodeKind))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static List<TextureInfo> GetTextureInfos(DMDNode node)
