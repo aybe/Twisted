@@ -40,22 +40,6 @@ namespace Twisted.Formats.Database
             ReadNodes(this, reader, addresses);
         }
 
-        //public override float4x4 LocalTransform
-        //{
-        //    get
-        //    {
-        //        return float4x4.identity;
-
-        //        // this actually is worse...
-
-        //        return NodeRole switch // 8010087C
-        //        {
-        //            3 => float4x4.Translate(Vector1),
-        //            _ => float4x4.identity
-        //        };
-        //    }
-        //}
-
         public override string? GetNodeInfo()
         {
             var role = NodeRole.ReverseEndianness();

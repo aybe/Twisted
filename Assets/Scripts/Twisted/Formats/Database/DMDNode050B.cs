@@ -8,13 +8,13 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode050B : DMDNode
     {
+        public readonly float3x3 Rotation;
+
         private readonly byte Unknown1;
 
         private readonly byte Unknown2;
 
-        private readonly Vector3 Vector1;
-
-        public readonly float3x3 Rotation;
+        public readonly float3 Vector1;
 
         public DMDNode050B(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
@@ -29,9 +29,11 @@ namespace Twisted.Formats.Database
 
             Rotation = new float3x3(i16[0], i16[1], i16[2], i16[3], i16[4], i16[5], i16[6], i16[7], i16[8]);
 
-            var pos = new float3(i32[5], i32[6], i32[7]);
-
-            Vector1 = pos;
+            Vector1 = new float3(
+                math.clamp(i32[5], -4096, +4096),
+                math.clamp(i32[6], -4096, +4096),
+                math.clamp(i32[7], -4096, +4096)
+            );
 
             Unknown1 = bytes[32];
 

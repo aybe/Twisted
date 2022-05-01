@@ -65,41 +65,41 @@ namespace Twisted.Formats.Database
                     );
                 }
 
+                var transform = float4x4.identity;
+
                 switch (this)
                 {
-                    case DMD dmd:
+                    case DMD:
                         return math.mul(float4x4.RotateX(math.radians(-90.0f)), float4x4.Scale(0.1f));
-                    case DMDNode0010 node0010:
-                        break;
-                    case DMDNode00FF node00FF:
-                        break;
-                    case DMDNode0107 node0107:
+                    case DMDNode0010:
                         return float4x4.identity;
-                        return float4x4.Translate(node0107.Vector1);
-                    case DMDNode020X node020X:
+                    case DMDNode00FF:
                         return float4x4.identity;
-                        return float4x4.Translate(node020X.Vector1);
-                    case DMDNode0305 node0305:
+                    case DMDNode0107:
+                        return float4x4.identity;
+                    case DMDNode020X:
+                        return float4x4.identity;
+                    case DMDNode0305: // specs
                         break;
-                    case DMDNode040B node040B:
+                    case DMDNode040B node040B: // this appears to be correct as it positions most of the objects correctly
                         return float4x4.Translate(node040B.Vector1);
-                    case DMDNode050B node050B:
-                        return TRS(float3.zero, node050B.Rotation, new float3(1.0f / 4096.0f)); // 800FE9C4 
-                    case DMDNode07FF node07FF:
-                        break;
-                    case DMDNode08FF node08FF:
-                        break;
-                    case DMDNode0903 node0903:
-                        break;
-                    case DMDNode0B06 node0B06:
-                        break;
-                    case DMDNodeXXXX nodeXXXX:
-                        break;
+                    case DMDNode050B node050B: // this is 800FE9C4 + translation, best results but still needs some offset
+                        return TRS(node050B.Vector1.yxz, node050B.Rotation, new float3(1.0f / 4096.0f));
+                    case DMDNode07FF:
+                        return float4x4.identity;
+                    case DMDNode08FF:
+                        return float4x4.identity;
+                    case DMDNode0903:
+                        return float4x4.identity;
+                    case DMDNode0B06:
+                        return float4x4.identity;
+                    case DMDNodeXXXX:
+                        return float4x4.identity;
                     default:
                         throw new NotSupportedException();
                 }
 
-                return float4x4.identity;
+                return transform;
             }
         }
 
