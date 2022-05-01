@@ -150,7 +150,7 @@ namespace Twisted.Editor
             if (info is not null)
             {
                 Debug.Log(
-                    $"Kind = 0x{node.NodeKind:X4}, Role = 0x{node.NodeRole:X4}, Position = {node.Position}, Info = {info}"
+                    $"Kind = 0x{node.NodeKind:X4}, Role = 0x{node.NodeRole:X4}, Position = {node.Position}, Info = {info}", parent
                 );
             }
 
