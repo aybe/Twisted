@@ -6,7 +6,7 @@ using Unity.Mathematics;
 
 namespace Twisted.Formats.Database
 {
-    public static class DMDNodeExtensions
+    public static class DMDExtensions
     {
         public static float4x4 GetWorldTransform(this DMDNode node)
         {
