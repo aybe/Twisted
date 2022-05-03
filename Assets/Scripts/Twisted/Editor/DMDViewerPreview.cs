@@ -209,27 +209,25 @@ namespace Twisted.Editor
             switch (node)
             {
                 case DMD:
-                    break;
                 case DMDNode0010:
                     break;
                 case DMDNode00FF:
                 case DMDNode0107:
+                case DMDNode020X:
+                case DMDNodeXXXX:
                     if (node.HasParent<DMDNode050B>()) // cancel 050B transform on its children, goes in pair with below
                     {
                         host.transform.localPosition = Vector3.zero;
                         host.transform.localScale    = Vector3.one;
                     }
                     break;
-                case DMDNode020X:
-                    break;
                 case DMDNode0305:
-                    break;
                 case DMDNode040B:
                     break;
                 case DMDNode050B node050B:
 
                     // this is a mix of reverse-engineering, boring calculations, trial and error, but it appears to work!
-                    
+
                     var matrix = node050B.Rotation;
 
                     matrix = new float3x3(
@@ -237,13 +235,13 @@ namespace Twisted.Editor
                         -matrix.c0.y, -matrix.c1.y, -matrix.c2.y,
                         -matrix.c0.z, -matrix.c1.z, -matrix.c2.z
                     );
-                    
+
                     var vector = node050B.Vector1;
 
                     var position = math.transform(DMDNode050B.TRS(matrix), vector);
 
                     position = position.yzx;
-                    
+
                     position.z = -position.z;
 
                     host.transform.position = position;
@@ -252,25 +250,20 @@ namespace Twisted.Editor
 
                     if (position.x is not 0)
                         scale.x = -scale.x;
-                    
+
                     if (position.y is not 0)
                         scale.y = -scale.y;
-                    
+
                     if (position.z is not 0)
                         scale.z = -scale.z;
 
                     host.transform.localScale = scale;
-                    
+
                     break;
                 case DMDNode07FF:
-                    break;
                 case DMDNode08FF:
-                    break;
                 case DMDNode0903:
-                    break;
                 case DMDNode0B06:
-                    break;
-                case DMDNodeXXXX:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(node));
@@ -280,17 +273,8 @@ namespace Twisted.Editor
         [SuppressMessage("ReSharper", "CommentTypo")]
         private static bool ExcludeFromHierarchy(DMDNode node)
         {
-            // NOTE: this is for XARENA1, that might not fully work on other maps for XXXX nodes
-
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
-
-            // anything that is not the 3D environment or the ground, this will drastically reduce hierarchy, e.g. HUD, small objects, etc
-
-            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
-            {
-                return true;
-            }
 
             // the cars are in every DMD file
 
@@ -321,9 +305,18 @@ namespace Twisted.Editor
                     return true;
             }
 
-            // low-poly meshes
+            // low-poly meshes // NOTE: this is for XARENA1, that might not fully work on other maps for XXXX nodes
 
             if (node.NodeType is 0x64720600)
+            {
+                return true;
+            }
+
+            return false;
+
+            // anything that is not the 3D environment or the ground, this will drastically reduce hierarchy, e.g. HUD, small objects, etc
+
+            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
             {
                 return true;
             }

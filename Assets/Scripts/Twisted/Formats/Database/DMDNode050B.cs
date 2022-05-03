@@ -12,7 +12,7 @@ namespace Twisted.Formats.Database
 
         private readonly byte Unknown1;
 
-        private readonly byte Unknown2;
+        public readonly byte Flag1;
 
         public readonly float3 Vector1;
 
@@ -41,7 +41,7 @@ namespace Twisted.Formats.Database
 
             var count = bytes[34];
 
-            Unknown2 = bytes[35];
+            Flag1 = bytes[35];
 
             var addresses = ReadAddresses(reader, count);
 
