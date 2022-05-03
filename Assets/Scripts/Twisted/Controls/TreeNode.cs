@@ -172,5 +172,22 @@ namespace Twisted.Controls
 
             return parents;
         }
+
+        public bool HasParent<T>() where T : TreeNode
+        {
+            var parent = Parent;
+
+            while (parent is not null)
+            {
+                if (parent is T)
+                {
+                    return true;
+                }
+
+                parent = parent.Parent;
+            }
+
+            return false;
+        }
     }
 }

@@ -170,7 +170,6 @@ namespace Twisted.Editor
 
                     var mr = parent.AddComponent<MeshRenderer>();
                     mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texturing.AtlasTexture };
-
                     break;
                 case DMDNode0107:
                     break;
@@ -191,6 +190,87 @@ namespace Twisted.Editor
                 case DMDNode0B06:
                     break;
                 case DMDNodeXXXX: // scenery
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(node));
+            }
+
+            ConfigureNodeTransform(node, parent);
+        }
+
+        private static void ConfigureNodeTransform(DMDNode node, GameObject host)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+
+            switch (node)
+            {
+                case DMD:
+                    break;
+                case DMDNode0010:
+                    break;
+                case DMDNode00FF:
+                case DMDNode0107:
+                    if (node.HasParent<DMDNode050B>()) // cancel 050B transform on its children, goes in pair with below
+                    {
+                        host.transform.localPosition = Vector3.zero;
+                        host.transform.localScale    = Vector3.one;
+                    }
+                    break;
+                case DMDNode020X:
+                    break;
+                case DMDNode0305:
+                    break;
+                case DMDNode040B:
+                    break;
+                case DMDNode050B node050B:
+
+                    // this is a mix of reverse-engineering, boring calculations, trial and error, but it appears to work!
+                    
+                    var matrix = node050B.Rotation;
+
+                    matrix = new float3x3(
+                        -matrix.c0.x, -matrix.c1.x, -matrix.c2.x,
+                        -matrix.c0.y, -matrix.c1.y, -matrix.c2.y,
+                        -matrix.c0.z, -matrix.c1.z, -matrix.c2.z
+                    );
+                    
+                    var vector = node050B.Vector1;
+
+                    var position = math.transform(DMDNode050B.TRS(matrix), vector);
+
+                    position = position.yzx;
+                    
+                    position.z = -position.z;
+
+                    host.transform.position = position;
+
+                    var scale = Vector3.one;
+
+                    if (position.x is not 0)
+                        scale.x = -scale.x;
+                    
+                    if (position.y is not 0)
+                        scale.y = -scale.y;
+                    
+                    if (position.z is not 0)
+                        scale.z = -scale.z;
+
+                    host.transform.localScale = scale;
+                    
+                    break;
+                case DMDNode07FF:
+                    break;
+                case DMDNode08FF:
+                    break;
+                case DMDNode0903:
+                    break;
+                case DMDNode0B06:
+                    break;
+                case DMDNodeXXXX:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(node));

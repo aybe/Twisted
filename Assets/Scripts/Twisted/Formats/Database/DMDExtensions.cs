@@ -29,53 +29,29 @@ namespace Twisted.Formats.Database
             return transform;
         }
 
-        [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public static float4x4 GetLocalTransform(this DMDNode node)
         {
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            switch (node)
+            return node switch // TODO arbitrary scale 
             {
-                case DMD:
-                    return math.mul(float4x4.RotateX(math.radians(-90.0f)), float4x4.Scale(0.1f));
-                case DMDNode0010:
-                    return float4x4.identity;
-                case DMDNode00FF:
-                    return float4x4.identity;
-                case DMDNode0107:
-                    return float4x4.identity;
-                case DMDNode020X:
-                    return float4x4.identity;
-                case DMDNode0305:
-                    return float4x4.identity;
-                case DMDNode040B node040B: // this appears to be correct as it positions most of the objects correctly
-                    return float4x4.Translate(node040B.Vector1);
-                case DMDNode050B node050B: // this is 800FE9C4 + translation, best results but still needs some offset
-                    return TRS(node050B.Vector1.yxz, node050B.Rotation, new float3(1.0f / 4096.0f));
-                case DMDNode07FF:
-                    return float4x4.identity;
-                case DMDNode08FF:
-                    return float4x4.identity;
-                case DMDNode0903:
-                    return float4x4.identity;
-                case DMDNode0B06:
-                    return float4x4.identity;
-                case DMDNodeXXXX:
-                    return float4x4.identity;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        private static float4x4 TRS(float3 translate, float3x3 rotate, float3 scale)
-        {
-            return math.float4x4(
-                math.float4(rotate.c0 * scale.x, 0.0f),
-                math.float4(rotate.c1 * scale.y, 0.0f),
-                math.float4(rotate.c2 * scale.z, 0.0f),
-                math.float4(translate,           1.0f)
-            );
+                DMD                  => math.mul(float4x4.RotateX(math.radians(-90.0f)), float4x4.Scale(1.0f)),
+                DMDNode0010          => float4x4.identity,
+                DMDNode00FF          => float4x4.identity,
+                DMDNode0107          => float4x4.identity,
+                DMDNode020X          => float4x4.identity,
+                DMDNode0305          => float4x4.identity,
+                DMDNode040B node040B => float4x4.Translate(node040B.Vector1), // this looks correct, e.g. ground stands
+                DMDNode050B          => float4x4.identity,                    // this one participates in hierarchy in a weird way, not done here
+                DMDNode07FF          => float4x4.identity,
+                DMDNode08FF          => float4x4.identity,
+                DMDNode0903          => float4x4.identity,
+                DMDNode0B06          => float4x4.identity,
+                DMDNodeXXXX          => float4x4.identity,
+                _                    => throw new NotSupportedException()
+            };
         }
     }
 }
