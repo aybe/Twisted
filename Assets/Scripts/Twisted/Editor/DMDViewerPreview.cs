@@ -274,27 +274,44 @@ namespace Twisted.Editor
 
                         var temp = new int3x3(node050B.Rotation);
 
-                        if (temp.Equals(new int3x3(zero, fore, zero, back, zero, zero, zero, zero, fore)))
+                        var mat1 = new int3x3(
+                            zero, back, zero,
+                            fore, zero, zero,
+                            zero, zero, fore
+                        );
+
+                        var mat2 = new int3x3(
+                            back, zero, zero,
+                            zero, back, zero,
+                            zero, zero, fore
+                        );
+
+                        var mat3 = new int3x3(
+                            zero, fore, zero,
+                            back, zero, zero,
+                            zero, zero, fore
+                        );
+
+                        switch (temp)
                         {
-                            host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
-                            host.transform.localRotation = Quaternion.identity;
-                            host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
-                        }
-                        else if (temp.Equals(new int3x3(back, zero, zero, zero, back, zero, zero, zero, fore)))
-                        {
-                            host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
-                            host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
-                            host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
-                        }
-                        else if (temp.Equals(new int3x3(zero, back, zero, fore, zero, zero, zero, zero, fore)))
-                        {
-                            host.transform.localPosition = node050B.Vector1.xyz;
-                            host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
-                            host.transform.localScale    = Vector3.one;
-                        }
-                        else
-                        {
-                            Debug.LogError($"Non-implemented transform for {node.GetType().Name} @ {node050B.Position}, {nameof(node050B.Rotation)} = {node050B.Rotation}", host);
+                            case var _ when temp.Equals(mat1):
+                                host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
+                                host.transform.localRotation = Quaternion.identity;
+                                host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
+                                break;
+                            case var _ when temp.Equals(mat2):
+                                host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
+                                host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
+                                host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
+                                break;
+                            case var _ when temp.Equals(mat3):
+                                host.transform.localPosition = node050B.Vector1.xyz;
+                                host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
+                                host.transform.localScale    = Vector3.one;
+                                break;
+                            default:
+                                Debug.LogError($"Non-implemented transform for {node.GetType().Name} @ {node050B.Position}, {nameof(node050B.Rotation)} = {node050B.Rotation}", host);
+                                break;
                         }
                     }
 
