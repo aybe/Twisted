@@ -11,7 +11,7 @@ namespace Twisted.Formats.Database
     {
         private readonly int Unknown1;
 
-        public readonly float3 Vector1;
+        public readonly float3 BoundsCenter;
 
         public DMDNode0107(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)
@@ -25,7 +25,7 @@ namespace Twisted.Formats.Database
 
             var ints = MemoryMarshal.Cast<byte, int>(bytes);
 
-            Vector1 = new float3(ints[0], ints[1], ints[2]);
+            BoundsCenter = new float3(ints[0], ints[1], ints[2]);
 
             Unknown1 = ints[3];
 
