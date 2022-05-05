@@ -1,10 +1,10 @@
-using System;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static Unity.Mathematics.math;
+using float3x3 = Unity.Mathematics.float3x3;
 
 namespace Twisted.Editor
 {
@@ -34,9 +34,9 @@ namespace Twisted.Editor
             var vi = root.Q<Vector3Field>("vi");
             var vo = root.Q<Vector3Field>("vo");
 
-            SetLabels(r0, "m00", "m01", "m02");
-            SetLabels(r1, "m10", "m11", "m12");
-            SetLabels(r2, "m20", "m21", "m22");
+            r0.SetLabels("m00", "m01", "m02");
+            r1.SetLabels("m10", "m11", "m12");
+            r2.SetLabels("m20", "m21", "m22");
 
             SetFields(r0, r1, r2, vs, vt, vi, vo);
 
@@ -81,16 +81,6 @@ namespace Twisted.Editor
 
                 vo.value = transform(trs, vi.value);
             }
-        }
-
-        private static void SetLabels(Vector3Field field, string x, string y, string z)
-        {
-            if (field == null)
-                throw new ArgumentNullException(nameof(field));
-
-            field.Q<FloatField>("unity-x-input").label = x;
-            field.Q<FloatField>("unity-y-input").label = y;
-            field.Q<FloatField>("unity-z-input").label = z;
         }
 
         [MenuItem("Twisted/Matrix Calculator")]
