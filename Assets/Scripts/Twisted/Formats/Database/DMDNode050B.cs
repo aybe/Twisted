@@ -2,17 +2,18 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Twisted.Formats.Database
 {
     public sealed class DMDNode050B : DMDNode
     {
+        public readonly byte Flag1;
+
         public readonly float3x3 Rotation;
 
-        private readonly byte Unknown1;
-
-        public readonly byte Flag1;
+        public readonly byte Unknown1;
 
         public readonly float3 Vector1;
 
@@ -27,11 +28,18 @@ namespace Twisted.Formats.Database
             var i16 = MemoryMarshal.Cast<byte, short>(bytes);
             var i32 = MemoryMarshal.Cast<byte, int>(bytes);
 
-            Rotation = new float3x3(
-                i16[0], i16[1], i16[2],
-                i16[3], i16[4], i16[5],
-                i16[6], i16[7], i16[8]
-            );
+            var m00 = i16[0];
+            var m01 = i16[1];
+            var m02 = i16[2];
+            var m10 = i16[3];
+            var m11 = i16[4];
+            var m12 = i16[5];
+            var m20 = i16[6];
+            var m21 = i16[7];
+            var m22 = i16[8];
+            var c0  = new int3(m00, m01, m02);
+            var c1  = new int3(m10, m11, m12);
+            var c2  = new int3(m20, m21, m22);
 
             Vector1 = new float3(i32[5], i32[6], i32[7]);
 
@@ -39,11 +47,30 @@ namespace Twisted.Formats.Database
 
             Assert.AreEqual((byte)0, bytes[33]);
 
-            var count = bytes[34];
+            var flag1 = bytes[35];
 
-            Flag1 = bytes[35];
+            Flag1 = flag1 switch
+            {
+                0 => flag1,
+                1 => flag1,
+                _ => throw new InvalidOperationException($"Unknown {nameof(Flag1)}: {Flag1}.")
+            };
 
-            var addresses = ReadAddresses(reader, count);
+            var x1 = new float3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+            var x2 = new float3x3(c0,  c1,  c2);
+
+            Debug.Log(x1);
+            Debug.Log(x2);
+
+            Rotation = Flag1 switch
+            {
+                0 => x1,
+                1 => x2,
+                _ => throw new InvalidOperationException($"Unknown {nameof(Flag1)}: {Flag1}.")
+            };
+
+            var addressesCount = bytes[34];
+            var addresses      = ReadAddresses(reader, addressesCount);
 
             SetupBinaryObject(reader);
 

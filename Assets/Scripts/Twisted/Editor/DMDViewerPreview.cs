@@ -215,9 +215,10 @@ namespace Twisted.Editor
                 case DMDNode0107:
                 case DMDNode020X:
                 case DMDNodeXXXX:
-                    if (node.HasParent<DMDNode050B>()) // cancel 050B transform on its children, goes in pair with below
+                    if (node.HasParent<DMDNode050B>()) // cancel 050B transform on its children, goes in pair with the code below
                     {
                         host.transform.localPosition = Vector3.zero;
+                        host.transform.localRotation = Quaternion.identity;
                         host.transform.localScale    = Vector3.one;
                     }
                     break;
@@ -226,38 +227,76 @@ namespace Twisted.Editor
                     break;
                 case DMDNode050B node050B:
 
-                    // this is a mix of reverse-engineering, boring calculations, trial and error, but it appears to work!
+                    if (node050B.Flag1 is 0)
+                    {
+                        // this is a mix of reverse-engineering, really boring calculations, lots of trial and error, but it works...
 
-                    var matrix = node050B.Rotation;
+                        var matrix = node050B.Rotation;
 
-                    matrix = new float3x3(
-                        -matrix.c0.x, -matrix.c1.x, -matrix.c2.x,
-                        -matrix.c0.y, -matrix.c1.y, -matrix.c2.y,
-                        -matrix.c0.z, -matrix.c1.z, -matrix.c2.z
-                    );
+                        matrix = new float3x3(
+                            -matrix.c0.x, -matrix.c1.x, -matrix.c2.x,
+                            -matrix.c0.y, -matrix.c1.y, -matrix.c2.y,
+                            -matrix.c0.z, -matrix.c1.z, -matrix.c2.z
+                        );
 
-                    var vector = node050B.Vector1;
+                        var vector = node050B.Vector1;
 
-                    var position = math.transform(DMDNode050B.TRS(matrix), vector);
+                        var position = math.transform(DMDNode050B.TRS(matrix), vector);
 
-                    position = position.yzx;
+                        position = position.yzx;
 
-                    position.z = -position.z;
+                        position.z = -position.z;
 
-                    host.transform.position = position;
+                        host.transform.position = position;
 
-                    var scale = Vector3.one;
+                        var scale = Vector3.one;
 
-                    if (position.x is not 0)
-                        scale.x = -scale.x;
+                        if (position.x is not 0)
+                            scale.x = -scale.x;
 
-                    if (position.y is not 0)
-                        scale.y = -scale.y;
+                        if (position.y is not 0)
+                            scale.y = -scale.y;
 
-                    if (position.z is not 0)
-                        scale.z = -scale.z;
+                        if (position.z is not 0)
+                            scale.z = -scale.z;
 
-                    host.transform.localScale = scale;
+                        host.transform.localScale = scale;
+                    }
+                    else
+                    {
+                        // these matrices are really weird as they don't seem to follow a particular convention
+                        // there doesn't seem to be any other flag that could give any indication about that...
+                        // while this is hard-coded, it just works and things are correctly positioned in scene
+
+                        const int zero = 0;
+                        const int fore = +4096;
+                        const int back = -4096;
+
+                        var temp = new int3x3(node050B.Rotation);
+
+                        if (temp.Equals(new int3x3(zero, fore, zero, back, zero, zero, zero, zero, fore)))
+                        {
+                            host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
+                            host.transform.localRotation = Quaternion.identity;
+                            host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
+                        }
+                        else if (temp.Equals(new int3x3(back, zero, zero, zero, back, zero, zero, zero, fore)))
+                        {
+                            host.transform.localPosition = node050B.Vector1.yzx * new float3(+1.0f, +1.0f, -1.0f);
+                            host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
+                            host.transform.localScale    = new float3(-1.0f, +1.0f, +1.0f);
+                        }
+                        else if (temp.Equals(new int3x3(zero, back, zero, fore, zero, zero, zero, zero, fore)))
+                        {
+                            host.transform.localPosition = node050B.Vector1.xyz;
+                            host.transform.localRotation = Quaternion.Euler(0.0f, 90.0f, 0.0f);
+                            host.transform.localScale    = Vector3.one;
+                        }
+                        else
+                        {
+                            Debug.LogError($"Non-implemented transform for {node.GetType().Name} @ {node050B.Position}, {nameof(node050B.Rotation)} = {node050B.Rotation}", host);
+                        }
+                    }
 
                     break;
                 case DMDNode07FF:
@@ -305,29 +344,36 @@ namespace Twisted.Editor
                     return true;
             }
 
-            // low-poly meshes // NOTE: this is for XARENA1, that might not fully work on other maps for XXXX nodes
+            // NOTE: the stuff below will probably not work for maps other than XARENA1
+
+            // only keep meshes with the highest LOD
 
             if (node.NodeType is 0x64720600)
             {
                 return true;
             }
 
-            return false;
+            // miscellaneous stuff to further thin out the crowd
 
-            // anything that is not the 3D environment or the ground, this will drastically reduce hierarchy, e.g. HUD, small objects, etc
-
-            if (node.Parent == node.Root && node.NodeType is not (0x0107_0100 or 0x0107_0300))
+            switch (node.Position)
             {
-                return true;
-            }
-
-            return false;
-
-            // multiple XXXX at same depth, pick highest value which is highest LOD
-
-            if (node is DMDNodeXXXX xxxx && node.NodeKind != xxxx.Parent!.OfType<DMDNodeXXXX>().Max(s => s.NodeKind))
-            {
-                return true;
+                case 161680:
+                case 190584:
+                case 349184:
+                case 421964:
+                case 553236:
+                case 511028:
+                case 512088:
+                    return true; // some objects
+                case 553916:
+                case 556904:
+                case 562544:
+                    return true; // some UI
+                case 521204:
+                case 521248:
+                case 529252:
+                case 535456:
+                    return true; // skidmarks
             }
 
             return false;
