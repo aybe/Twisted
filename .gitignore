@@ -87,3 +87,4 @@ crashlytics-build.properties
 *.g.cs
 *[Tt][Ee][Mm][Pp]*
 Assets/Scenes/DMDViewer*
+UIElementsSchema
