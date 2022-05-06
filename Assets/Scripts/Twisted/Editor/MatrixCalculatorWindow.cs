@@ -1,14 +1,14 @@
+using System;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static Unity.Mathematics.math;
-using float3x3 = Unity.Mathematics.float3x3;
 
 namespace Twisted.Editor
 {
-    internal sealed class MatrixCalculatorWindow : EditorWindow
+    internal sealed class MatrixCalculatorWindow : EditorWindow, IHasCustomMenu
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
@@ -80,7 +80,78 @@ namespace Twisted.Editor
                 );
 
                 vo.value = transform(trs, vi.value);
+
+                var vec1 = MathMulVec(rotation, new int3(vi.value), false);
+                var vec2 = MathMulVec(rotation, new int3(vi.value), true);
+                var vec3 = MathMulTransVec(rotation, new int3(vi.value), false);
+                var vec4 = MathMulTransVec(rotation, new int3(vi.value), true);
+
+                var label = root.Q<Label>("temp");
+
+                if (label == null)
+                {
+                    root.Add(label = new Label { name = "temp" });
+                }
+
+                label.text = string.Join(Environment.NewLine, vec1, vec2, vec3, vec4);
             }
+        }
+
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            const string text = "Reset";
+
+            menu.AddItem(L10n.TextContent(text), false, ResetWorkspace);
+
+            static void ResetWorkspace()
+            {
+                Undo.RecordObject(Workspace, text);
+                Workspace.Reset();
+            }
+        }
+
+        private static float3 MathMulVec(float3x3 a1, int3 a2, bool transpose)
+        {
+            // 0 1 2
+            // 3 4 5
+            // 6 7 8
+
+            // 0 3 6
+            // 1 4 7
+            // 2 5 8
+
+            if (transpose)
+            {
+                a1 = math.transpose(a1);
+            }
+
+            var x = (a2.x * a1.c0.x + a2.y * a1.c0.y + a2.z * a1.c0.z) / 4096.0f;
+            var y = (a2.x * a1.c1.x + a2.y * a1.c1.y + a2.z * a1.c1.z) / 4096.0f;
+            var z = (a2.x * a1.c2.x + a2.y * a1.c2.y + a2.z * a1.c2.z) / 4096.0f;
+
+            return new float3(x, y, z);
+        }
+
+        private static float3 MathMulTransVec(float3x3 a1, int3 a2, bool transpose)
+        {
+            // 0 1 2
+            // 3 4 5
+            // 6 7 8
+
+            // 0 3 6
+            // 1 4 7
+            // 2 5 8
+
+            if (transpose)
+            {
+                a1 = math.transpose(a1);
+            }
+
+            var x = (a2.x * a1.c0.x + a2.y * a1.c1.x + a2.z * a1.c2.x) / 4096.0f;
+            var y = (a2.x * a1.c0.y + a2.y * a1.c1.y + a2.z * a1.c2.y) / 4096.0f;
+            var z = (a2.x * a1.c0.z + a2.y * a1.c1.z + a2.z * a1.c2.z) / 4096.0f;
+
+            return new float3(x, y, z);
         }
 
         [MenuItem("Twisted/Matrix Calculator")]
