@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Controls;
+using Twisted.Formats.Binary;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
@@ -332,8 +333,6 @@ namespace Twisted.Editor
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            // the cars are in every DMD file
-
             switch (node.NodeType)
             {
                 case 0x0107_0A00: // sweet tooth
@@ -349,48 +348,76 @@ namespace Twisted.Editor
                 case 0x0107_6E00: // spectre
                 case 0x0107_7800: // road kill
                     return true;
-            }
-
-            // power ups, these are sprites 08FF, not yet implemented 
-
-            switch (node.NodeType)
-            {
-                case 0x040B_9101:
-                case 0x040B_9301:
-                case 0x040B_9C01:
+                case 0x040B_9101: // power up 
+                case 0x040B_9201: // power up 
+                case 0x040B_9301: // power up 
+                case 0x040B_9501: // power up 
+                case 0x040B_9A01: // power up 
+                case 0x040B_9C01: // power up 
+                case 0x040B_9E01: // power up 
                     return true;
             }
 
-            // NOTE: the stuff below will probably not work for maps other than XARENA1
+            // mesh with highest LOD when there are many
 
-            // only keep meshes with the highest LOD
-
-            if (node.NodeType is 0x64720600)
+            if (node is DMDNodeXXXX { Parent: { } } nodeXXXX)
             {
-                return true;
+                if (nodeXXXX.NodeKind != nodeXXXX.Parent.OfType<DMDNodeXXXX>().Max(s => s.NodeKind))
+                {
+                    return true;
+                }
             }
 
-            // miscellaneous stuff to further thin out the crowd
+            // various stuff
 
-            switch (node.Position)
+            var role = node.NodeRole.ReverseEndianness();
+
+            switch (role)
             {
-                case 161680:
-                case 190584:
-                case 349184:
-                case 421964:
-                case 553236:
-                case 511028:
-                case 512088:
-                    return true; // some objects
-                case 553916:
-                case 556904:
-                case 562544:
-                    return true; // some UI
-                case 521204:
-                case 521248:
-                case 529252:
-                case 535456:
-                    return true; // skidmarks
+                case 0x00D2: // weapon texture
+                case 0x00D4: // weapon texture
+                case 0x00D5: // weapon texture
+                case 0x00D6: // weapon texture
+                case 0x028A: // flame animation
+                case 0x028B: // smoke animation
+                case 0x028C: // contrail animation
+                case 0x028D: // spark animation
+                case 0x028E: // explosion animation
+                case 0x028F: // burst animation
+                case 0x0290: // burn animation
+                case 0x029E: // frag texture
+                case 0x029F: // frag texture
+                case 0x02A0: // frag texture
+                case 0x02A1: // frag texture
+                case 0x02EF: // pedestrian
+                case 0x02F4: // pedestrian
+                case 0x02F8: // pedestrian
+                case 0x0304: // pedestrian
+                case 0x0305: // pedestrian
+                case 0x0307: // pedestrian
+                case 0x0308: // pedestrian
+                case 0x0309: // pedestrian
+                case 0x030A: // pedestrian
+                case 0x030D: // pedestrian
+                case 0x030E: // pedestrian
+                case 0x02EE: // hover cop
+                case 0x02F0: // hover cop
+                case 0x02F1: // static cop
+                case 0x02F2: // static cop
+                case 0x02F3: // static cop
+                case 0x04D8: // dashboard
+                case 0x04DF: // rear view mirror
+                case 0x04EC: // dashboard icons
+                case 0x0500: // steering wheel
+                case 0x012D: // special bullet
+                case 0x012E: // special bullet
+                case 0x0134: // special bullet
+                case 0x0135: // special bullet
+                    return true;
+                case 0x0398: // health stand
+                case 0x0399: // health stand lightniing
+                case 0x0514: // car occupants
+                    break;
             }
 
             return false;
