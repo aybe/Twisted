@@ -53,7 +53,7 @@ namespace Twisted.Editor
             PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame)
+        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame, bool split)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -112,7 +112,7 @@ namespace Twisted.Editor
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
 
-                ConfigureNode(child, node, texturing);
+                ConfigureNode(child, node, texturing, split);
 
                 foreach (var item in node.Cast<DMDNode>().Reverse())
                 {
@@ -131,7 +131,7 @@ namespace Twisted.Editor
             }
         }
 
-        private static void ConfigureNode(GameObject parent, DMDNode node, DMDTexturing texturing)
+        private static void ConfigureNode(GameObject parent, DMDNode node, DMDTexturing texturing, bool split)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
@@ -158,19 +158,34 @@ namespace Twisted.Editor
                 case DMDNode0010:
                     break;
                 case DMDNode00FF node00FF:
-                    var mesh = ConfigureModel(node00FF, texturing);
 
-                    mesh.name = parent.name;
+                    var lists = split ? node00FF.Polygons.Select(s => new[] { s }).ToArray() : new[] { node00FF.Polygons };
 
-                    var mc = parent.AddComponent<MeshCollider>();
-                    mc.cookingOptions = MeshColliderCookingOptions.None; // BUG [Physics.PhysX] cleaning the mesh failed
-                    mc.sharedMesh     = mesh;
+                    var index = 0;
 
-                    var mf = parent.AddComponent<MeshFilter>();
-                    mf.sharedMesh = mesh;
+                    foreach (var polygons in lists)
+                    {
+                        var label = split
+                            ? $"Index = {++index}, Type = {polygons.Single().GetType().Name.Replace("Polygon", string.Empty)}, Position = {polygons.Single().Position}"
+                            : parent.name;
 
-                    var mr = parent.AddComponent<MeshRenderer>();
-                    mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texturing.AtlasTexture };
+                        var child = split ? parent.CreateChild(label) : parent;
+
+                        var mesh = ConfigureModel(node00FF, texturing, polygons);
+
+                        mesh.name = label;
+
+                        var mc = child.AddComponent<MeshCollider>();
+                        mc.cookingOptions = MeshColliderCookingOptions.None; // BUG [Physics.PhysX] cleaning the mesh failed
+                        mc.sharedMesh     = mesh;
+
+                        var mf = child.AddComponent<MeshFilter>();
+                        mf.sharedMesh = mesh;
+
+                        var mr = child.AddComponent<MeshRenderer>();
+                        mr.material = new Material(Shader.Find("Twisted/DMDViewer")) { mainTexture = texturing.AtlasTexture };
+                    }
+
                     break;
                 case DMDNode0107:
                     break;
@@ -450,15 +465,13 @@ namespace Twisted.Editor
             return infos;
         }
 
-        private static Mesh ConfigureModel(DMDNode00FF node, DMDTexturing texturing)
+        private static Mesh ConfigureModel(DMDNode00FF node, DMDTexturing texturing, IReadOnlyList<Polygon> polygons)
         {
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
             if (texturing is null)
                 throw new ArgumentNullException(nameof(texturing));
-
-            var polygons = node.Polygons;
 
             var meshes = new List<Mesh>();
             var groups = polygons.GroupBy(s => s.TextureInfo.HasValue).ToArray();

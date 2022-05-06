@@ -492,7 +492,8 @@ namespace Twisted.Editor
             Preview.ConfigureNodes(
                 Factory,
                 e.Items,
-                Settings.UseSceneFrameProperty.boolValue
+                Settings.UseSceneFrameProperty.boolValue,
+                Settings.UseSplitModelProperty.boolValue
             );
         }
 
