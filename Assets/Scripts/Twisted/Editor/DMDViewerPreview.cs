@@ -311,7 +311,13 @@ namespace Twisted.Editor
                                 host.transform.localScale    = Vector3.one;
                                 break;
                             default:
-                                Debug.LogError($"Non-implemented transform for {node.GetType().Name} @ {node050B.Position}, {nameof(node050B.Rotation)} = {node050B.Rotation}", host);
+                                Debug.LogError(
+                                    $"Non-implemented transform for {node.GetType().Name}, " +
+                                    $"{nameof(node050B.Position)} = {node050B.Position}, " +
+                                    $"{nameof(node050B.Rotation)} = {node050B.Rotation}, " +
+                                    $"{nameof(node050B.Vector1)} = {node050B.Vector1}",
+                                    host
+                                );
                                 break;
                         }
                     }
