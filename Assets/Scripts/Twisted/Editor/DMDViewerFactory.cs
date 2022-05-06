@@ -63,7 +63,7 @@ namespace Twisted.Editor
 
             var buffer = FrameBuffer ??= GetBuffer();
 
-            var list = new SortedList<TextureInfo, Texture2D>(TextureInfoComparer.Instance);
+            var list = new SortedList<TextureInfo, Texture2D>();
 
             foreach (var info in infos)
             {
@@ -112,11 +112,11 @@ namespace Twisted.Editor
             foreach (var (key, value) in list)
             {
                 var name = $"Index = {index++}, " +
-                           $"PageX = {key.Page.Position.x}, " +
-                           $"PageY = {key.Page.Position.y}, " +
+                           $"PageX = {key.Page.Position.X}, " +
+                           $"PageY = {key.Page.Position.Y}, " +
                            $"PageColors = {key.Page.Colors}, " +
-                           $"PaletteX = {key.Palette.x}, " +
-                           $"PaletteY = {key.Palette.y}";
+                           $"PaletteX = {key.Palette.X}, " +
+                           $"PaletteY = {key.Palette.Y}";
 
                 var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
 
@@ -185,8 +185,8 @@ namespace Twisted.Editor
                 _                             => throw new NotSupportedException(colors.ToString())
             };
 
-            var picRect = new RectInt(info.Page.Position.x, info.Page.Position.y, picWidth, 256);
-            var palRect = new RectInt(info.Palette.x,       info.Palette.y,       palWidth, 1);
+            var picRect = new RectInt(info.Page.Position.X, info.Page.Position.Y, picWidth, 256);
+            var palRect = new RectInt(info.Palette.X,       info.Palette.Y,       palWidth, 1);
             var texture = FrameBuffer.GetTexture(picFormat, buffer, picRect, buffer, palRect, mode);
 
             return texture;

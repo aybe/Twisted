@@ -218,7 +218,7 @@ namespace Twisted.Formats.Graphics3D
             var paletteRaw = Data.ReadInt16(position.Value + 2, Endianness.LE);
             var paletteX   = (paletteRaw & 0b00000000_00111111) * 16;
             var paletteY   = (paletteRaw & 0b01111111_11000000) / 64;
-            var palette    = new Vector2Int(paletteX, paletteY);
+            var palette    = new TexturePalette(paletteX, paletteY);
 
             var pageRaw     = Data.ReadInt32(position.Value + 6, Endianness.LE);
             var pageX       = (pageRaw & 0b_00000000_00001111) * 64;
@@ -226,7 +226,7 @@ namespace Twisted.Formats.Graphics3D
             var pageAlpha   = (pageRaw & 0b_00000000_01100000) / 32;
             var pageColors  = (pageRaw & 0b_00000001_10000000) / 128;
             var pageDisable = (pageRaw & 0b_00001000_00000000) / 1024;
-            var page        = new TexturePage(new Vector2Int(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
+            var page        = new TexturePage(new TexturePosition(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
 
             return new TextureInfo(page, palette);
         }

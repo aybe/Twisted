@@ -1,15 +1,13 @@
 ﻿// #define DMD_DEBUG_POLYGON_TEXTURE // TODO this should be toggleable from editor
+
 using System;
 using System.ComponentModel;
-using JetBrains.Annotations;
-using UnityEngine;
 
 namespace Twisted.Formats.Graphics2D
 {
-    [PublicAPI]
-    public readonly struct TexturePage
+    public readonly struct TexturePage : IEquatable<TexturePage>, IComparable<TexturePage>, IComparable
     {
-        public Vector2Int Position { get; }
+        public TexturePosition Position { get; }
 
         public TexturePageAlpha Alpha { get; }
 
@@ -17,22 +15,10 @@ namespace Twisted.Formats.Graphics2D
 
         public TexturePageDisable Disable { get; }
 
-        public int Index => Position.y % 256 * 16 + Position.x % 64;
+        public int Index => Position.Y % 256 * 16 + Position.X % 64;
 
-        public TexturePage(Vector2Int position, TexturePageAlpha alpha, TexturePageColors colors, TexturePageDisable disable)
+        public TexturePage(TexturePosition position, TexturePageAlpha alpha, TexturePageColors colors, TexturePageDisable disable)
         {
-            if (position.x < 0)
-                throw new ArgumentOutOfRangeException(nameof(position.x), "Must be positive.");
-
-            if (position.y < 0)
-                throw new ArgumentOutOfRangeException(nameof(position.y), "Must be positive.");
-
-            if (position.x % 64 != 0)
-                throw new ArgumentOutOfRangeException(nameof(position.x), position.x, "Not a multiple of 64.");
-
-            if (position.y % 256 != 0)
-                throw new ArgumentOutOfRangeException(nameof(position.x), position.y, "Not a multiple of 256.");
-
             if (!Enum.IsDefined(typeof(TexturePageAlpha), alpha))
                 throw new InvalidEnumArgumentException(nameof(alpha), (int)alpha, typeof(TexturePageAlpha));
 
@@ -51,9 +37,9 @@ namespace Twisted.Formats.Graphics2D
 
             var xMax = 1024 - GetPixelWidth(this);
 
-            if (position.x > xMax)
+            if (position.X > xMax)
             {
-                // throw new ArgumentOutOfRangeException(nameof(position.x), $"Must not be greater than {xMax}.");
+                // throw new ArgumentOutOfRangeException(nameof(position.X), $"Must not be greater than {xMax}.");
 #if DMD_DEBUG_POLYGON_TEXTURE // very slow
                 Debug.LogError($"X must not be greater than {xMax}.");
 #endif
@@ -61,13 +47,69 @@ namespace Twisted.Formats.Graphics2D
 
             const int yMax = 256;
 
-            if (position.y > yMax)
+            if (position.Y > yMax)
             {
-                // throw new ArgumentOutOfRangeException(nameof(position.y), $"Must not be greater than {yMax}.");
+                // throw new ArgumentOutOfRangeException(nameof(position.Y), $"Must not be greater than {yMax}.");
 #if DMD_DEBUG_POLYGON_TEXTURE // very slow
                 Debug.LogError($"Y must not be greater than {yMax}.");
 #endif
             }
+        }
+
+        public int CompareTo(TexturePage other)
+        {
+            var positionComparison = Position.CompareTo(other.Position);
+
+            if (positionComparison != 0)
+            {
+                return positionComparison;
+            }
+
+            var alphaComparison = Alpha.CompareTo(other.Alpha);
+
+            if (alphaComparison != 0)
+            {
+                return alphaComparison;
+            }
+
+            var colorsComparison = Colors.CompareTo(other.Colors);
+
+            if (colorsComparison != 0)
+            {
+                return colorsComparison;
+            }
+
+            var disableComparison = Disable.CompareTo(other.Disable);
+
+            if (disableComparison != 0)
+            {
+                return disableComparison;
+            }
+
+            return 0;
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return 1;
+
+            return obj is TexturePage other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(TexturePage)}");
+        }
+
+        public bool Equals(TexturePage other)
+        {
+            return Position.Equals(other.Position) && Alpha == other.Alpha && Colors == other.Colors && Disable == other.Disable;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is TexturePage other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Position, (int)Alpha, (int)Colors, (int)Disable);
         }
 
         public override string ToString()
@@ -87,6 +129,36 @@ namespace Twisted.Formats.Graphics2D
                 TexturePageColors.Reserved    => throw new NotSupportedException(colors.ToString()),
                 _                             => throw new NotSupportedException(colors.ToString())
             };
+        }
+
+        public static bool operator ==(TexturePage left, TexturePage right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(TexturePage left, TexturePage right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static bool operator <(TexturePage left, TexturePage right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator >(TexturePage left, TexturePage right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator <=(TexturePage left, TexturePage right)
+        {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >=(TexturePage left, TexturePage right)
+        {
+            return left.CompareTo(right) >= 0;
         }
     }
 }
