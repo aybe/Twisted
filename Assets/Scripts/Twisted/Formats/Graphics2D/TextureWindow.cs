@@ -25,6 +25,18 @@ namespace Twisted.Formats.Graphics2D
 
         public TextureWindow(int maskX, int maskY, int offsetX, int offsetY)
         {
+            if (maskX is < 0 or > 31)
+                throw new ArgumentOutOfRangeException(nameof(maskX));
+         
+            if (maskY is < 0 or > 31)
+                throw new ArgumentOutOfRangeException(nameof(maskX));
+           
+            if (offsetX is < 0 or > 31)
+                throw new ArgumentOutOfRangeException(nameof(maskX));
+           
+            if (offsetY is < 0 or > 31)
+                throw new ArgumentOutOfRangeException(nameof(maskX));
+
             MaskX   = maskX;
             MaskY   = maskY;
             OffsetX = offsetX;
