@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Twisted.Editor
+namespace Twisted.Editor.Tools
 {
     [FilePath("UserSettings/MatrixCalculatorWorkspace.yaml", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class MatrixCalculatorWorkspace : ScriptableSingleton<MatrixCalculatorWorkspace>

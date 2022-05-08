@@ -1,4 +1,3 @@
-using System;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -6,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static Unity.Mathematics.math;
 
-namespace Twisted.Editor
+namespace Twisted.Editor.Tools
 {
     internal sealed class MatrixCalculatorWindow : EditorWindow, IHasCustomMenu
     {
@@ -80,20 +79,6 @@ namespace Twisted.Editor
                 );
 
                 vo.value = transform(trs, vi.value);
-
-                var vec1 = MathMulVec(rotation, new int3(vi.value), false);
-                var vec2 = MathMulVec(rotation, new int3(vi.value), true);
-                var vec3 = MathMulTransVec(rotation, new int3(vi.value), false);
-                var vec4 = MathMulTransVec(rotation, new int3(vi.value), true);
-
-                var label = root.Q<Label>("temp");
-
-                if (label == null)
-                {
-                    root.Add(label = new Label { name = "temp" });
-                }
-
-                label.text = string.Join(Environment.NewLine, vec1, vec2, vec3, vec4);
             }
         }
 
@@ -154,7 +139,7 @@ namespace Twisted.Editor
             return new float3(x, y, z);
         }
 
-        [MenuItem("Twisted/Matrix Calculator")]
+        [MenuItem("Twisted/Matrix Calculator", priority = int.MaxValue)]
         public static void InitializeWindow()
         {
             var window = GetWindow<MatrixCalculatorWindow>();
