@@ -223,7 +223,7 @@ namespace Twisted.Formats.Graphics3D
             var paletteY   = (paletteRaw & 0b01111111_11000000) / 64;
             var palette    = new TexturePalette(paletteX, paletteY);
 
-            var pageRaw     = Data.ReadInt32(position.Value + 6, Endianness.LE);
+            var pageRaw     = Data.ReadInt16(position.Value + 6, Endianness.LE);
             var pageX       = (pageRaw & 0b_00000000_00001111) * 64;
             var pageY       = (pageRaw & 0b_00000000_00010000) / 16 * 256;
             var pageAlpha   = (pageRaw & 0b_00000000_01100000) / 32;
