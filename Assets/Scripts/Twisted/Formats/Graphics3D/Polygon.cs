@@ -191,6 +191,8 @@ namespace Twisted.Formats.Graphics3D
         protected virtual int? TextureElements { get; } = null;
 
         protected virtual int? TexturePosition { get; } = null;
+        
+        protected virtual int? TextureWindowPosition { get; } = null;
 
         public TextureInfo? TextureInfo => TryReadTextureInfo();
 
@@ -228,7 +230,11 @@ namespace Twisted.Formats.Graphics3D
             var pageDisable = (pageRaw & 0b_00001000_00000000) / 1024;
             var page        = new TexturePage(new TexturePosition(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
 
-            return new TextureInfo(page, palette);
+            var window = TextureWindowPosition.HasValue 
+                ? new TextureWindow(Data.ReadInt32(TextureWindowPosition.Value, Endianness.LE)) 
+                : default(TextureWindow?);
+
+            return new TextureInfo(page, palette, window);
         }
 
         private IReadOnlyList<Vector2Int>? TryReadTextureUVs()

@@ -196,6 +196,37 @@ namespace Twisted.Editor
             var palRect = new RectInt(info.Palette.X,       info.Palette.Y,       palWidth, 1);
             var texture = FrameBuffer.GetTexture(picFormat, buffer, picRect, buffer, palRect, mode);
 
+            if (info.Window == null)
+            {
+                return texture;
+            }
+
+            var textureWidth  = texture.width;
+            var textureHeight = texture.height;
+            var textureSource = texture.GetPixels32();
+            var textureTarget = new Color32[textureSource.Length];
+            var window        = info.Window.Value;
+            var windowMaskX   = window.MaskX;
+            var windowMaskY   = window.MaskY;
+            var windowOffsetX = window.OffsetX;
+            var windowOffsetY = window.OffsetY;
+
+            for (var y = 0; y < textureHeight; y++)
+            {
+                for (var x = 0; x < textureWidth; x++)
+                {
+                    var u = TextureWindow.Transform(x, windowMaskX, windowOffsetX);
+                    var v = TextureWindow.Transform(y, windowMaskY, windowOffsetY);
+                    var i = (textureHeight - v - 1) * textureWidth + u;
+                    var j = (textureHeight - y - 1) * textureWidth + x;
+
+                    textureTarget[j] = textureSource[i];
+                }
+            }
+
+            texture.SetPixels32(textureTarget);
+            texture.Apply();
+
             return texture;
         }
     }
