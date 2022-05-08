@@ -191,7 +191,7 @@ namespace Twisted.Formats.Graphics3D
 
         protected virtual int? TextureElements { get; } = null;
 
-        protected virtual int? TexturePosition { get; } = null;
+        protected virtual int? TextureElementsPosition { get; } = null;
         
         protected virtual int? TextureWindowPosition { get; } = null;
 
@@ -202,13 +202,13 @@ namespace Twisted.Formats.Graphics3D
         private TextureInfo? TryReadTextureInfo()
         {
             var elements = TextureElements;
-            var position = TexturePosition;
+            var position = TextureElementsPosition;
 
             if (elements is null && position is null)
                 return null;
 
             if (elements is null != position is null)
-                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TextureElementsPosition)} must be overridden.");
 
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
@@ -216,7 +216,7 @@ namespace Twisted.Formats.Graphics3D
             var dataMax = Data.Length - 8;
 
             if (position!.Value > dataMax)
-                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+                throw new ArgumentOutOfRangeException($"{nameof(TextureElementsPosition)} must be less than or equal to {dataMax}.");
 
             var paletteRaw = Data.ReadInt16(position.Value + 2, Endianness.LE);
             var paletteX   = (paletteRaw & 0b00000000_00111111) * 16;
@@ -241,13 +241,13 @@ namespace Twisted.Formats.Graphics3D
         private IReadOnlyList<Vector2Int>? TryReadTextureUVs()
         {
             var elements = TextureElements;
-            var position = TexturePosition;
+            var position = TextureElementsPosition;
 
             if (elements is null && position is null)
                 return null;
 
             if (elements is null != position is null)
-                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TextureElementsPosition)} must be overridden.");
 
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
@@ -255,7 +255,7 @@ namespace Twisted.Formats.Graphics3D
             var dataMax = Data.Length - elements.Value * 4;
 
             if (position!.Value > dataMax)
-                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+                throw new ArgumentOutOfRangeException($"{nameof(TextureElementsPosition)} must be less than or equal to {dataMax}.");
 
             var uvs = new Vector2Int[elements.Value];
 
