@@ -90,15 +90,22 @@ namespace Twisted.Editor
             {
                 try
                 {
-                    Directory.Delete(directory, true);
+                    var files = Directory.GetFiles(directory);
+
+                    foreach (var file in files)
+                    {
+                        File.Delete(file);
+                    }
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
                 }
             }
-
-            Directory.CreateDirectory(directory);
+            else
+            {
+                Directory.CreateDirectory(directory);
+            }
 
             var texture = FrameBuffer.GetTexture(buffer.Format, buffer, buffer.Rect);
             var png     = texture.EncodeToPNG();
