@@ -130,9 +130,7 @@ namespace Twisted.Editor
                 File.WriteAllBytes(path, value.EncodeToPNG());
             }
 
-            // Debug.Log($"Generated {list.Count} textures in {directory}.");
-
-            File.WriteAllBytes(Path.Combine(directory, "TextureAtlas.png"), atlasTexture.EncodeToPNG());
+            File.WriteAllBytes(Path.Combine(directory, "TMS atlas.png"), atlasTexture.EncodeToPNG());
 #endif
         }
 
