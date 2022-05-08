@@ -101,7 +101,7 @@ namespace Twisted.Editor
 
         #region Initialization/cleanup
 
-        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
+        [MenuItem("Twisted/DMD Viewer")]
         private static void InitializeWindow()
         {
             GetWindow<DMDViewer>();
