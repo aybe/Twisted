@@ -1,0 +1,14 @@
+TemplateContainer {
+    flex-grow: 1;
+}
+
+.image {
+    flex-grow: 1;
+    margin: 5px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.image-container {
+    flex-direction: row;
+    flex-grow: 1;
+}

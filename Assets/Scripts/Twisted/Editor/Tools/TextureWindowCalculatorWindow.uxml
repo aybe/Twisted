@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="TextureWindowCalculatorWindow.uss" />
+    <uie:Toolbar>
+        <uie:ToolbarButton tabindex="-1" text="Browse..." display-tooltip-when-elided="true" name="buttonBrowse" />
+    </uie:Toolbar>
+    <ui:VisualElement>
+        <ui:SliderInt picking-mode="Ignore" label="Mask X" show-input-field="true" value="8" high-value="256" name="sliderWindowMaskX" low-value="0" />
+        <ui:SliderInt picking-mode="Ignore" label="Mask Y" show-input-field="true" value="8" high-value="256" name="sliderWindowMaskY" low-value="0" />
+        <ui:SliderInt picking-mode="Ignore" label="Offset X" show-input-field="true" value="8" high-value="256" name="sliderWindowOffsetX" low-value="0" />
+        <ui:SliderInt picking-mode="Ignore" label="Offset Y" show-input-field="true" value="8" high-value="256" name="sliderWindowOffsetY" low-value="0" />
+    </ui:VisualElement>
+    <ui:VisualElement class="image-container">
+        <ui:VisualElement name="elementImageSource" class="image" />
+        <ui:VisualElement name="elementImageTarget" class="image" />
+    </ui:VisualElement>
+</ui:UXML>
