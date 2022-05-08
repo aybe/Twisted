@@ -118,12 +118,12 @@ namespace Twisted.Editor
 
             foreach (var (key, value) in list)
             {
-                var name = $"Index = {index++}, " +
-                           $"PageX = {key.Page.Position.X}, " +
-                           $"PageY = {key.Page.Position.Y}, " +
-                           $"PageColors = {key.Page.Colors}, " +
-                           $"PaletteX = {key.Palette.X}, " +
-                           $"PaletteY = {key.Palette.Y}";
+                var name = $"Index = {index++:D3}, PX = {key.Page.Position.X}, PY = {key.Page.Position.Y}, PC = {key.Page.Colors}, CX = {key.Palette.X}, CY = {key.Palette.Y}";
+
+                if (key.Window.HasValue)
+                {
+                    name += $", MX = {key.Window.Value.MaskX}, MY = {key.Window.Value.MaskY}, OX = {key.Window.Value.OffsetX}, OY = {key.Window.Value.OffsetY}";
+                }
 
                 var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
 
