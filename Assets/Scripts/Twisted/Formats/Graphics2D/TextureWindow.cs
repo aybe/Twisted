@@ -23,6 +23,14 @@ namespace Twisted.Formats.Graphics2D
             Assert.AreEqual(0xE2, (data >> 24) & 0xFF);
         }
 
+        public TextureWindow(int maskX, int maskY, int offsetX, int offsetY)
+        {
+            MaskX   = maskX;
+            MaskY   = maskY;
+            OffsetX = offsetX;
+            OffsetY = offsetY;
+        }
+
         public int CompareTo(TextureWindow other)
         {
             var maskXComparison = MaskX.CompareTo(other.MaskX);
