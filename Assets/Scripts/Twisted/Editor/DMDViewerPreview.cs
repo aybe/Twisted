@@ -82,11 +82,6 @@ namespace Twisted.Editor
                 atlasTexture.filterMode = FilterMode.Point;
             }
 
-            if (atlasTexture != null)
-            {
-                File.WriteAllBytes(".temp/atlas.png", atlasTexture.EncodeToPNG());
-            }
-
             // cleanup garbage from previous hierarchy if any
 
             while (transform.childCount > 0)
