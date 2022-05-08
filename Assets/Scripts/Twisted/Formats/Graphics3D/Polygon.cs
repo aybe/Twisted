@@ -1,4 +1,5 @@
 ﻿// #define DMD_DEBUG_POLYGON_COLOR // TODO this should be toggleable from editor
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -118,7 +119,7 @@ namespace Twisted.Formats.Graphics3D
             }
         }
 
-        private byte[] Data { get; }
+        protected byte[] Data { get; }
 
         public uint Type { get; }
 

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Twisted.Formats.Binary;
 
 namespace Twisted.Formats.Graphics3D
 {
@@ -9,6 +10,10 @@ namespace Twisted.Formats.Graphics3D
         public Polygon84010B09(BinaryReader reader, int positionVertices)
             : base(reader, 44, 4, positionVertices)
         {
+            var unknown1 = Data.ReadInt16(12, Endianness.LE);
+            var unknown2 = Data.ReadInt16(14, Endianness.LE);
+            var unknown3 = Data.ReadInt16(40, Endianness.LE);
+            var unknown4 = Data.ReadInt16(42, Endianness.LE);
         }
 
         protected override int? ColorElements { get; } = 1;
