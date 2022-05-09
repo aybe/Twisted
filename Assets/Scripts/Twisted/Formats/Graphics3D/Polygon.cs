@@ -119,7 +119,7 @@ namespace Twisted.Formats.Graphics3D
             }
         }
 
-        protected byte[] Data { get; }
+        private byte[] Data { get; }
 
         public uint Type { get; }
 
@@ -130,6 +130,11 @@ namespace Twisted.Formats.Graphics3D
         public long Position { get; }
 
         public long Length { get; }
+
+        public byte[] GetObjectData()
+        {
+            return Data.ToArray();
+        }
 
         public override string ToString()
         {
