@@ -106,12 +106,6 @@ namespace Twisted.Editor
 
         #region Initialization/cleanup
 
-        [MenuItem("Twisted/DMD Viewer")]
-        private static void InitializeWindow()
-        {
-            GetWindow<DMDViewer>();
-        }
-
         private void InitializeRootVisual()
         {
             var root = rootVisualElement;

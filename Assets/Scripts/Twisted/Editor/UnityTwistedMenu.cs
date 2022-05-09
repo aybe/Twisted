@@ -10,6 +10,12 @@ namespace Twisted.Editor
 {
     internal static class UnityTwistedMenu
     {
+        [MenuItem("Twisted/DMD Viewer", priority = 0)]
+        private static void DMDViewer()
+        {
+            EditorWindow.GetWindow<DMDViewer>();
+        }
+
         private static void BatchExtract(Action<TreeNode, List<byte[]>> action)
         {
             if (action == null)
