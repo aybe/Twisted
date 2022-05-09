@@ -21,6 +21,9 @@ namespace Twisted.Editor
         private bool UseModelTexture;
 
         [SerializeField]
+        private bool UseTextureAlpha = true;
+
+        [SerializeField]
         private bool UseSceneFrame;
 
         [SerializeField]
@@ -41,6 +44,8 @@ namespace Twisted.Editor
         public SerializedProperty UseFilterDistinctProperty { get; private set; } = null!;
 
         public SerializedProperty UseModelTextureProperty { get; private set; } = null!;
+
+        public SerializedProperty UseTextureAlphaProperty { get; private set; } = null!;
 
         public SerializedProperty UsePolygonColorsProperty { get; private set; } = null!;
 
@@ -65,6 +70,7 @@ namespace Twisted.Editor
             LastFilterProperty        = SerializedObject.FindProperty(nameof(LastFilter));
             UseFilterDistinctProperty = SerializedObject.FindProperty(nameof(UseFilterDistinct));
             UseModelTextureProperty   = SerializedObject.FindProperty(nameof(UseModelTexture));
+            UseTextureAlphaProperty   = SerializedObject.FindProperty(nameof(UseTextureAlpha));
             UseSceneFrameProperty     = SerializedObject.FindProperty(nameof(UseSceneFrame));
             UseSplitModelProperty     = SerializedObject.FindProperty(nameof(UseSplitModel));
             UseVertexColorsProperty   = SerializedObject.FindProperty(nameof(UseVertexColors));

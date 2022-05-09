@@ -56,6 +56,11 @@ namespace Twisted.Editor
                     OnToolbarTexturingValueChanged
                 );
 
+            ToolbarTextureAlpha
+                .UnregisterValueChangedCallback(
+                    OnToolbarTextureAlphaValueChanged
+                );
+
             ToolbarVertexColors
                 .UnregisterValueChangedCallback(
                     OnToolbarVertexColorsValueChanged
@@ -138,6 +143,7 @@ namespace Twisted.Editor
             InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
             InitializeToolbarToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
             InitializeToolbarToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarTextureAlpha,      Settings.UseTextureAlphaProperty,   OnToolbarTextureAlphaValueChanged);
             InitializeToolbarToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
             InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
         }
@@ -368,6 +374,12 @@ namespace Twisted.Editor
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
+        private void OnToolbarTextureAlphaValueChanged(ChangeEvent<bool> evt)
+        {
+            Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_ALPHA"), evt.newValue);
+        }
+
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnToolbarVertexColorsValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_VERTEX"), evt.newValue);
@@ -518,6 +530,9 @@ namespace Twisted.Editor
 
         private ToolbarToggle ToolbarTexturing =>
             rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
+
+        private ToolbarToggle ToolbarTextureAlpha =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTextureAlpha");
 
         private ToolbarToggle ToolbarVertexColors =>
             rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");

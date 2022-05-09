@@ -21,6 +21,11 @@
 			                   class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material Icon&apos;);" />
 			<uie:ToolbarToggle focusable="false" tooltip="Enable polygon family coloring." name="toolbarPolygonColoring"
 			                   class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
+			<uie:ToolbarToggle focusable="false"
+							   tooltip="Enable texture alpha."
+							   name="toolbarTextureAlpha"
+							   class="toolbar-toggle"
+							   style="background-image: resource(&apos;Icons/Texture Icon&apos;);" />
 			<uie:ToolbarSpacer class="toolbar-spacer" />
 			<ui:Label tabindex="-1" display-tooltip-when-elided="true" name="toolbarSearchLabel" class="toolbar-label" />
 			<uie:ToolbarSearchField focusable="true" name="toolbarSearchField" class="toolbar-search-field" />
