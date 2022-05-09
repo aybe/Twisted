@@ -1,3 +1,8 @@
+Graphical bugs
+==============
+- some polygons lack proper color, this is probably due to missing lighting, e.g. XARENA1 fighters posters
+
+
 - see the implications of not checking strict texture page size in ctor
     xarena1
         377924, 
