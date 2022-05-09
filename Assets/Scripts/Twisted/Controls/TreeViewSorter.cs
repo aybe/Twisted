@@ -57,7 +57,7 @@ namespace Twisted.Controls
 
                 // now it's time to restore the selection that was previously made by the user
 
-                View.SetSelectionById(selection.Select(s => builder.GetNodeIdentifier(s)));
+                View.SetSelectionByIdWithoutNotify(selection.Select(s => builder.GetNodeIdentifier(s)));
 
                 // scroll to something or it'll suck, not perfect because of their incompetence
 
