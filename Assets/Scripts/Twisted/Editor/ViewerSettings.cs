@@ -18,19 +18,19 @@ namespace Twisted.Editor
         private bool UseFilterDistinct;
 
         [SerializeField]
-        private bool UseModelTexture;
+        private bool UseModelTexture = true;
 
         [SerializeField]
         private bool UseTextureAlpha = true;
 
         [SerializeField]
-        private bool UseSceneFrame;
+        private bool UseSceneFrame = true;
 
         [SerializeField]
         private bool UseSplitModel;
 
         [SerializeField]
-        private bool UseVertexColors;
+        private bool UseVertexColors = true;
 
         [SerializeField]
         private bool UsePolygonColors;
