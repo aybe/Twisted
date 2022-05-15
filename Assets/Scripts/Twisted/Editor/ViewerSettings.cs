@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Twisted.Editor
 {
-    [FilePath("UserSettings/ViewerSettings.yaml", FilePathAttribute.Location.ProjectFolder)]
     [Serializable]
+    [FilePath("UserSettings/ViewerSettings.asset", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class ViewerSettings : ScriptableSingleton<ViewerSettings>
     {
         [SerializeField]
