@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Twisted.Controls;
 using Twisted.Formats.Database;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -18,9 +17,22 @@ namespace Twisted.Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private ViewerFactory? Factory { get; set; }
+        private static GameObject Container
+        {
+            get
+            {
+                var gameObject = GameObject.Find("DMD Viewer");
 
-        private static ViewerPreview Preview => Singleton<ViewerPreview>.instance;
+                if (gameObject == null)
+                {
+                    gameObject = new GameObject("DMD Viewer") { hideFlags = HideFlags.DontSave };
+                }
+
+                return gameObject;
+            }
+        }
+
+        private ViewerFactory? Factory { get; set; }
 
         private static ViewerSettings Settings => ViewerSettings.instance;
 
@@ -35,7 +47,7 @@ namespace Twisted.Editor
 
         private void OnDestroy()
         {
-            DestroyImmediate(Preview.gameObject); // don't leave garbage on scene
+            DestroyImmediate(Container);
         }
 
         public void CreateGUI()
@@ -255,7 +267,7 @@ namespace Twisted.Editor
         {
             if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
-                EditorApplication.delayCall += () => ViewerUtility.Frame(Preview.gameObject);
+                EditorApplication.delayCall += () => ViewerUtility.Frame(Container);
             }
         }
 
@@ -396,7 +408,8 @@ namespace Twisted.Editor
                 EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
             };
 
-            Preview.ConfigureNodes(
+            ViewerPreview.ConfigureNodes(
+                Container,
                 Factory,
                 e.Items,
                 Settings.EnableFramingProperty.boolValue,

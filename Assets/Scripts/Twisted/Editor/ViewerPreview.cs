@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -11,34 +10,25 @@ using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
-using Debug = UnityEngine.Debug;
-using DMDNode = Twisted.Formats.Database.DMDNode;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
 {
     [ExecuteAlways]
-    [Singleton(Automatic = true)]
-    internal sealed class ViewerPreview : MonoBehaviour, ISingleton
+    internal sealed class ViewerPreview : MonoBehaviour
         // TODO splitting
         // TODO texturing
         // TODO transform
         // TODO there's no need for an MB at all!?
     {
-        private static IReadOnlyDictionary<Type, Color> PolygonColors { get; set; } = null!;
+        private static IReadOnlyDictionary<Type, Color> PolygonColors { get; } = GetPolygonColors();
 
         private static int[] PolygonWinding { get; } = { 2, 1, 0, 2, 3, 1 };
 
-        private void OnEnable()
-        {
-            ConfigurePolygonColors();
-        }
-
-        private static void ConfigurePolygonColors()
+        private static IReadOnlyDictionary<Type, Color> GetPolygonColors()
         {
             var type = typeof(Polygon);
 
@@ -52,11 +42,11 @@ namespace Twisted.Editor
 
             Random.state = state;
 
-            PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
+            return new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        
-        public void ConfigureNodes(ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
+
+        public static void ConfigureNodes(GameObject host, ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -77,7 +67,7 @@ namespace Twisted.Editor
             // generate textures
 
             var texturing = factory.GetTextureAtlas(currentInfos, progress1);
-            
+
             if (texturing.AtlasTexture != null)
                 texturing.AtlasTexture.filterMode = FilterMode.Point;
 
@@ -87,9 +77,9 @@ namespace Twisted.Editor
 
             // cleanup garbage from previous hierarchy if any
 
-            while (transform.childCount > 0)
+            while (host.transform.childCount > 0)
             {
-                DestroyImmediate(transform.GetChild(0).gameObject);
+                DestroyImmediate(host.transform.GetChild(0).gameObject);
             }
 
             // build hierarchy of selected nodes
@@ -98,7 +88,7 @@ namespace Twisted.Editor
 
             foreach (var node in nodes)
             {
-                stack.Push(new KeyValuePair<DMDNode, GameObject>(node, gameObject));
+                stack.Push(new KeyValuePair<DMDNode, GameObject>(node, host));
             }
 
             var nodesProcessed = 0;
@@ -109,7 +99,7 @@ namespace Twisted.Editor
 
                 if (filter && ExcludeFromHierarchy(node))
                     continue;
-                
+
                 progress3?.Report(1.0f / currentNodes * ++nodesProcessed);
 
                 var child = new GameObject($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}")
@@ -129,7 +119,7 @@ namespace Twisted.Editor
 
             if (frame) // TODO move
             {
-                ViewerUtility.Frame(gameObject);
+                ViewerUtility.Frame(host);
             }
         }
 
