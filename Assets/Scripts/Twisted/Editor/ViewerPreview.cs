@@ -10,6 +10,7 @@ using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
@@ -119,7 +120,7 @@ namespace Twisted.Editor
 
             if (frame) // TODO move
             {
-                ViewerUtility.Frame(host);
+                Frame(host);
             }
         }
 
@@ -592,6 +593,30 @@ namespace Twisted.Editor
             Profiler.EndSample();
 
             return mesh;
+        }
+
+        public static void Frame(GameObject gameObject)
+        {
+            if (gameObject == null)
+                throw new ArgumentNullException(nameof(gameObject));
+
+            // this is a consistent framing experience unlike Unity's which may or may not further zoom in/out
+
+            var view = SceneView.lastActiveSceneView;
+
+            if (view == null)
+                return;
+
+            var renderers = gameObject.GetComponentsInChildren<Renderer>();
+            var renderer1 = renderers.FirstOrDefault();
+            var bounds    = renderer1 != null ? renderer1.bounds : new Bounds();
+
+            foreach (var current in renderers)
+            {
+                bounds.Encapsulate(current.bounds);
+            }
+
+            view.Frame(bounds, false);
         }
     }
 }

@@ -267,7 +267,7 @@ namespace Twisted.Editor
         {
             if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
-                EditorApplication.delayCall += () => ViewerUtility.Frame(Container);
+                EditorApplication.delayCall += () => ViewerPreview.Frame(Container);
             }
         }
 
