@@ -12,11 +12,12 @@ resharper_csharp_blank_lines_around_single_line_field = 0
 resharper_csharp_blank_lines_around_single_line_invocable = 1
 resharper_csharp_int_align_comments = true
 resharper_csharp_max_line_length = 200
-resharper_csharp_wrap_after_declaration_lpar = true
+resharper_csharp_wrap_after_declaration_lpar = false
+resharper_csharp_wrap_parameters_style = wrap_if_long
 resharper_int_align_assignments = true
 resharper_int_align_fields = true
 resharper_int_align_invocations = true
-resharper_int_align_parameters = true
+resharper_int_align_parameters = false
 resharper_int_align_switch_expressions = true
 resharper_int_align_variables = true
 resharper_keep_existing_embedded_arrangement = false
@@ -24,6 +25,7 @@ resharper_place_accessorholder_attribute_on_same_line = false
 resharper_place_field_attribute_on_same_line = false
 resharper_place_simple_anonymousmethod_on_single_line = false
 resharper_place_simple_embedded_statement_on_same_line = false
+resharper_wrap_after_declaration_lpar = false
 resharper_xmldoc_max_line_length = 180
 
 

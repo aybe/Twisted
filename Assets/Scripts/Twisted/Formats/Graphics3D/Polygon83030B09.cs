@@ -4,7 +4,6 @@ namespace Twisted.Formats.Graphics3D
 {
     internal sealed class Polygon83030B09 : PolygonGT3
         // TODO unknown int32 @ 12
-        // TODO unknown int32 @ 40 ends with E2
     {
         public Polygon83030B09(BinaryReader reader, int positionVertices)
             : base(reader, 44, 3, positionVertices)
@@ -19,6 +18,8 @@ namespace Twisted.Formats.Graphics3D
 
         protected override int? TextureElements { get; } = 3;
 
-        protected override int? TexturePosition { get; } = 28;
+        protected override int? TextureElementsPosition { get; } = 28;
+
+        protected override int? TextureWindowPosition { get; } = 40;
     }
 }

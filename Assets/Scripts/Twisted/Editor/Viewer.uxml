@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements"
+         xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements"
+         editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+         editor-extension-mode="True">
+    <Style src="Viewer.uss" />
+    <ui:VisualElement class="root">
+        <uie:Toolbar class="toolbar">
+            <uie:ToolbarButton tabindex="-1" display-tooltip-when-elided="true" tooltip="Open an existing DMD file."
+                               name="toolbarOpenFile" class="toolbar-button"
+                               style="background-image: resource(&apos;Icons/Folder&apos;);" />
+            <uie:ToolbarSpacer />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon-level generation (slow)." name="toolbarModelSplitting"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid&apos;);" />
+            <uie:ToolbarSpacer />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable texture." name="toolbarTexturing" class="toolbar-toggle"
+                               style="background-image: resource(&apos;Icons/Texture2D&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable texture alpha."
+                               name="toolbarTextureAlpha" class="toolbar-toggle"
+                               style="background-image: resource(&apos;Icons/Texture&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable vertex colors." name="toolbarVertexColors"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon colors." name="toolbarPolygonColoring"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
+            <uie:ToolbarSpacer />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable filtering of miscellaneous nodes." name="toolbarNodeFilter"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Filter&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable distinct nodes for search mode."
+                               name="toolbarDistinctFiltering"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/FilterByType&apos;);" />
+            <uie:ToolbarSpacer />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable selection framing." name="toolbarSelectionFraming"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Camera&apos;);" />
+            <uie:ToolbarSpacer class="toolbar-spacer" />
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="toolbarSearchLabel" class="toolbar-label" />
+            <uie:ToolbarSearchField focusable="true" name="toolbarSearchField" class="toolbar-search-field" />
+        </uie:Toolbar>
+        <Twisted.Editor.ViewerTreeView focusable="true" />
+    </ui:VisualElement>
+</ui:UXML>

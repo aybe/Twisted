@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -11,32 +10,26 @@ using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
 using Unity.Mathematics;
-using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
-using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
 {
-    [ExecuteAlways]
-    [Singleton(Automatic = true)]
-    public sealed class DMDViewerPreview : MonoBehaviour, ISingleton
+    internal static class ViewerPreview
         // TODO splitting
         // TODO texturing
         // TODO transform
+        // TODO there's no need for an MB at all!?
     {
-        private static IReadOnlyDictionary<Type, Color> PolygonColors { get; set; } = null!;
+        private static IReadOnlyDictionary<Type, Color> PolygonColors { get; } = GetPolygonColors();
 
         private static int[] PolygonWinding { get; } = { 2, 1, 0, 2, 3, 1 };
 
-        private void OnEnable()
-        {
-            ConfigurePolygonColors();
-        }
-
-        private static void ConfigurePolygonColors()
+        private static IReadOnlyDictionary<Type, Color> GetPolygonColors()
         {
             var type = typeof(Polygon);
 
@@ -50,10 +43,11 @@ namespace Twisted.Editor
 
             Random.state = state;
 
-            PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
+            return new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame, bool split)
+
+        public static void ConfigureNodes(GameObject host, ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -61,37 +55,32 @@ namespace Twisted.Editor
             if (nodes is null)
                 throw new ArgumentNullException(nameof(nodes));
 
-            if (nodes.Any(s => s.Root != nodes.First().Root))
-            {
+            if (nodes.Any(s => s.Root != nodes.First().Root)) // TODO delete
                 throw new ArgumentOutOfRangeException(nameof(nodes), "The nodes must all have the same root node.");
-            }
 
-            var infos1 = nodes.SelectMany(GetTextureInfos).ToArray();
-            var infos2 = infos1.Distinct().ToArray();
+            var currentInfos = nodes.SelectMany(GetTextureInfos).ToArray().Distinct().ToArray();
+            var currentNodes = GetNodeCount(nodes, filter);
 
-            var stopwatch = Stopwatch.StartNew();
-            Profiler.BeginSample("TEX ATLAS");
-            factory.GetTextureAtlas(infos2, out var atlas, out var atlasTexture, out var atlasIndices);
-            Profiler.EndSample();
-            Debug.Log($"Atlas generated in {stopwatch.Elapsed} ({infos1.Length} -> {infos2.Length})");
+            var progress1 = progress == null ? null : new Progress("Texturing", currentInfos.Length, progress);
+            var progress2 = progress == null ? null : new Progress("Debugging", currentInfos.Length, progress);
+            var progress3 = progress == null ? null : new Progress("Hierarchy", currentNodes,        progress);
 
-            var texturing = new DMDTexturing(atlas, atlasIndices, atlasTexture);
+            // generate textures
 
-            if (atlasTexture != null)
-            {
-                atlasTexture.filterMode = FilterMode.Point;
-            }
+            var texturing = factory.GetTextureAtlas(currentInfos, progress1);
 
-            if (atlasTexture != null)
-            {
-                File.WriteAllBytes(".temp/atlas.png", atlasTexture.EncodeToPNG());
-            }
+            if (texturing.AtlasTexture != null)
+                texturing.AtlasTexture.filterMode = FilterMode.Point;
+
+            // generate textures for debugging
+
+            factory.ExportData(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
 
             // cleanup garbage from previous hierarchy if any
 
-            while (transform.childCount > 0)
+            while (host.transform.childCount > 0)
             {
-                DestroyImmediate(transform.GetChild(0).gameObject);
+                Object.DestroyImmediate(host.transform.GetChild(0).gameObject);
             }
 
             // build hierarchy of selected nodes
@@ -100,17 +89,24 @@ namespace Twisted.Editor
 
             foreach (var node in nodes)
             {
-                stack.Push(new KeyValuePair<DMDNode, GameObject>(node, gameObject));
+                stack.Push(new KeyValuePair<DMDNode, GameObject>(node, host));
             }
+
+            var nodesProcessed = 0;
 
             while (stack.Count > 0)
             {
                 var (node, parent) = stack.Pop();
 
-                if (ExcludeFromHierarchy(node))
+                if (filter && ExcludeFromHierarchy(node))
                     continue;
 
-                var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
+                progress3?.Report(1.0f / currentNodes * ++nodesProcessed);
+
+                var child = new GameObject($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}")
+                {
+                    transform = { parent = parent.transform }
+                };
 
                 ConfigureNode(child, node, texturing, split);
 
@@ -120,18 +116,44 @@ namespace Twisted.Editor
                 }
             }
 
-            if (atlas != null)
-            {
-                DestroyImmediate(atlas);
-            }
+            texturing.Dispose();
 
-            if (frame)
+            if (frame) // TODO move
             {
-                SceneViewUtility.Frame(gameObject);
+                Frame(host);
             }
         }
 
-        private static void ConfigureNode(GameObject parent, DMDNode node, DMDTexturing texturing, bool split)
+        private static int GetNodeCount(DMDNode[] nodes, bool filter)
+        {
+            var nodeCount = 0;
+
+            if (filter)
+            {
+                var nodeStack = new Stack<DMDNode>(nodes);
+
+                while (nodeStack.Count > 0)
+                {
+                    var node = nodeStack.Pop();
+
+                    if (ExcludeFromHierarchy(node))
+                        continue;
+
+                    nodeCount++;
+
+                    foreach (var item in node.Cast<DMDNode>().Reverse())
+                        nodeStack.Push(item);
+                }
+            }
+            else
+            {
+                nodeCount = nodes.Sum(s => s.TraverseDfs().Count());
+            }
+
+            return nodeCount;
+        }
+
+        private static void ConfigureNode(GameObject parent, DMDNode node, ViewerTexturing texturing, bool split)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
@@ -141,15 +163,6 @@ namespace Twisted.Editor
 
             if (texturing == null)
                 throw new ArgumentNullException(nameof(texturing));
-
-            var info = node.GetNodeInfo();
-
-            if (info is not null)
-            {
-                Debug.Log(
-                    $"Kind = 0x{node.NodeKind:X4}, Role = 0x{node.NodeRole:X4}, Position = {node.Position}, Info = {info}", parent
-                );
-            }
 
             switch (node)
             {
@@ -166,10 +179,10 @@ namespace Twisted.Editor
                     foreach (var polygons in lists)
                     {
                         var label = split
-                            ? $"Index = {++index}, Type = {polygons.Single().GetType().Name.Replace("Polygon", string.Empty)}, Position = {polygons.Single().Position}"
+                            ? $"Polygon {++index:D3}, Type = 0x{polygons.Single().GetType().Name.Replace("Polygon", string.Empty)}, Position = {polygons.Single().Position}"
                             : parent.name;
 
-                        var child = split ? parent.CreateChild(label) : parent;
+                        var child = split ? new GameObject(label) { transform = { parent = parent.transform } } : parent;
 
                         var mesh = ConfigureModel(node00FF, texturing, polygons);
 
@@ -326,8 +339,8 @@ namespace Twisted.Editor
                                 host.transform.localScale    = Vector3.one;
                                 break;
                             default:
-                                Debug.LogError(
-                                    $"Non-implemented transform for {node.GetType().Name}, " +
+                                Debug.LogWarning(
+                                    $"Transform not implemented for {node.GetType().Name}, " +
                                     $"{nameof(node050B.Position)} = {node050B.Position}, " +
                                     $"{nameof(node050B.Rotation)} = {node050B.Rotation}, " +
                                     $"{nameof(node050B.Vector1)} = {node050B.Vector1}",
@@ -465,7 +478,7 @@ namespace Twisted.Editor
             return infos;
         }
 
-        private static Mesh ConfigureModel(DMDNode00FF node, DMDTexturing texturing, IReadOnlyList<Polygon> polygons)
+        private static Mesh ConfigureModel(DMDNode00FF node, ViewerTexturing texturing, IReadOnlyList<Polygon> polygons)
         {
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
@@ -487,7 +500,7 @@ namespace Twisted.Editor
 
                 foreach (var polygon in group)
                 {
-                    var polygonColor = PolygonColors![polygon.GetType()];
+                    var polygonColor = PolygonColors[polygon.GetType()];
 
                     for (var i = 0; i < polygon.Vertices.Count / 2; i++)
                     {
@@ -498,11 +511,11 @@ namespace Twisted.Editor
 
                             var vertex = polygon.Vertices[l];
 
-                            Profiler.BeginSample($"{nameof(DMDViewerPreview)} get vertex");
+                            Profiler.BeginSample($"{nameof(ViewerPreview)} get vertex");
                             vertices.Add(math.transform(matrix, new Vector3(vertex.X, vertex.Y, vertex.Z)));
                             Profiler.EndSample();
 
-                            Profiler.BeginSample($"{nameof(DMDViewerPreview)} get color");
+                            Profiler.BeginSample($"{nameof(ViewerPreview)} get color");
                             var color1 = polygon.Colors is null
                                 ? default(Color?)
                                 : polygon.Colors.Count switch
@@ -531,7 +544,7 @@ namespace Twisted.Editor
 
                                 var uv = polygon.TextureUVs[l];
 
-                                Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
+                                Profiler.BeginSample($"{nameof(ViewerPreview)} get UV");
                                 uvs.Add(texturing.Atlas.GetUV(index, uv, false, TextureTransform.FlipY));
                                 Profiler.EndSample();
                             }
@@ -569,7 +582,7 @@ namespace Twisted.Editor
                 meshes.Add(subMesh);
             }
 
-            Profiler.BeginSample($"{nameof(DMDViewerPreview)} combine meshes");
+            Profiler.BeginSample($"{nameof(ViewerPreview)} combine meshes");
 
             var combine = meshes.Select(s => new CombineInstance { mesh = s }).ToArray();
 
@@ -582,23 +595,28 @@ namespace Twisted.Editor
             return mesh;
         }
 
-        private sealed class DMDTexturing
+        public static void Frame(GameObject gameObject)
         {
-            public DMDTexturing(
-                TextureAtlas                          atlas,
-                IReadOnlyDictionary<TextureInfo, int> atlasIndices,
-                Texture2D                             atlasTexture)
+            if (gameObject == null)
+                throw new ArgumentNullException(nameof(gameObject));
+
+            // this is a consistent framing experience unlike Unity's which may or may not further zoom in/out
+
+            var view = SceneView.lastActiveSceneView;
+
+            if (view == null)
+                return;
+
+            var renderers = gameObject.GetComponentsInChildren<Renderer>();
+            var renderer1 = renderers.FirstOrDefault();
+            var bounds    = renderer1 != null ? renderer1.bounds : new Bounds();
+
+            foreach (var current in renderers)
             {
-                Atlas        = atlas;
-                AtlasIndices = atlasIndices;
-                AtlasTexture = atlasTexture;
+                bounds.Encapsulate(current.bounds);
             }
 
-            public TextureAtlas Atlas { get; }
-
-            public IReadOnlyDictionary<TextureInfo, int> AtlasIndices { get; }
-
-            public Texture2D AtlasTexture { get; }
+            view.Frame(bounds, false);
         }
     }
 }

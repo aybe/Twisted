@@ -4,6 +4,9 @@ Shader "Twisted/DMDViewer"
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 
+		[HideInInspector]
+		_Cutoff("Alpha cutoff", Range(0, 1)) = 0.5
+
 		[Enum(UnityEngine.Rendering.CullMode)]
 		_Cull ("Cull", Int) = 0
 	}
@@ -11,7 +14,7 @@ Shader "Twisted/DMDViewer"
 	{
 		Tags
 		{
-			"RenderType"="Opaque"
+			"Queue"="AlphaTest" "IgnoreProjector"="True" "RenderType"="TransparentCutout"
 		}
 		LOD 100
 		Cull[_Cull]
@@ -27,6 +30,7 @@ Shader "Twisted/DMDViewer"
 			#pragma multi_compile _ DMD_VIEWER_TEXTURE
 			#pragma multi_compile _ DMD_VIEWER_COLOR_VERTEX
 			#pragma multi_compile _ DMD_VIEWER_COLOR_POLYGON
+			#pragma multi_compile _ DMD_VIEWER_COLOR_ALPHA
 
 			#include "UnityCG.cginc"
 
@@ -60,6 +64,7 @@ Shader "Twisted/DMDViewer"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
+			fixed _Cutoff;
 
 			v2f vert(appdata v)
 			{
@@ -91,6 +96,10 @@ Shader "Twisted/DMDViewer"
 
 #if DMD_VIEWER_COLOR_POLYGON
 				col *= i.uv2;
+#endif
+
+#if DMD_VIEWER_COLOR_ALPHA
+				clip(col.a - _Cutoff);
 #endif
 
 				return col;

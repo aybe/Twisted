@@ -1,4 +1,5 @@
 ﻿// #define DMD_DEBUG_POLYGON_COLOR // TODO this should be toggleable from editor
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -130,6 +131,11 @@ namespace Twisted.Formats.Graphics3D
 
         public long Length { get; }
 
+        public byte[] GetObjectData()
+        {
+            return Data.ToArray();
+        }
+
         public override string ToString()
         {
             return $"{nameof(Type)}: 0x{Type:X8}, {nameof(Position)}: {Position}, {nameof(Length)}: {Length}, {nameof(Vertices)}: {Vertices.Count}, {nameof(Normals)}: {Normals.Count}";
@@ -190,7 +196,9 @@ namespace Twisted.Formats.Graphics3D
 
         protected virtual int? TextureElements { get; } = null;
 
-        protected virtual int? TexturePosition { get; } = null;
+        protected virtual int? TextureElementsPosition { get; } = null;
+        
+        protected virtual int? TextureWindowPosition { get; } = null;
 
         public TextureInfo? TextureInfo => TryReadTextureInfo();
 
@@ -199,13 +207,13 @@ namespace Twisted.Formats.Graphics3D
         private TextureInfo? TryReadTextureInfo()
         {
             var elements = TextureElements;
-            var position = TexturePosition;
+            var position = TextureElementsPosition;
 
             if (elements is null && position is null)
                 return null;
 
             if (elements is null != position is null)
-                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TextureElementsPosition)} must be overridden.");
 
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
@@ -213,34 +221,38 @@ namespace Twisted.Formats.Graphics3D
             var dataMax = Data.Length - 8;
 
             if (position!.Value > dataMax)
-                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+                throw new ArgumentOutOfRangeException($"{nameof(TextureElementsPosition)} must be less than or equal to {dataMax}.");
 
             var paletteRaw = Data.ReadInt16(position.Value + 2, Endianness.LE);
             var paletteX   = (paletteRaw & 0b00000000_00111111) * 16;
             var paletteY   = (paletteRaw & 0b01111111_11000000) / 64;
-            var palette    = new Vector2Int(paletteX, paletteY);
+            var palette    = new TexturePalette(paletteX, paletteY);
 
-            var pageRaw     = Data.ReadInt32(position.Value + 6, Endianness.LE);
+            var pageRaw     = Data.ReadInt16(position.Value + 6, Endianness.LE);
             var pageX       = (pageRaw & 0b_00000000_00001111) * 64;
             var pageY       = (pageRaw & 0b_00000000_00010000) / 16 * 256;
             var pageAlpha   = (pageRaw & 0b_00000000_01100000) / 32;
             var pageColors  = (pageRaw & 0b_00000001_10000000) / 128;
             var pageDisable = (pageRaw & 0b_00001000_00000000) / 1024;
-            var page        = new TexturePage(new Vector2Int(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
+            var page        = new TexturePage(new TexturePosition(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
 
-            return new TextureInfo(page, palette);
+            var window = TextureWindowPosition.HasValue 
+                ? new TextureWindow(Data.ReadInt32(TextureWindowPosition.Value, Endianness.LE)) 
+                : default(TextureWindow?);
+
+            return new TextureInfo(page, palette, window);
         }
 
         private IReadOnlyList<Vector2Int>? TryReadTextureUVs()
         {
             var elements = TextureElements;
-            var position = TexturePosition;
+            var position = TextureElementsPosition;
 
             if (elements is null && position is null)
                 return null;
 
             if (elements is null != position is null)
-                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TexturePosition)} must be overridden.");
+                throw new InvalidOperationException($"Both {nameof(TextureElements)} and {nameof(TextureElementsPosition)} must be overridden.");
 
             if (elements!.Value is not (3 or 4))
                 throw new InvalidDataException($"{nameof(TextureElements)} must be 3 or 4.");
@@ -248,7 +260,7 @@ namespace Twisted.Formats.Graphics3D
             var dataMax = Data.Length - elements.Value * 4;
 
             if (position!.Value > dataMax)
-                throw new ArgumentOutOfRangeException($"{nameof(TexturePosition)} must be less than or equal to {dataMax}.");
+                throw new ArgumentOutOfRangeException($"{nameof(TextureElementsPosition)} must be less than or equal to {dataMax}.");
 
             var uvs = new Vector2Int[elements.Value];
 

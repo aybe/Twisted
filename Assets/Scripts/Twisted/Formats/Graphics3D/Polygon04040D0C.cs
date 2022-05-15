@@ -19,6 +19,6 @@ namespace Twisted.Formats.Graphics3D
 
         protected override int? TextureElements { get; } = 4;
 
-        protected override int? TexturePosition { get; } = 32;
+        protected override int? TextureElementsPosition { get; } = 32;
     }
 }

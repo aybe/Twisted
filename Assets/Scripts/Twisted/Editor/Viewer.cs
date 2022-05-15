@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using Twisted.Controls;
 using Twisted.Formats.Database;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -14,68 +13,34 @@ using UnityEngine.UIElements;
 
 namespace Twisted.Editor
 {
-    public sealed partial class DMDViewer : EditorWindow
+    public sealed partial class Viewer : EditorWindow
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private List<DMDNode> Breadcrumbs { get; } = new();
+        private static GameObject Container
+        {
+            get
+            {
+                var gameObject = GameObject.Find("DMD Viewer");
 
-        private DMDViewerFactory? Factory { get; set; }
+                if (gameObject == null)
+                {
+                    gameObject = new GameObject("DMD Viewer") { hideFlags = HideFlags.DontSave };
+                }
 
-        private static DMDViewerPreview Preview => Singleton<DMDViewerPreview>.instance;
+                return gameObject;
+            }
+        }
 
-        private static DMDViewerSettings Settings => DMDViewerSettings.instance;
+        private DMD? Database { get; set; }
+
+        private ViewerFactory? Factory { get; set; }
+
+        private static ViewerSettings Settings => ViewerSettings.instance;
 
         private void OnDisable()
         {
-            rootVisualElement
-                .UnregisterCallback<KeyDownEvent>(
-                    OnRootVisualKeyDown
-                );
-
-            ToolbarOpenFile.clicked -= OnToolbarOpenFile;
-
-            ToolbarDistinctFiltering
-                .UnregisterValueChangedCallback(
-                    OnToolbarDistinctFilteringValueChanged
-                );
-
-            ToolbarSelectionFraming
-                .UnregisterValueChangedCallback(
-                    OnToolbarSelectionFramingValueChanged
-                );
-
-            ToolbarModelSplitting
-                .UnregisterValueChangedCallback(
-                    OnToolbarModelSplittingValueChanged
-                );
-
-            ToolbarTexturing
-                .UnregisterValueChangedCallback(
-                    OnToolbarTexturingValueChanged
-                );
-
-            ToolbarVertexColors
-                .UnregisterValueChangedCallback(
-                    OnToolbarVertexColorsValueChanged
-                );
-
-            ToolbarPolygonColoring
-                .UnregisterValueChangedCallback(
-                    OnToolbarPolygonColoringValueChanged
-                );
-
-            ToolbarSearchField
-                .UnregisterValueChangedCallback(
-                    OnToolbarSearchFieldValueChanged
-                );
-
-            ToolbarSearchField
-                .UnregisterCallback<KeyDownEvent>(
-                    OnToolbarSearchFieldKeyDown
-                );
-
             TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
 
             TreeView.Dispose();
@@ -85,7 +50,7 @@ namespace Twisted.Editor
 
         private void OnDestroy()
         {
-            DestroyImmediate(Preview.gameObject); // don't leave garbage on scene
+            DestroyImmediate(Container);
         }
 
         public void CreateGUI()
@@ -100,12 +65,6 @@ namespace Twisted.Editor
         }
 
         #region Initialization/cleanup
-
-        [MenuItem("Twisted/DMD Viewer (UI Elements)")]
-        private static void InitializeWindow()
-        {
-            GetWindow<DMDViewer>();
-        }
 
         private void InitializeRootVisual()
         {
@@ -134,12 +93,14 @@ namespace Twisted.Editor
 
         private void InitializeToolbarToggles()
         {
-            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.UseFilterDistinctProperty, OnToolbarDistinctFilteringValueChanged);
-            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
-            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
-            InitializeToolbarToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
-            InitializeToolbarToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
-            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
+            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.EnableFilteredSearchProperty,    OnToolbarDistinctFilteringValueChanged);
+            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.EnableFramingProperty,           OnToolbarSelectionFramingValueChanged);
+            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.EnablePolygonGenerationProperty, OnToolbarModelSplittingValueChanged);
+            InitializeToolbarToggle(ToolbarTexturing,         Settings.EnableTextureProperty,           OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarTextureAlpha,      Settings.EnableTextureAlphaProperty,      OnToolbarTextureAlphaValueChanged);
+            InitializeToolbarToggle(ToolbarVertexColors,      Settings.EnableVertexColorsProperty,      OnToolbarVertexColorsValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.EnablePolygonColorsProperty,     OnToolbarPolygonColoringValueChanged);
+            InitializeToolbarToggle(ToolbarNodeFilter,        Settings.EnableFilteredNodesProperty,     OnToolbarNodeFilterValueChanged);
         }
 
         private static void InitializeToolbarToggle(
@@ -176,11 +137,11 @@ namespace Twisted.Editor
 
         private void InitializeTreeView()
         {
-            TreeView.selectionType = SelectionType.Single;
+            TreeView.selectionType = SelectionType.Multiple;
 
             TreeView.sortingEnabled = true;
 
-            TreeView.SetColumns(DMDViewerTreeView.GetColumns());
+            TreeView.SetColumns(ViewerTreeView.GetColumns());
 
             TreeView.SelectionChanged += OnTreeViewSelectionChanged;
 
@@ -208,9 +169,19 @@ namespace Twisted.Editor
         {
             var path = Settings.LastDatabaseProperty.stringValue;
 
-            if (File.Exists(path))
+            if (!File.Exists(path))
+                return;
+
+            using (var stream = new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, "DMD"))))
+            using (var reader = new BinaryReader(stream))
             {
-                Factory = DMDViewerFactory.Create(path);
+                Database = new DMD(reader);
+            }
+
+            using (var stream = new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, "TMS"))))
+            using (var reader = new BinaryReader(stream))
+            {
+                Factory = new ViewerFactory(reader);
             }
         }
 
@@ -218,9 +189,7 @@ namespace Twisted.Editor
         {
             // try populate the tree
 
-            var dmd = Factory?.DMD;
-
-            TreeView.RootNode = dmd;
+            TreeView.RootNode = Database;
 
             TreeView.Rebuild();
 
@@ -232,18 +201,11 @@ namespace Twisted.Editor
 
             // show or hide tree depending DMD, because dumb ass tree will NRE if clicked but empty
 
-            var visible = dmd is not null;
-
-            TreeView.visible = visible;
-
-            ToolbarBreadcrumbsHost.visible = visible;
-
-            ToolbarBreadcrumbsHost.style.display = DisplayStyle.None; // TODO remove as it's useless
+            TreeView.visible = Database is not null;
 
             // finally, update our controls
 
             UpdateSearchLabel();
-            UpdateBreadcrumbs();
         }
 
         private void UpdateTitle()
@@ -256,50 +218,20 @@ namespace Twisted.Editor
             };
         }
 
-        private void UpdateBreadcrumbs()
-        {
-            // update breadcrumbs: clicking, elements, node stack
-
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-            }
-
-            while (ToolbarBreadcrumbs.childCount > 0)
-            {
-                ToolbarBreadcrumbs.PopItem();
-                Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
-            }
-
-            var current = TreeView.selectedItem as DMDNode;
-
-            while (current != null)
-            {
-                Breadcrumbs.Insert(0, current);
-                current = current.Parent as DMDNode;
-
-                if (!string.IsNullOrWhiteSpace(ToolbarSearchField.value))
-                    current = null;
-            }
-
-            foreach (var item in Breadcrumbs)
-            {
-                ToolbarBreadcrumbs.PushItem($"0x{item.NodeType:X8}");
-            }
-
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.RegisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-            }
-        }
-
         private void UpdateSearchLabel()
         {
             var count = TreeView.GetRowCount();
 
             ToolbarSearchLabel.text = count is 0 ? string.Empty : $"{count} item{(count is not 1 ? "s" : string.Empty)}";
+        }
+
+        private void UpdateSelection()
+        {
+            var selection = TreeView.GetSelection();
+            if (selection.Any())
+            {
+                TreeView.SetSelection(selection);
+            }
         }
 
         #endregion
@@ -342,15 +274,15 @@ namespace Twisted.Editor
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
-            if (Settings.UseSceneFrameProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
+            if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
-                EditorApplication.delayCall += () => SceneViewUtility.Frame(Preview.gameObject);
+                EditorApplication.delayCall += () => ViewerPreview.Frame(Container);
             }
         }
 
         private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
         {
-            TreeView.SearchFilterComparer = evt.newValue ? DMDViewerComparer.Instance : null;
+            TreeView.SearchFilterComparer = evt.newValue ? ViewerComparer.Instance : null;
             TreeView.Rebuild();
 
             UpdateSearchLabel();
@@ -358,13 +290,19 @@ namespace Twisted.Editor
 
         private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
         {
-            TreeView.SetSelection(TreeView.GetSelection());
+            UpdateSelection();
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
         private void OnToolbarTexturingValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_TEXTURE"), evt.newValue);
+        }
+
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
+        private void OnToolbarTextureAlphaValueChanged(ChangeEvent<bool> evt)
+        {
+            Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_ALPHA"), evt.newValue);
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
@@ -377,6 +315,11 @@ namespace Twisted.Editor
         private void OnToolbarPolygonColoringValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON"), evt.newValue);
+        }
+
+        private void OnToolbarNodeFilterValueChanged(ChangeEvent<bool> evt)
+        {
+            UpdateSelection();
         }
 
         private void OnToolbarSearchFieldKeyDown(KeyDownEvent evt)
@@ -436,30 +379,6 @@ namespace Twisted.Editor
             }
 
             UpdateSearchLabel();
-            UpdateBreadcrumbs();
-        }
-
-        private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
-        {
-            // update breadcrumbs: clicking, elements, node stack
-
-            var target = evt.target as VisualElement ?? throw new InvalidOperationException();
-            var parent = target.parent;
-            var index  = parent.IndexOf(target);
-
-            for (var i = Breadcrumbs.Count - 1; i > index; i--)
-            {
-                var element = parent.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-                ToolbarBreadcrumbs.PopItem();
-                Breadcrumbs.RemoveAt(i);
-            }
-
-            // sync tree view selection with clicked breadcrumbs
-
-            var node = Breadcrumbs[index];
-
-            TreeView.SelectNode(node, true, true);
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
@@ -487,20 +406,34 @@ namespace Twisted.Editor
             if (Factory is null)
                 return;
 
-            UpdateBreadcrumbs();
+            // no task here is overall better: progress bar modal behavior is kept, no context switch to call onto Unity API
 
-            Preview.ConfigureNodes(
+            var progress = new Progress();
+
+            progress.ProgressChanged += (_, args) =>
+            {
+                var percent1 = args.Leaf.GetProgress();
+                var percent2 = args.Head.GetProgress();
+                EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
+            };
+
+            ViewerPreview.ConfigureNodes(
+                Container,
                 Factory,
                 e.Items,
-                Settings.UseSceneFrameProperty.boolValue,
-                Settings.UseSplitModelProperty.boolValue
+                Settings.EnableFramingProperty.boolValue,
+                Settings.EnablePolygonGenerationProperty.boolValue,
+                Settings.EnableFilteredNodesProperty.boolValue,
+                progress
             );
+
+            EditorUtility.ClearProgressBar();
         }
 
         #endregion
     }
 
-    public sealed partial class DMDViewer
+    public sealed partial class Viewer
     {
         #region Controls
 
@@ -519,11 +452,17 @@ namespace Twisted.Editor
         private ToolbarToggle ToolbarTexturing =>
             rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
 
+        private ToolbarToggle ToolbarTextureAlpha =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTextureAlpha");
+
         private ToolbarToggle ToolbarVertexColors =>
             rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");
 
         private ToolbarToggle ToolbarPolygonColoring =>
             rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColoring");
+
+        private ToolbarToggle ToolbarNodeFilter =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarNodeFilter");
 
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
@@ -531,15 +470,27 @@ namespace Twisted.Editor
         private ToolbarSearchField ToolbarSearchField =>
             rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
 
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
-            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
-
-        private Toolbar ToolbarBreadcrumbsHost =>
-            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
-
-        private DMDViewerTreeView TreeView =>
-            rootVisualElement.Q<DMDViewerTreeView>();
+        private ViewerTreeView TreeView =>
+            rootVisualElement.Q<ViewerTreeView>();
 
         #endregion
+    }
+
+    public sealed partial class Viewer
+    {
+        private sealed class ViewerComparer : EqualityComparer<DMDNode>
+        {
+            public static EqualityComparer<DMDNode> Instance { get; } = new ViewerComparer();
+
+            public override bool Equals(DMDNode x, DMDNode y)
+            {
+                return x.Position.Equals(y.Position);
+            }
+
+            public override int GetHashCode(DMDNode obj)
+            {
+                return obj.Position.GetHashCode();
+            }
+        }
     }
 }

@@ -48,8 +48,7 @@ namespace Twisted.Formats.Database
 
         protected virtual uint BaseAddress => (Root as DMDNode)!.BaseAddress;
 
-        [SuppressMessage("ReSharper", "ReturnTypeCanBeEnumerable.Global")]
-        public IReadOnlyList<byte> GetObjectData()
+        public byte[] GetObjectData()
         {
             return ObjectData.ToArray();
         }

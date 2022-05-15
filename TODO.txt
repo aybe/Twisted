@@ -1,3 +1,65 @@
+bug split model multi selection fails
+
+all progress nodes should be computed first so that pbar is split
+not all nodes go to 100%
+
+tree click should show progress bar
+	task/thread switch
+
+tree when maximized screws everything
+
+add buttons
+	generate atlas every time
+	filter hierarchy
+
+fix transform
+
+fix messages/comments
+
+test project
+
+general cleanup
+
+## Unity bugs
+
+### General
+
+On some occasions, focused control won't be anymore as soon as a keyboard key is pressed.
+
+## Tree view
+
+When holding the Alt key to recursively expand a tree node, it will get selected as well.
+
+A node can only be fully revealed using the mouse wheel, no when using the keyboard.
+
+Horizontal scroll bar constantly flickers.
+
+
+## Project bugs
+
+When rendering a very large DMD file in its entirety, some textures suddenly become incorrect. This is most probably because the texture information present in polygons is lacking some information for extra differentiation.
+
+Transparency among the different types of polygons hasn't been addressed yet. This will cause polygons ought to be opaque to be rendered as transparent and therefore will show a lot of holes in black regions.
+
+There is a lot of Z-fighting as many objects are in the same exact position. The ordering tables of the game haven't been figured out and are unlikely to be in the near future.
+
+The different transformation matrices have such a weird logic that currently it isn't possible to process them in a generic way. Consequently, non-handled transforms are reported in the console and these objects will be improperly positioned in the scene.
+
+The weird logic of LOD...
+
+Even though rendering a whole level won't report unhandled transforms, chunks of objects are still apart from each other;
+
+The sprites.
+
+sprites buried in buildings
+
+Some models have holes in them
+
+Graphical bugs
+==============
+- some polygons lack proper color, this is probably due to missing lighting, e.g. XARENA1 fighters posters
+
+
 - see the implications of not checking strict texture page size in ctor
     xarena1
         377924, 
