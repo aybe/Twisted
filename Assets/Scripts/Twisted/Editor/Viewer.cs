@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -18,8 +17,6 @@ namespace Twisted.Editor
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
-
-        private List<DMDNode> Breadcrumbs { get; } = new();
 
         private ViewerFactory? Factory { get; set; }
 
@@ -237,14 +234,9 @@ namespace Twisted.Editor
 
             TreeView.visible = visible;
 
-            ToolbarBreadcrumbsHost.visible = visible;
-
-            ToolbarBreadcrumbsHost.style.display = DisplayStyle.None; // TODO remove as it's useless
-
             // finally, update our controls
 
             UpdateSearchLabel();
-            UpdateBreadcrumbs();
         }
 
         private void UpdateTitle()
@@ -255,45 +247,6 @@ namespace Twisted.Editor
             {
                 text = File.Exists(path) ? Path.GetFileName(path) : "DMD Viewer"
             };
-        }
-
-        private void UpdateBreadcrumbs()
-        {
-            // update breadcrumbs: clicking, elements, node stack
-
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-            }
-
-            while (ToolbarBreadcrumbs.childCount > 0)
-            {
-                ToolbarBreadcrumbs.PopItem();
-                Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
-            }
-
-            var current = TreeView.selectedItem as DMDNode;
-
-            while (current != null)
-            {
-                Breadcrumbs.Insert(0, current);
-                current = current.Parent as DMDNode;
-
-                if (!string.IsNullOrWhiteSpace(ToolbarSearchField.value))
-                    current = null;
-            }
-
-            foreach (var item in Breadcrumbs)
-            {
-                ToolbarBreadcrumbs.PushItem($"0x{item.NodeType:X8}");
-            }
-
-            for (var i = 0; i < ToolbarBreadcrumbs.childCount; i++)
-            {
-                var element = ToolbarBreadcrumbs.ElementAt(i);
-                element.RegisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-            }
         }
 
         private void UpdateSearchLabel()
@@ -457,30 +410,6 @@ namespace Twisted.Editor
             }
 
             UpdateSearchLabel();
-            UpdateBreadcrumbs();
-        }
-
-        private void OnToolbarBreadcrumbsItemClick(ClickEvent evt)
-        {
-            // update breadcrumbs: clicking, elements, node stack
-
-            var target = evt.target as VisualElement ?? throw new InvalidOperationException();
-            var parent = target.parent;
-            var index  = parent.IndexOf(target);
-
-            for (var i = Breadcrumbs.Count - 1; i > index; i--)
-            {
-                var element = parent.ElementAt(i);
-                element.UnregisterCallback<ClickEvent>(OnToolbarBreadcrumbsItemClick);
-                ToolbarBreadcrumbs.PopItem();
-                Breadcrumbs.RemoveAt(i);
-            }
-
-            // sync tree view selection with clicked breadcrumbs
-
-            var node = Breadcrumbs[index];
-
-            TreeView.SelectNode(node, true, true);
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
@@ -507,8 +436,6 @@ namespace Twisted.Editor
         {
             if (Factory is null)
                 return;
-
-            UpdateBreadcrumbs();
 
             // no task here is overall better: progress bar modal behavior is kept, no context switch to call onto Unity API
 
@@ -572,12 +499,6 @@ namespace Twisted.Editor
 
         private ToolbarSearchField ToolbarSearchField =>
             rootVisualElement.Q<ToolbarSearchField>("toolbarSearchField");
-
-        private ToolbarBreadcrumbs ToolbarBreadcrumbs =>
-            rootVisualElement.Q<ToolbarBreadcrumbs>("toolbarBreadcrumbs");
-
-        private Toolbar ToolbarBreadcrumbsHost =>
-            rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
 
         private ViewerTreeView TreeView =>
             rootVisualElement.Q<ViewerTreeView>();

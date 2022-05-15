@@ -34,9 +34,6 @@
             <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="toolbarSearchLabel" class="toolbar-label" />
             <uie:ToolbarSearchField focusable="true" name="toolbarSearchField" class="toolbar-search-field" />
         </uie:Toolbar>
-        <uie:Toolbar name="toolbarBreadcrumbsHost">
-            <uie:ToolbarBreadcrumbs name="toolbarBreadcrumbs" />
-        </uie:Toolbar>
         <Twisted.Editor.ViewerTreeView focusable="true" />
     </ui:VisualElement>
 </ui:UXML>
