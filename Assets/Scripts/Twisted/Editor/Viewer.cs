@@ -305,7 +305,11 @@ namespace Twisted.Editor
 
         private void UpdateSelection()
         {
-            TreeView.SetSelection(TreeView.GetSelection());
+            var selection = TreeView.GetSelection();
+            if (selection.Any())
+            {
+                TreeView.SetSelection(selection);
+            }
         }
 
         #endregion
@@ -517,11 +521,9 @@ namespace Twisted.Editor
                 EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
             };
 
-            var nodes = e.Items;
-
             Preview.ConfigureNodes(
-                Factory!,
-                nodes,
+                Factory,
+                e.Items,
                 Settings.UseSceneFrameProperty.boolValue,
                 Settings.UseSplitModelProperty.boolValue,
                 Settings.UseNodeFilterProperty.boolValue,
