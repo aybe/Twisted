@@ -16,6 +16,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
+using DMDNode = Twisted.Formats.Database.DMDNode;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
@@ -54,7 +55,8 @@ namespace Twisted.Editor
             PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, Progress? progress = null)
+        
+        public void ConfigureNodes(ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -66,7 +68,7 @@ namespace Twisted.Editor
                 throw new ArgumentOutOfRangeException(nameof(nodes), "The nodes must all have the same root node.");
 
             var currentInfos = nodes.SelectMany(GetTextureInfos).ToArray().Distinct().ToArray();
-            var currentNodes = nodes.Sum(s => s.TraverseDfs().Count());
+            var currentNodes = GetNodeCount(nodes, filter);
 
             var progress1 = progress == null ? null : new Progress("Texturing", currentInfos.Length, progress);
             var progress2 = progress == null ? null : new Progress("Debugging", currentInfos.Length, progress);
@@ -99,18 +101,16 @@ namespace Twisted.Editor
                 stack.Push(new KeyValuePair<DMDNode, GameObject>(node, gameObject));
             }
 
-            var progressNodesCount = 0;
+            var nodesProcessed = 0;
 
             while (stack.Count > 0)
             {
-                progress3?.Report(1.0f / currentNodes * ++progressNodesCount);
-
                 var (node, parent) = stack.Pop();
 
-                if (ExcludeFromHierarchy(node))
-                {
-                    // continue; // TODO not working with progress reporting
-                }
+                if (filter && ExcludeFromHierarchy(node))
+                    continue;
+                
+                progress3?.Report(1.0f / currentNodes * ++nodesProcessed);
 
                 var child = new GameObject($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}")
                 {
@@ -131,6 +131,35 @@ namespace Twisted.Editor
             {
                 ViewerUtility.Frame(gameObject);
             }
+        }
+
+        private static int GetNodeCount(DMDNode[] nodes, bool filter)
+        {
+            var nodeCount = 0;
+
+            if (filter)
+            {
+                var nodeStack = new Stack<DMDNode>(nodes);
+
+                while (nodeStack.Count > 0)
+                {
+                    var node = nodeStack.Pop();
+
+                    if (ExcludeFromHierarchy(node))
+                        continue;
+
+                    nodeCount++;
+
+                    foreach (var item in node.Cast<DMDNode>().Reverse())
+                        nodeStack.Push(item);
+                }
+            }
+            else
+            {
+                nodeCount = nodes.Sum(s => s.TraverseDfs().Count());
+            }
+
+            return nodeCount;
         }
 
         private static void ConfigureNode(GameObject parent, DMDNode node, ViewerTexturing texturing, bool split)

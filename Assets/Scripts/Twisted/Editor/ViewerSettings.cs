@@ -35,6 +35,9 @@ namespace Twisted.Editor
         [SerializeField]
         private bool UsePolygonColors;
 
+        [SerializeField]
+        private bool UseNodeFilter;
+
         public SerializedObject SerializedObject { get; private set; } = null!;
 
         public SerializedProperty LastDatabaseProperty { get; private set; } = null!;
@@ -54,6 +57,8 @@ namespace Twisted.Editor
         public SerializedProperty UseSplitModelProperty { get; private set; } = null!;
 
         public SerializedProperty UseVertexColorsProperty { get; private set; } = null!;
+
+        public SerializedProperty UseNodeFilterProperty { get; private set; } = null!;
 
         private void OnEnable()
         {
@@ -75,6 +80,7 @@ namespace Twisted.Editor
             UseSplitModelProperty     = SerializedObject.FindProperty(nameof(UseSplitModel));
             UseVertexColorsProperty   = SerializedObject.FindProperty(nameof(UseVertexColors));
             UsePolygonColorsProperty  = SerializedObject.FindProperty(nameof(UsePolygonColors));
+            UseNodeFilterProperty     = SerializedObject.FindProperty(nameof(UseNodeFilter));
         }
 
         public void Save()
