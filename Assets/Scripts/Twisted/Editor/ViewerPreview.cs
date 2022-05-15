@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
 {
-    internal sealed class ViewerPreview
+    internal static class ViewerPreview
         // TODO splitting
         // TODO texturing
         // TODO transform
