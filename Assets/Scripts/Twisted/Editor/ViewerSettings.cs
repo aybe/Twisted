@@ -25,7 +25,7 @@ namespace Twisted.Editor
         private bool EnableTextureAlpha = true;
 
         [SerializeField]
-        private bool EnableVertexColors = true;
+        private bool EnableVertexColors;
 
         [SerializeField]
         private bool EnablePolygonColors;
