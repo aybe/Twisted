@@ -22,10 +22,11 @@ namespace Twisted.Editor
 {
     [ExecuteAlways]
     [Singleton(Automatic = true)]
-    public sealed class DMDViewerPreview : MonoBehaviour, ISingleton
+    internal sealed class DMDViewerPreview : MonoBehaviour, ISingleton
         // TODO splitting
         // TODO texturing
         // TODO transform
+        // TODO there's no need for an MB at all!?
     {
         private static IReadOnlyDictionary<Type, Color> PolygonColors { get; set; } = null!;
 
@@ -53,7 +54,7 @@ namespace Twisted.Editor
             PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame, bool split)
+        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame, bool split, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -61,26 +62,30 @@ namespace Twisted.Editor
             if (nodes is null)
                 throw new ArgumentNullException(nameof(nodes));
 
-            if (nodes.Any(s => s.Root != nodes.First().Root))
-            {
+            if (nodes.Any(s => s.Root != nodes.First().Root)) // TODO delete
                 throw new ArgumentOutOfRangeException(nameof(nodes), "The nodes must all have the same root node.");
-            }
 
-            var infos1 = nodes.SelectMany(GetTextureInfos).ToArray();
-            var infos2 = infos1.Distinct().ToArray();
+            var currentInfos = nodes.SelectMany(GetTextureInfos).ToArray().Distinct().ToArray();
+            var currentNodes = nodes.Sum(s => s.TraverseDfs().Count());
+
+            var progress1 = progress == null ? null : new Progress("Texturing", currentInfos.Length, progress);
+            var progress2 = progress == null ? null : new Progress("Debugging", currentInfos.Length, progress);
+            var progress3 = progress == null ? null : new Progress("Hierarchy", currentNodes,        progress);
+
+            // generate textures
 
             var stopwatch = Stopwatch.StartNew();
-            Profiler.BeginSample("TEX ATLAS");
-            factory.GetTextureAtlas(infos2, out var atlas, out var atlasTexture, out var atlasIndices);
+            Profiler.BeginSample("DMD texture atlas");
+            var texturing = factory.GetTextureAtlas(currentInfos, progress1);
             Profiler.EndSample();
-            Debug.Log($"Atlas generated in {stopwatch.Elapsed} ({infos1.Length} -> {infos2.Length})");
+            Debug.Log($"Texture atlas built from {currentInfos.Length} textures in {stopwatch.Elapsed.TotalSeconds:F3} seconds.");
 
-            var texturing = new DMDTexturing(atlas, atlasIndices, atlasTexture);
+            if (texturing.AtlasTexture != null)
+                texturing.AtlasTexture.filterMode = FilterMode.Point;
 
-            if (atlasTexture != null)
-            {
-                atlasTexture.filterMode = FilterMode.Point;
-            }
+            // generate textures for debugging
+
+            factory.ExportData(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
 
             // cleanup garbage from previous hierarchy if any
 
@@ -98,12 +103,18 @@ namespace Twisted.Editor
                 stack.Push(new KeyValuePair<DMDNode, GameObject>(node, gameObject));
             }
 
+            var progressNodesCount = 0;
+
             while (stack.Count > 0)
             {
+                progress3?.Report(1.0f / currentNodes * ++progressNodesCount);
+
                 var (node, parent) = stack.Pop();
 
                 if (ExcludeFromHierarchy(node))
-                    continue;
+                {
+                    // continue; // TODO not working with progress reporting
+                }
 
                 var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
 
@@ -115,18 +126,15 @@ namespace Twisted.Editor
                 }
             }
 
-            if (atlas != null)
-            {
-                DestroyImmediate(atlas);
-            }
+            texturing.Dispose();
 
-            if (frame)
+            if (frame) // TODO move
             {
                 SceneViewUtility.Frame(gameObject);
             }
         }
 
-        private static void ConfigureNode(GameObject parent, DMDNode node, DMDTexturing texturing, bool split)
+        private static void ConfigureNode(GameObject parent, DMDNode node, ViewerTexturing texturing, bool split)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
@@ -137,13 +145,12 @@ namespace Twisted.Editor
             if (texturing == null)
                 throw new ArgumentNullException(nameof(texturing));
 
-            var info = node.GetNodeInfo();
+            // var info = node.GetNodeInfo();
+            var info = TryGetNodeInfo(node);
 
             if (info is not null)
             {
-                Debug.Log(
-                    $"Kind = 0x{node.NodeKind:X4}, Role = 0x{node.NodeRole:X4}, Position = {node.Position}, Info = {info}", parent
-                );
+                // Debug.Log($"Found node with role '{info}'.", parent);
             }
 
             switch (node)
@@ -343,6 +350,89 @@ namespace Twisted.Editor
             }
         }
 
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        private static string? TryGetNodeInfo(DMDNode node)
+        {
+            var info = node.NodeType switch
+            {
+                0x0107_0A00 => "Sweet Tooth",
+                0x0107_1400 => "Yellow Jacket",
+                0x0107_1E00 => "Darkside",
+                0x0107_2800 => "Hammerhead",
+                0x0107_3200 => "Outlaw",
+                0x0107_3C00 => "Crimson Fury",
+                0x0107_4600 => "Warthog",
+                0x0107_5000 => "Mr Grimm",
+                0x0107_5A00 => "Pit Viper",
+                0x0107_6400 => "Thumper",
+                0x0107_6E00 => "Spectre",
+                0x0107_7800 => "Road Kill",
+                0x040B_9101 => "Power up",
+                0x040B_9201 => "Power up",
+                0x040B_9301 => "Power up",
+                0x040B_9501 => "Power up",
+                0x040B_9A01 => "Power up",
+                0x040B_9C01 => "Power up",
+                0x040B_9E01 => "Power up",
+                _           => null
+            };
+
+            var role = node.NodeRole.ReverseEndianness();
+
+            info ??= role switch
+            {
+                0x0001 => "3D environment",
+                0x0002 => "Sky",
+                0x00C9 => "Bullet",
+                0x0138 => "Bullet",
+                0x00D2 => "Weapon texture",
+                0x00D4 => "Weapon texture",
+                0x00D5 => "Weapon texture",
+                0x00D6 => "Weapon texture",
+                0x028A => "Flame animation",
+                0x028B => "Smoke animation",
+                0x028C => "Contrail animation",
+                0x028D => "Spark animation",
+                0x028E => "Explosion animation",
+                0x028F => "Burst animation",
+                0x0290 => "Burn animation",
+                0x029E => "Frag texture",
+                0x029F => "Frag texture",
+                0x02A0 => "Frag texture",
+                0x02A1 => "Frag texture",
+                0x02EF => "Pedestrian",
+                0x02F4 => "Pedestrian",
+                0x02F8 => "Pedestrian",
+                0x0304 => "Pedestrian",
+                0x0305 => "Pedestrian",
+                0x0307 => "Pedestrian",
+                0x0308 => "Pedestrian",
+                0x0309 => "Pedestrian",
+                0x030A => "Pedestrian",
+                0x030D => "Pedestrian",
+                0x030E => "Pedestrian",
+                0x02EE => "Hover cop",
+                0x02F0 => "Hover cop",
+                0x02F1 => "Static cop",
+                0x02F2 => "Static cop",
+                0x02F3 => "Static cop",
+                0x04D8 => "Dashboard",
+                0x04DF => "Rear view mirror",
+                0x04EC => "Dashboard icons",
+                0x0500 => "Steering wheel",
+                0x012D => "Special bullet",
+                0x012E => "Special bullet",
+                0x0134 => "Special bullet",
+                0x0135 => "Special bullet",
+                0x0398 => "Health stand",
+                0x0399 => "Health stand lightning",
+                0x0514 => "Protagonists",
+                _      => null
+            };
+
+            return info;
+        }
+
         [SuppressMessage("ReSharper", "CommentTypo")]
         private static bool ExcludeFromHierarchy(DMDNode node)
         {
@@ -460,7 +550,7 @@ namespace Twisted.Editor
             return infos;
         }
 
-        private static Mesh ConfigureModel(DMDNode00FF node, DMDTexturing texturing, IReadOnlyList<Polygon> polygons)
+        private static Mesh ConfigureModel(DMDNode00FF node, ViewerTexturing texturing, IReadOnlyList<Polygon> polygons)
         {
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
@@ -575,25 +665,6 @@ namespace Twisted.Editor
             Profiler.EndSample();
 
             return mesh;
-        }
-
-        private sealed class DMDTexturing
-        {
-            public DMDTexturing(
-                TextureAtlas                          atlas,
-                IReadOnlyDictionary<TextureInfo, int> atlasIndices,
-                Texture2D                             atlasTexture)
-            {
-                Atlas        = atlas;
-                AtlasIndices = atlasIndices;
-                AtlasTexture = atlasTexture;
-            }
-
-            public TextureAtlas Atlas { get; }
-
-            public IReadOnlyDictionary<TextureInfo, int> AtlasIndices { get; }
-
-            public Texture2D AtlasTexture { get; }
         }
     }
 }

@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 
 namespace Twisted.Editor
 {
-    public sealed class DMDViewerFactory
+    internal sealed class DMDViewerFactory
     {
         private DMDViewerFactory(DMD dmd, Tms tms)
         {
@@ -44,29 +44,20 @@ namespace Twisted.Editor
             return new DMDViewerFactory(dmd, tms);
         }
 
-        public void GetTextureAtlas(TextureInfo[] infos, out TextureAtlas atlas, out Texture2D atlasTexture, out IReadOnlyDictionary<TextureInfo, int> atlasIndices)
+        public ViewerTexturing GetTextureAtlas(TextureInfo[] infos, Progress? progress = null)
         {
-            atlas        = default!;
-            atlasTexture = default!;
-            atlasIndices = default!;
-
-            if (infos is null)
-                throw new ArgumentNullException(nameof(infos));
-
-            if (infos.Length is 0)
-                Debug.LogWarning("No textures were generated for this model because it doesn't have any textured polygon.");
-
-            if (infos.Length is 0)
-                return;
-
             // initialize VRAM, generate the set of textures for this set of texture info
 
             var buffer = FrameBuffer ??= GetBuffer();
 
             var list = new SortedList<TextureInfo, Texture2D>();
 
-            foreach (var info in infos)
+            for (var i = 0; i < infos.Length; i++)
             {
+                progress?.Report(1.0f / infos.Length * (i + 1));
+
+                var info = infos[i];
+
                 if (list.ContainsKey(info))
                     continue;
 
@@ -77,46 +68,34 @@ namespace Twisted.Editor
 
             var textures = list.Values.ToArray();
 
-            if (!TextureAtlas.TryCreate(textures, out atlas, out atlasTexture))
-                throw new InvalidOperationException("Couldn't create texture atlas, try increase atlas size or reduce the number of textures.");
+            if (!TextureAtlas.TryCreate(textures, out var atlas, out var atlasTexture))
+                throw new InvalidOperationException(
+                    "Couldn't create texture atlas, try increase atlas size or reduce the number of textures."
+                );
 
-            atlasIndices = new ReadOnlyDictionary<TextureInfo, int>(list.ToDictionary(s => s.Key, s => list.IndexOfKey(s.Key)));
+            var indices = new ReadOnlyDictionary<TextureInfo, int>(list.ToDictionary(s => s.Key, s => list.IndexOfKey(s.Key))); // TODO
 
-#if DEBUG_TEXTURES // TODO delete this texture debugging code
+            return new ViewerTexturing(atlas, new Dictionary<TextureInfo, int>(indices), atlasTexture, new Dictionary<TextureInfo, Texture2D>(list));
+        }
 
-            var directory = Path.GetFullPath(Path.Combine(Application.dataPath, "../.temp/TextureBuilder"));
+        public void ExportData(ViewerTexturing texturing, string directory, Progress? progress = null)
+        {
+            Directory.CreateDirectory(directory);
 
-            if (Directory.Exists(directory))
-            {
-                try
-                {
-                    var files = Directory.GetFiles(directory);
+            var buffer = FrameBuffer ?? GetBuffer();
 
-                    foreach (var file in files)
-                    {
-                        File.Delete(file);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-            }
-            else
-            {
-                Directory.CreateDirectory(directory);
-            }
+            File.WriteAllBytes(Path.Combine(directory, "TMS buffer.BIN"), MemoryMarshal.Cast<short, byte>(buffer.Pixels.ToArray()).ToArray());
 
             var texture = FrameBuffer.GetTexture(buffer.Format, buffer, buffer.Rect);
-            var png     = texture.EncodeToPNG();
+
+            File.WriteAllBytes(Path.Combine(directory, "TMS buffer.PNG"), texture.EncodeToPNG());
+
             Object.DestroyImmediate(texture);
 
-            File.WriteAllBytes(Path.Combine(directory, "TMS dump.BIN"), MemoryMarshal.Cast<short, byte>(buffer.Pixels.ToArray()).ToArray());
-            File.WriteAllBytes(Path.Combine(directory, "TMS dump.PNG"), png);
+            var index    = 0;
+            var textures = texturing.AtlasTextures;
 
-            var index = 0;
-
-            foreach (var (key, value) in list)
+            foreach (var (key, value) in textures)
             {
                 var name = $"Index = {index++:D3}, PX = {key.Page.Position.X}, PY = {key.Page.Position.Y}, PC = {key.Page.Colors}, CX = {key.Palette.X}, CY = {key.Palette.Y}";
 
@@ -128,10 +107,11 @@ namespace Twisted.Editor
                 var path = Path.Combine(directory, Path.ChangeExtension(name, ".PNG"));
 
                 File.WriteAllBytes(path, value.EncodeToPNG());
+
+                progress?.Report(1.0f / textures.Count * index);
             }
 
-            File.WriteAllBytes(Path.Combine(directory, "TMS atlas.png"), atlasTexture.EncodeToPNG());
-#endif
+            File.WriteAllBytes(Path.Combine(directory, "TMS atlas.png"), texturing.AtlasTexture.EncodeToPNG());
         }
 
         private FrameBuffer GetBuffer()

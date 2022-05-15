@@ -176,7 +176,7 @@ namespace Twisted.Editor
 
         private void InitializeTreeView()
         {
-            TreeView.selectionType = SelectionType.Single;
+            TreeView.selectionType = SelectionType.Multiple;
 
             TreeView.sortingEnabled = true;
 
@@ -495,12 +495,28 @@ namespace Twisted.Editor
 
             UpdateBreadcrumbs();
 
+            // no task here is overall better: progress bar modal behavior is kept, no context switch to call onto Unity API
+
+            var progress = new Progress();
+
+            progress.ProgressChanged += (_, args) =>
+            {
+                var percent1 = args.Leaf.GetProgress();
+                var percent2 = args.Head.GetProgress();
+                EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
+            };
+
+            var nodes = e.Items;
+
             Preview.ConfigureNodes(
-                Factory,
-                e.Items,
+                Factory!,
+                nodes,
                 Settings.UseSceneFrameProperty.boolValue,
-                Settings.UseSplitModelProperty.boolValue
+                Settings.UseSplitModelProperty.boolValue,
+                progress
             );
+
+            EditorUtility.ClearProgressBar();
         }
 
         #endregion

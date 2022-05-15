@@ -1,3 +1,5 @@
+bug split model multi selection fails
+
 all progress nodes should be computed first so that pbar is split
 not all nodes go to 100%
 
