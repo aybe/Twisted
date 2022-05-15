@@ -31,7 +31,7 @@ namespace Twisted.Editor
         private bool EnablePolygonColors;
 
         [SerializeField]
-        private bool EnableFilteredNodes;
+        private bool EnableFilteredNodes = true;
 
         [SerializeField]
         private bool EnableFilteredSearch;
