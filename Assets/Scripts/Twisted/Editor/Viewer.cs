@@ -417,11 +417,10 @@ namespace Twisted.Editor
                 EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
             };
 
-            ViewerPreview.ConfigureNodes(
+            ViewerPreview.SetupNodes(
                 Container,
                 Factory,
                 e.Items,
-                Settings.EnableFramingProperty.boolValue,
                 Settings.EnablePolygonGenerationProperty.boolValue,
                 Settings.EnableFilteredNodesProperty.boolValue,
                 progress
