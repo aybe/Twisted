@@ -13,9 +13,9 @@ using Object = UnityEngine.Object;
 
 namespace Twisted.Editor
 {
-    internal sealed class DMDViewerFactory
+    internal sealed class ViewerFactory
     {
-        private DMDViewerFactory(DMD dmd, Tms tms)
+        private ViewerFactory(DMD dmd, Tms tms)
         {
             DMD = dmd ?? throw new ArgumentNullException(nameof(dmd));
             TMS = tms ?? throw new ArgumentNullException(nameof(tms));
@@ -30,7 +30,7 @@ namespace Twisted.Editor
         [PublicAPI]
         public FrameBuffer? FrameBuffer { get; set; }
 
-        public static DMDViewerFactory Create(string path)
+        public static ViewerFactory Create(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
@@ -41,7 +41,7 @@ namespace Twisted.Editor
             var dmd = new DMD(reader1);
             var tms = new Tms(reader2);
 
-            return new DMDViewerFactory(dmd, tms);
+            return new ViewerFactory(dmd, tms);
         }
 
         public ViewerTexturing GetTextureAtlas(TextureInfo[] infos, Progress? progress = null)

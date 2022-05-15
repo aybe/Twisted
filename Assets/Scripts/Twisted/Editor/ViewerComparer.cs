@@ -3,9 +3,9 @@ using Twisted.Formats.Database;
 
 namespace Twisted.Editor
 {
-    internal sealed class DMDViewerComparer : EqualityComparer<DMDNode>
+    internal sealed class ViewerComparer : EqualityComparer<DMDNode>
     {
-        public static EqualityComparer<DMDNode> Instance { get; } = new DMDViewerComparer();
+        public static EqualityComparer<DMDNode> Instance { get; } = new ViewerComparer();
 
         public override bool Equals(DMDNode x, DMDNode y)
         {

@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Twisted.Editor
 {
-    [FilePath("UserSettings/DMDViewerSettings.yaml", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath("UserSettings/ViewerSettings.yaml", FilePathAttribute.Location.ProjectFolder)]
     [Serializable]
-    internal sealed class DMDViewerSettings : ScriptableSingleton<DMDViewerSettings>
+    internal sealed class ViewerSettings : ScriptableSingleton<ViewerSettings>
     {
         [SerializeField]
         private string? LastDatabase;

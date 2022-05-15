@@ -13,7 +13,7 @@ namespace Twisted.Editor
         [MenuItem("Twisted/DMD Viewer", priority = 0)]
         private static void DMDViewer()
         {
-            EditorWindow.GetWindow<DMDViewer>();
+            EditorWindow.GetWindow<Viewer>();
         }
 
         private static void BatchExtract(Action<TreeNode, List<byte[]>> action)

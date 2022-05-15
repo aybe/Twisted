@@ -14,18 +14,18 @@ using UnityEngine.UIElements;
 
 namespace Twisted.Editor
 {
-    public sealed partial class DMDViewer : EditorWindow
+    public sealed partial class Viewer : EditorWindow
     {
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
         private List<DMDNode> Breadcrumbs { get; } = new();
 
-        private DMDViewerFactory? Factory { get; set; }
+        private ViewerFactory? Factory { get; set; }
 
-        private static DMDViewerPreview Preview => Singleton<DMDViewerPreview>.instance;
+        private static ViewerPreview Preview => Singleton<ViewerPreview>.instance;
 
-        private static DMDViewerSettings Settings => DMDViewerSettings.instance;
+        private static ViewerSettings Settings => ViewerSettings.instance;
 
         private void OnDisable()
         {
@@ -180,7 +180,7 @@ namespace Twisted.Editor
 
             TreeView.sortingEnabled = true;
 
-            TreeView.SetColumns(DMDViewerTreeView.GetColumns());
+            TreeView.SetColumns(ViewerTreeView.GetColumns());
 
             TreeView.SelectionChanged += OnTreeViewSelectionChanged;
 
@@ -210,7 +210,7 @@ namespace Twisted.Editor
 
             if (File.Exists(path))
             {
-                Factory = DMDViewerFactory.Create(path);
+                Factory = ViewerFactory.Create(path);
             }
         }
 
@@ -350,7 +350,7 @@ namespace Twisted.Editor
 
         private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
         {
-            TreeView.SearchFilterComparer = evt.newValue ? DMDViewerComparer.Instance : null;
+            TreeView.SearchFilterComparer = evt.newValue ? ViewerComparer.Instance : null;
             TreeView.Rebuild();
 
             UpdateSearchLabel();
@@ -522,7 +522,7 @@ namespace Twisted.Editor
         #endregion
     }
 
-    public sealed partial class DMDViewer
+    public sealed partial class Viewer
     {
         #region Controls
 
@@ -562,8 +562,8 @@ namespace Twisted.Editor
         private Toolbar ToolbarBreadcrumbsHost =>
             rootVisualElement.Q<Toolbar>("toolbarBreadcrumbsHost");
 
-        private DMDViewerTreeView TreeView =>
-            rootVisualElement.Q<DMDViewerTreeView>();
+        private ViewerTreeView TreeView =>
+            rootVisualElement.Q<ViewerTreeView>();
 
         #endregion
     }

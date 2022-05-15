@@ -22,7 +22,7 @@ namespace Twisted.Editor
 {
     [ExecuteAlways]
     [Singleton(Automatic = true)]
-    internal sealed class DMDViewerPreview : MonoBehaviour, ISingleton
+    internal sealed class ViewerPreview : MonoBehaviour, ISingleton
         // TODO splitting
         // TODO texturing
         // TODO transform
@@ -54,7 +54,7 @@ namespace Twisted.Editor
             PolygonColors = new ReadOnlyDictionary<Type, Color>(dictionary);
         }
 
-        public void ConfigureNodes(DMDViewerFactory factory, DMDNode[] nodes, bool frame, bool split, Progress? progress = null)
+        public void ConfigureNodes(ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));
@@ -492,11 +492,11 @@ namespace Twisted.Editor
 
                             var vertex = polygon.Vertices[l];
 
-                            Profiler.BeginSample($"{nameof(DMDViewerPreview)} get vertex");
+                            Profiler.BeginSample($"{nameof(ViewerPreview)} get vertex");
                             vertices.Add(math.transform(matrix, new Vector3(vertex.X, vertex.Y, vertex.Z)));
                             Profiler.EndSample();
 
-                            Profiler.BeginSample($"{nameof(DMDViewerPreview)} get color");
+                            Profiler.BeginSample($"{nameof(ViewerPreview)} get color");
                             var color1 = polygon.Colors is null
                                 ? default(Color?)
                                 : polygon.Colors.Count switch
@@ -525,7 +525,7 @@ namespace Twisted.Editor
 
                                 var uv = polygon.TextureUVs[l];
 
-                                Profiler.BeginSample($"{nameof(DMDViewerPreview)} get UV");
+                                Profiler.BeginSample($"{nameof(ViewerPreview)} get UV");
                                 uvs.Add(texturing.Atlas.GetUV(index, uv, false, TextureTransform.FlipY));
                                 Profiler.EndSample();
                             }
@@ -563,7 +563,7 @@ namespace Twisted.Editor
                 meshes.Add(subMesh);
             }
 
-            Profiler.BeginSample($"{nameof(DMDViewerPreview)} combine meshes");
+            Profiler.BeginSample($"{nameof(ViewerPreview)} combine meshes");
 
             var combine = meshes.Select(s => new CombineInstance { mesh = s }).ToArray();
 
