@@ -74,12 +74,8 @@ namespace Twisted.Editor
 
             // generate textures
 
-            var stopwatch = Stopwatch.StartNew();
-            Profiler.BeginSample("DMD texture atlas");
             var texturing = factory.GetTextureAtlas(currentInfos, progress1);
-            Profiler.EndSample();
-            Debug.Log($"Texture atlas built from {currentInfos.Length} textures in {stopwatch.Elapsed.TotalSeconds:F3} seconds.");
-
+            
             if (texturing.AtlasTexture != null)
                 texturing.AtlasTexture.filterMode = FilterMode.Point;
 
