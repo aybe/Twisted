@@ -500,7 +500,7 @@ namespace Twisted.Editor
 
                 foreach (var polygon in group)
                 {
-                    var polygonColor = PolygonColors![polygon.GetType()];
+                    var polygonColor = PolygonColors[polygon.GetType()];
 
                     for (var i = 0; i < polygon.Vertices.Count / 2; i++)
                     {
