@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,6 +13,9 @@ namespace Twisted.Editor
     {
         public ViewerTexturingFactory(BinaryReader reader)
         {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
+
             var tms = new Tms(reader);
 
             var buffer = FrameBuffer.CreatePlayStationVideoMemory();
@@ -41,40 +43,14 @@ namespace Twisted.Editor
 
         private FrameBuffer Buffer { get; }
 
-        public ViewerTexturing GetTextureAtlas(TextureInfo[] infos, Progress? progress = null)
+        public void Export(ViewerTexturing texturing, string directory, Progress? progress = null)
         {
-            // initialize VRAM, generate the set of textures for this set of texture info
+            if (texturing == null)
+                throw new ArgumentNullException(nameof(texturing));
 
-            var list = new SortedList<TextureInfo, Texture2D>();
+            if (string.IsNullOrWhiteSpace(directory))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(directory));
 
-            for (var i = 0; i < infos.Length; i++)
-            {
-                progress?.Report(1.0f / infos.Length * (i + 1));
-
-                var info = infos[i];
-
-                if (list.ContainsKey(info))
-                    continue;
-
-                var value = GetTexture(info, TransparentColorMode.None);
-
-                list.Add(info, value);
-            }
-
-            var textures = list.Values.ToArray();
-
-            if (!TextureAtlas.TryCreate(textures, out var atlas, out var atlasTexture))
-                throw new InvalidOperationException(
-                    "Couldn't create texture atlas, try increase atlas size or reduce the number of textures."
-                );
-
-            var indices = new ReadOnlyDictionary<TextureInfo, int>(list.ToDictionary(s => s.Key, s => list.IndexOfKey(s.Key))); // TODO
-
-            return new ViewerTexturing(atlas, new Dictionary<TextureInfo, int>(indices), atlasTexture, new Dictionary<TextureInfo, Texture2D>(list));
-        }
-
-        public void ExportData(ViewerTexturing texturing, string directory, Progress? progress = null)
-        {
             Directory.CreateDirectory(directory);
 
             File.WriteAllBytes(Path.Combine(directory, "TMS buffer.BIN"), MemoryMarshal.Cast<short, byte>(Buffer.Pixels.ToArray()).ToArray());
@@ -105,6 +81,36 @@ namespace Twisted.Editor
             }
 
             File.WriteAllBytes(Path.Combine(directory, "TMS atlas.png"), texturing.AtlasTexture.EncodeToPNG());
+        }
+
+        public ViewerTexturing GetTexturing(TextureInfo[] infos, Progress? progress = null)
+        {
+            if (infos == null)
+                throw new ArgumentNullException(nameof(infos));
+
+            if (infos.Length == 0)
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(infos));
+
+            var textures = new SortedList<TextureInfo, Texture2D>();
+
+            for (var i = 0; i < infos.Length; i++)
+            {
+                progress?.Report(1.0f / infos.Length * (i + 1));
+
+                var info = infos[i];
+
+                if (textures.ContainsKey(info))
+                    continue;
+
+                textures.Add(info, GetTexture(info, TransparentColorMode.None));
+            }
+
+            if (!TextureAtlas.TryCreate(textures.Values.ToArray(), out var atlas, out var atlasTexture))
+                throw new InvalidOperationException(
+                    "Couldn't create texture atlas, try increase atlas size or reduce the number of textures."
+                );
+
+            return new ViewerTexturing(atlas, textures.ToDictionary(s => s.Key, s => textures.IndexOfKey(s.Key)), atlasTexture, textures.ToDictionary(s => s.Key, s => s.Value));
         }
 
         private Texture2D GetTexture(TextureInfo info, TransparentColorMode mode)

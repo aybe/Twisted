@@ -67,14 +67,14 @@ namespace Twisted.Editor
 
             // generate textures
 
-            var texturing = factory.GetTextureAtlas(currentInfos, progress1);
+            var texturing = factory.GetTexturing(currentInfos, progress1);
 
             if (texturing.AtlasTexture != null)
                 texturing.AtlasTexture.filterMode = FilterMode.Point;
 
             // generate textures for debugging
 
-            factory.ExportData(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
+            factory.Export(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
 
             // cleanup garbage from previous hierarchy if any
 
