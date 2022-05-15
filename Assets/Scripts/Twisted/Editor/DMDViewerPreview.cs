@@ -145,14 +145,6 @@ namespace Twisted.Editor
             if (texturing == null)
                 throw new ArgumentNullException(nameof(texturing));
 
-            // var info = node.GetNodeInfo();
-            var info = TryGetNodeInfo(node);
-
-            if (info is not null)
-            {
-                // Debug.Log($"Found node with role '{info}'.", parent);
-            }
-
             switch (node)
             {
                 case DMD:
@@ -348,89 +340,6 @@ namespace Twisted.Editor
                 default:
                     throw new ArgumentOutOfRangeException(nameof(node));
             }
-        }
-
-        [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        private static string? TryGetNodeInfo(DMDNode node)
-        {
-            var info = node.NodeType switch
-            {
-                0x0107_0A00 => "Sweet Tooth",
-                0x0107_1400 => "Yellow Jacket",
-                0x0107_1E00 => "Darkside",
-                0x0107_2800 => "Hammerhead",
-                0x0107_3200 => "Outlaw",
-                0x0107_3C00 => "Crimson Fury",
-                0x0107_4600 => "Warthog",
-                0x0107_5000 => "Mr Grimm",
-                0x0107_5A00 => "Pit Viper",
-                0x0107_6400 => "Thumper",
-                0x0107_6E00 => "Spectre",
-                0x0107_7800 => "Road Kill",
-                0x040B_9101 => "Power up",
-                0x040B_9201 => "Power up",
-                0x040B_9301 => "Power up",
-                0x040B_9501 => "Power up",
-                0x040B_9A01 => "Power up",
-                0x040B_9C01 => "Power up",
-                0x040B_9E01 => "Power up",
-                _           => null
-            };
-
-            var role = node.NodeRole.ReverseEndianness();
-
-            info ??= role switch
-            {
-                0x0001 => "3D environment",
-                0x0002 => "Sky",
-                0x00C9 => "Bullet",
-                0x0138 => "Bullet",
-                0x00D2 => "Weapon texture",
-                0x00D4 => "Weapon texture",
-                0x00D5 => "Weapon texture",
-                0x00D6 => "Weapon texture",
-                0x028A => "Flame animation",
-                0x028B => "Smoke animation",
-                0x028C => "Contrail animation",
-                0x028D => "Spark animation",
-                0x028E => "Explosion animation",
-                0x028F => "Burst animation",
-                0x0290 => "Burn animation",
-                0x029E => "Frag texture",
-                0x029F => "Frag texture",
-                0x02A0 => "Frag texture",
-                0x02A1 => "Frag texture",
-                0x02EF => "Pedestrian",
-                0x02F4 => "Pedestrian",
-                0x02F8 => "Pedestrian",
-                0x0304 => "Pedestrian",
-                0x0305 => "Pedestrian",
-                0x0307 => "Pedestrian",
-                0x0308 => "Pedestrian",
-                0x0309 => "Pedestrian",
-                0x030A => "Pedestrian",
-                0x030D => "Pedestrian",
-                0x030E => "Pedestrian",
-                0x02EE => "Hover cop",
-                0x02F0 => "Hover cop",
-                0x02F1 => "Static cop",
-                0x02F2 => "Static cop",
-                0x02F3 => "Static cop",
-                0x04D8 => "Dashboard",
-                0x04DF => "Rear view mirror",
-                0x04EC => "Dashboard icons",
-                0x0500 => "Steering wheel",
-                0x012D => "Special bullet",
-                0x012E => "Special bullet",
-                0x0134 => "Special bullet",
-                0x0135 => "Special bullet",
-                0x0398 => "Health stand",
-                0x0399 => "Health stand lightning",
-                0x0514 => "Protagonists",
-                _      => null
-            };
-
-            return info;
         }
 
         [SuppressMessage("ReSharper", "CommentTypo")]
