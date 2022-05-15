@@ -18,6 +18,8 @@ namespace Twisted.Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
+        private DMD? Database { get; set; }
+
         private static GameObject Container
         {
             get
@@ -167,9 +169,19 @@ namespace Twisted.Editor
         {
             var path = Settings.LastDatabaseProperty.stringValue;
 
-            if (File.Exists(path))
+            if (!File.Exists(path))
+                return;
+
+            using (var stream = new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, "DMD"))))
+            using (var reader = new BinaryReader(stream))
             {
-                Factory = ViewerFactory.Create(path);
+                Database = new DMD(reader);
+            }
+
+            using (var stream = new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, "TMS"))))
+            using (var reader = new BinaryReader(stream))
+            {
+                Factory = new ViewerFactory(reader);
             }
         }
 
@@ -177,9 +189,7 @@ namespace Twisted.Editor
         {
             // try populate the tree
 
-            var dmd = Factory?.DMD;
-
-            TreeView.RootNode = dmd;
+            TreeView.RootNode = Database;
 
             TreeView.Rebuild();
 
@@ -191,9 +201,7 @@ namespace Twisted.Editor
 
             // show or hide tree depending DMD, because dumb ass tree will NRE if clicked but empty
 
-            var visible = dmd is not null;
-
-            TreeView.visible = visible;
+            TreeView.visible = Database is not null;
 
             // finally, update our controls
 
