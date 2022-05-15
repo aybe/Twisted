@@ -9,26 +9,24 @@
                                name="toolbarOpenFile" class="toolbar-button"
                                style="background-image: resource(&apos;Icons/Folder&apos;);" />
             <uie:ToolbarSpacer />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon-level generation (slow)." name="toolbarModelSplitting"
+            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon-level generation (slow)." name="toolbarPolygonGeneration"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid&apos;);" />
             <uie:ToolbarSpacer />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable texture." name="toolbarTexturing" class="toolbar-toggle"
-                               style="background-image: resource(&apos;Icons/Texture2D&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable texture alpha."
-                               name="toolbarTextureAlpha" class="toolbar-toggle"
-                               style="background-image: resource(&apos;Icons/Texture&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable texture." name="toolbarTexture"
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Texture2D&apos;);" />
+            <uie:ToolbarToggle focusable="false" tooltip="Enable texture alpha." name="toolbarTextureAlpha" 
+                               class="toolbar-toggle" style="background-image: resource(&apos;Icons/Texture&apos;);" />
             <uie:ToolbarToggle focusable="false" tooltip="Enable vertex colors." name="toolbarVertexColors"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/Material&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon colors." name="toolbarPolygonColoring"
+            <uie:ToolbarToggle focusable="false" tooltip="Enable polygon colors." name="toolbarPolygonColors"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/Grid.FillTool&apos;);" />
             <uie:ToolbarSpacer />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable filtering of miscellaneous nodes." name="toolbarNodeFilter"
+            <uie:ToolbarToggle focusable="false" tooltip="Enable filtering of miscellaneous nodes." name="toolbarFilteredNodes"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/Filter&apos;);" />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable distinct nodes for search mode."
-                               name="toolbarDistinctFiltering"
+            <uie:ToolbarToggle focusable="false" tooltip="Enable distinct nodes for search mode." name="toolbarFilteredSearch"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/FilterByType&apos;);" />
             <uie:ToolbarSpacer />
-            <uie:ToolbarToggle focusable="false" tooltip="Enable selection framing." name="toolbarSelectionFraming"
+            <uie:ToolbarToggle focusable="false" tooltip="Enable selection framing." name="toolbarFraming"
                                class="toolbar-toggle" style="background-image: resource(&apos;Icons/Camera&apos;);" />
             <uie:ToolbarSpacer class="toolbar-spacer" />
             <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="toolbarSearchLabel" class="toolbar-label" />

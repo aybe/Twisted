@@ -93,14 +93,14 @@ namespace Twisted.Editor
 
         private void InitializeToolbarToggles()
         {
-            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.EnableFilteredSearchProperty,    OnToolbarDistinctFilteringValueChanged);
-            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.EnableFramingProperty,           OnToolbarSelectionFramingValueChanged);
-            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.EnablePolygonGenerationProperty, OnToolbarModelSplittingValueChanged);
-            InitializeToolbarToggle(ToolbarTexturing,         Settings.EnableTextureProperty,           OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarFraming,           Settings.EnableFramingProperty,           OnToolbarFramingValueChanged);
+            InitializeToolbarToggle(ToolbarTexture,           Settings.EnableTextureProperty,           OnToolbarTextureValueChanged);
             InitializeToolbarToggle(ToolbarTextureAlpha,      Settings.EnableTextureAlphaProperty,      OnToolbarTextureAlphaValueChanged);
             InitializeToolbarToggle(ToolbarVertexColors,      Settings.EnableVertexColorsProperty,      OnToolbarVertexColorsValueChanged);
-            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.EnablePolygonColorsProperty,     OnToolbarPolygonColoringValueChanged);
-            InitializeToolbarToggle(ToolbarNodeFilter,        Settings.EnableFilteredNodesProperty,     OnToolbarNodeFilterValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonColors,     Settings.EnablePolygonColorsProperty,     OnToolbarPolygonColorsValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonGeneration, Settings.EnablePolygonGenerationProperty, OnToolbarPolygonGenerationValueChanged);
+            InitializeToolbarToggle(ToolbarFilteredNodes,     Settings.EnableFilteredNodesProperty,     OnToolbarFilteredNodesValueChanged);
+            InitializeToolbarToggle(ToolbarFilteredSearch,    Settings.EnableFilteredSearchProperty,    OnToolbarFilteredSearchValueChanged);
         }
 
         private static void InitializeToolbarToggle(
@@ -272,7 +272,7 @@ namespace Twisted.Editor
             UpdateTitle();
         }
 
-        private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarFramingValueChanged(ChangeEvent<bool> evt)
         {
             if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
@@ -280,7 +280,7 @@ namespace Twisted.Editor
             }
         }
 
-        private void OnToolbarDistinctFilteringValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarFilteredSearchValueChanged(ChangeEvent<bool> evt)
         {
             TreeView.SearchFilterComparer = evt.newValue ? ViewerComparer.Instance : null;
             TreeView.Rebuild();
@@ -288,13 +288,13 @@ namespace Twisted.Editor
             UpdateSearchLabel();
         }
 
-        private void OnToolbarModelSplittingValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarPolygonGenerationValueChanged(ChangeEvent<bool> evt)
         {
             UpdateSelection();
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
-        private void OnToolbarTexturingValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarTextureValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_TEXTURE"), evt.newValue);
         }
@@ -312,12 +312,12 @@ namespace Twisted.Editor
         }
 
         [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
-        private void OnToolbarPolygonColoringValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarPolygonColorsValueChanged(ChangeEvent<bool> evt)
         {
             Shader.SetKeyword(GlobalKeyword.Create("DMD_VIEWER_COLOR_POLYGON"), evt.newValue);
         }
 
-        private void OnToolbarNodeFilterValueChanged(ChangeEvent<bool> evt)
+        private void OnToolbarFilteredNodesValueChanged(ChangeEvent<bool> evt)
         {
             UpdateSelection();
         }
@@ -428,6 +428,11 @@ namespace Twisted.Editor
             );
 
             EditorUtility.ClearProgressBar();
+
+            if (Settings.EnableFramingProperty.boolValue)
+            {
+                ViewerPreview.Frame(Container);
+            }
         }
 
         #endregion
@@ -440,17 +445,17 @@ namespace Twisted.Editor
         private ToolbarButton ToolbarOpenFile =>
             rootVisualElement.Q<ToolbarButton>("toolbarOpenFile");
 
-        private ToolbarToggle ToolbarDistinctFiltering =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarDistinctFiltering");
+        private ToolbarToggle ToolbarFilteredSearch =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarFilteredSearch");
 
-        private ToolbarToggle ToolbarSelectionFraming =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarSelectionFraming");
+        private ToolbarToggle ToolbarFraming =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarFraming");
 
-        private ToolbarToggle ToolbarModelSplitting =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarModelSplitting");
+        private ToolbarToggle ToolbarPolygonGeneration =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonGeneration");
 
-        private ToolbarToggle ToolbarTexturing =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarTexturing");
+        private ToolbarToggle ToolbarTexture =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarTexture");
 
         private ToolbarToggle ToolbarTextureAlpha =>
             rootVisualElement.Q<ToolbarToggle>("toolbarTextureAlpha");
@@ -458,11 +463,11 @@ namespace Twisted.Editor
         private ToolbarToggle ToolbarVertexColors =>
             rootVisualElement.Q<ToolbarToggle>("toolbarVertexColors");
 
-        private ToolbarToggle ToolbarPolygonColoring =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColoring");
+        private ToolbarToggle ToolbarPolygonColors =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarPolygonColors");
 
-        private ToolbarToggle ToolbarNodeFilter =>
-            rootVisualElement.Q<ToolbarToggle>("toolbarNodeFilter");
+        private ToolbarToggle ToolbarFilteredNodes =>
+            rootVisualElement.Q<ToolbarToggle>("toolbarFilteredNodes");
 
         private Label ToolbarSearchLabel =>
             rootVisualElement.Q<Label>("toolbarSearchLabel");
