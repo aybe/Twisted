@@ -18,8 +18,6 @@ namespace Twisted.Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private DMD? Database { get; set; }
-
         private static GameObject Container
         {
             get
@@ -34,6 +32,8 @@ namespace Twisted.Editor
                 return gameObject;
             }
         }
+
+        private DMD? Database { get; set; }
 
         private ViewerFactory? Factory { get; set; }
 
