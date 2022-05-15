@@ -15,28 +15,28 @@ namespace Twisted.Editor
         private string? LastFilter;
 
         [SerializeField]
-        private bool UseFilterDistinct;
+        private bool EnableFraming = true;
 
         [SerializeField]
-        private bool UseModelTexture = true;
+        private bool EnablePolygonGeneration;
 
         [SerializeField]
-        private bool UseTextureAlpha = true;
+        private bool EnableTexture = true;
 
         [SerializeField]
-        private bool UseSceneFrame = true;
+        private bool EnableTextureAlpha = true;
 
         [SerializeField]
-        private bool UseSplitModel;
+        private bool EnableVertexColors = true;
 
         [SerializeField]
-        private bool UseVertexColors = true;
+        private bool EnablePolygonColors;
 
         [SerializeField]
-        private bool UsePolygonColors;
+        private bool EnableFilteredNodes;
 
         [SerializeField]
-        private bool UseNodeFilter;
+        private bool EnableFilteredSearch;
 
         public SerializedObject SerializedObject { get; private set; } = null!;
 
@@ -44,21 +44,21 @@ namespace Twisted.Editor
 
         public SerializedProperty LastFilterProperty { get; private set; } = null!;
 
-        public SerializedProperty UseFilterDistinctProperty { get; private set; } = null!;
+        public SerializedProperty EnableFilteredSearchProperty { get; private set; } = null!;
 
-        public SerializedProperty UseModelTextureProperty { get; private set; } = null!;
+        public SerializedProperty EnableTextureProperty { get; private set; } = null!;
 
-        public SerializedProperty UseTextureAlphaProperty { get; private set; } = null!;
+        public SerializedProperty EnableTextureAlphaProperty { get; private set; } = null!;
 
-        public SerializedProperty UsePolygonColorsProperty { get; private set; } = null!;
+        public SerializedProperty EnablePolygonColorsProperty { get; private set; } = null!;
 
-        public SerializedProperty UseSceneFrameProperty { get; private set; } = null!;
+        public SerializedProperty EnableFramingProperty { get; private set; } = null!;
 
-        public SerializedProperty UseSplitModelProperty { get; private set; } = null!;
+        public SerializedProperty EnablePolygonGenerationProperty { get; private set; } = null!;
 
-        public SerializedProperty UseVertexColorsProperty { get; private set; } = null!;
+        public SerializedProperty EnableVertexColorsProperty { get; private set; } = null!;
 
-        public SerializedProperty UseNodeFilterProperty { get; private set; } = null!;
+        public SerializedProperty EnableFilteredNodesProperty { get; private set; } = null!;
 
         private void OnEnable()
         {
@@ -71,16 +71,16 @@ namespace Twisted.Editor
 
             SerializedObject = new SerializedObject(this);
 
-            LastDatabaseProperty      = SerializedObject.FindProperty(nameof(LastDatabase));
-            LastFilterProperty        = SerializedObject.FindProperty(nameof(LastFilter));
-            UseFilterDistinctProperty = SerializedObject.FindProperty(nameof(UseFilterDistinct));
-            UseModelTextureProperty   = SerializedObject.FindProperty(nameof(UseModelTexture));
-            UseTextureAlphaProperty   = SerializedObject.FindProperty(nameof(UseTextureAlpha));
-            UseSceneFrameProperty     = SerializedObject.FindProperty(nameof(UseSceneFrame));
-            UseSplitModelProperty     = SerializedObject.FindProperty(nameof(UseSplitModel));
-            UseVertexColorsProperty   = SerializedObject.FindProperty(nameof(UseVertexColors));
-            UsePolygonColorsProperty  = SerializedObject.FindProperty(nameof(UsePolygonColors));
-            UseNodeFilterProperty     = SerializedObject.FindProperty(nameof(UseNodeFilter));
+            LastDatabaseProperty            = SerializedObject.FindProperty(nameof(LastDatabase));
+            LastFilterProperty              = SerializedObject.FindProperty(nameof(LastFilter));
+            EnableFramingProperty           = SerializedObject.FindProperty(nameof(EnableFraming));
+            EnablePolygonGenerationProperty = SerializedObject.FindProperty(nameof(EnablePolygonGeneration));
+            EnableTextureProperty           = SerializedObject.FindProperty(nameof(EnableTexture));
+            EnableTextureAlphaProperty      = SerializedObject.FindProperty(nameof(EnableTextureAlpha));
+            EnableVertexColorsProperty      = SerializedObject.FindProperty(nameof(EnableVertexColors));
+            EnablePolygonColorsProperty     = SerializedObject.FindProperty(nameof(EnablePolygonColors));
+            EnableFilteredNodesProperty     = SerializedObject.FindProperty(nameof(EnableFilteredNodes));
+            EnableFilteredSearchProperty    = SerializedObject.FindProperty(nameof(EnableFilteredSearch));
         }
 
         public void Save()

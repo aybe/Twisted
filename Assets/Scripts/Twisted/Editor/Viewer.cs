@@ -133,14 +133,14 @@ namespace Twisted.Editor
 
         private void InitializeToolbarToggles()
         {
-            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.UseFilterDistinctProperty, OnToolbarDistinctFilteringValueChanged);
-            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.UseSceneFrameProperty,     OnToolbarSelectionFramingValueChanged);
-            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.UseSplitModelProperty,     OnToolbarModelSplittingValueChanged);
-            InitializeToolbarToggle(ToolbarTexturing,         Settings.UseModelTextureProperty,   OnToolbarTexturingValueChanged);
-            InitializeToolbarToggle(ToolbarTextureAlpha,      Settings.UseTextureAlphaProperty,   OnToolbarTextureAlphaValueChanged);
-            InitializeToolbarToggle(ToolbarVertexColors,      Settings.UseVertexColorsProperty,   OnToolbarVertexColorsValueChanged);
-            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.UsePolygonColorsProperty,  OnToolbarPolygonColoringValueChanged);
-            InitializeToolbarToggle(ToolbarNodeFilter,        Settings.UseNodeFilterProperty,     OnToolbarNodeFilterValueChanged);
+            InitializeToolbarToggle(ToolbarDistinctFiltering, Settings.EnableFilteredSearchProperty,    OnToolbarDistinctFilteringValueChanged);
+            InitializeToolbarToggle(ToolbarSelectionFraming,  Settings.EnableFramingProperty,           OnToolbarSelectionFramingValueChanged);
+            InitializeToolbarToggle(ToolbarModelSplitting,    Settings.EnablePolygonGenerationProperty, OnToolbarModelSplittingValueChanged);
+            InitializeToolbarToggle(ToolbarTexturing,         Settings.EnableTextureProperty,           OnToolbarTexturingValueChanged);
+            InitializeToolbarToggle(ToolbarTextureAlpha,      Settings.EnableTextureAlphaProperty,      OnToolbarTextureAlphaValueChanged);
+            InitializeToolbarToggle(ToolbarVertexColors,      Settings.EnableVertexColorsProperty,      OnToolbarVertexColorsValueChanged);
+            InitializeToolbarToggle(ToolbarPolygonColoring,   Settings.EnablePolygonColorsProperty,     OnToolbarPolygonColoringValueChanged);
+            InitializeToolbarToggle(ToolbarNodeFilter,        Settings.EnableFilteredNodesProperty,     OnToolbarNodeFilterValueChanged);
         }
 
         private static void InitializeToolbarToggle(
@@ -352,7 +352,7 @@ namespace Twisted.Editor
 
         private void OnToolbarSelectionFramingValueChanged(ChangeEvent<bool> evt)
         {
-            if (Settings.UseSceneFrameProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
+            if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
                 EditorApplication.delayCall += () => ViewerUtility.Frame(Preview.gameObject);
             }
@@ -524,9 +524,9 @@ namespace Twisted.Editor
             Preview.ConfigureNodes(
                 Factory,
                 e.Items,
-                Settings.UseSceneFrameProperty.boolValue,
-                Settings.UseSplitModelProperty.boolValue,
-                Settings.UseNodeFilterProperty.boolValue,
+                Settings.EnableFramingProperty.boolValue,
+                Settings.EnablePolygonGenerationProperty.boolValue,
+                Settings.EnableFilteredNodesProperty.boolValue,
                 progress
             );
 
