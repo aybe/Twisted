@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace Twisted.Controls
+namespace Twisted.Extensions
 {
     public static class VisualElementExtensions
     {

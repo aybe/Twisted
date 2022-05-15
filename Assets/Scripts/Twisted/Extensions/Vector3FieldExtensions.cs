@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace Twisted.Editor
+namespace Twisted.Extensions
 {
     public static class Vector3FieldExtensions
     {

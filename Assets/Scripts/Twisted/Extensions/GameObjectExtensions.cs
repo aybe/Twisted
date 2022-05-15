@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Twisted.Editor
+namespace Twisted.Extensions
 {
     public static class GameObjectExtensions
     {
