@@ -1,10 +1,8 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Twisted.Editor
 {
-    [Serializable]
     [FilePath("UserSettings/ViewerSettings.asset", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class ViewerSettings : ScriptableSingleton<ViewerSettings>
     {
