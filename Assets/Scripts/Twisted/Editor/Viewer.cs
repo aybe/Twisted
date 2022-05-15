@@ -35,7 +35,7 @@ namespace Twisted.Editor
 
         private DMD? Database { get; set; }
 
-        private ViewerFactory? Factory { get; set; }
+        private ViewerTexturingFactory? Factory { get; set; }
 
         private static ViewerSettings Settings => ViewerSettings.instance;
 
@@ -181,7 +181,7 @@ namespace Twisted.Editor
             using (var stream = new MemoryStream(File.ReadAllBytes(Path.ChangeExtension(path, "TMS"))))
             using (var reader = new BinaryReader(stream))
             {
-                Factory = new ViewerFactory(reader);
+                Factory = new ViewerTexturingFactory(reader);
             }
         }
 

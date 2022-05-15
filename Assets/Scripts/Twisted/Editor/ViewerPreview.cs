@@ -47,7 +47,7 @@ namespace Twisted.Editor
         }
 
 
-        public static void ConfigureNodes(GameObject host, ViewerFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
+        public static void ConfigureNodes(GameObject host, ViewerTexturingFactory factory, DMDNode[] nodes, bool frame, bool split, bool filter, Progress? progress = null)
         {
             if (factory is null)
                 throw new ArgumentNullException(nameof(factory));

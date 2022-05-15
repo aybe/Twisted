@@ -10,9 +10,9 @@ using Object = UnityEngine.Object;
 
 namespace Twisted.Editor
 {
-    internal sealed class ViewerFactory
+    internal sealed class ViewerTexturingFactory
     {
-        public ViewerFactory(BinaryReader reader)
+        public ViewerTexturingFactory(BinaryReader reader)
         {
             var tms = new Tms(reader);
 
