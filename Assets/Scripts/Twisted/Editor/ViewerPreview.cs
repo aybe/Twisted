@@ -116,7 +116,10 @@ namespace Twisted.Editor
                     // continue; // TODO not working with progress reporting
                 }
 
-                var child = parent.CreateChild($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}");
+                var child = new GameObject($"0x{node.NodeType:X8} ({node.GetType().Name}) @ {node.Position}")
+                {
+                    transform = { parent = parent.transform }
+                };
 
                 ConfigureNode(child, node, texturing, split);
 
@@ -163,7 +166,7 @@ namespace Twisted.Editor
                             ? $"Index = {++index}, Type = {polygons.Single().GetType().Name.Replace("Polygon", string.Empty)}, Position = {polygons.Single().Position}"
                             : parent.name;
 
-                        var child = split ? parent.CreateChild(label) : parent;
+                        var child = split ? new GameObject(label) { transform = { parent = parent.transform } } : parent;
 
                         var mesh = ConfigureModel(node00FF, texturing, polygons);
 
