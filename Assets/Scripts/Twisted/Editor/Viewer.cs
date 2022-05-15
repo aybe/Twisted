@@ -344,7 +344,7 @@ namespace Twisted.Editor
         {
             if (Settings.UseSceneFrameProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
             {
-                EditorApplication.delayCall += () => SceneViewUtility.Frame(Preview.gameObject);
+                EditorApplication.delayCall += () => ViewerUtility.Frame(Preview.gameObject);
             }
         }
 

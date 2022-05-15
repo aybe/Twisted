@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Twisted.Editor
 {
-    public static class SceneViewUtility
+    public static class ViewerUtility
     {
         public static void Frame(GameObject gameObject)
         {

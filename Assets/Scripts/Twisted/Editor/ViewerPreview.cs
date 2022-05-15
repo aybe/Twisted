@@ -130,7 +130,7 @@ namespace Twisted.Editor
 
             if (frame) // TODO move
             {
-                SceneViewUtility.Frame(gameObject);
+                ViewerUtility.Frame(gameObject);
             }
         }
 
