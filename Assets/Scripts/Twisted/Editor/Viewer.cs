@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -465,5 +466,23 @@ namespace Twisted.Editor
             rootVisualElement.Q<ViewerTreeView>();
 
         #endregion
+    }
+
+    public sealed partial class Viewer
+    {
+        private sealed class ViewerComparer : EqualityComparer<DMDNode>
+        {
+            public static EqualityComparer<DMDNode> Instance { get; } = new ViewerComparer();
+
+            public override bool Equals(DMDNode x, DMDNode y)
+            {
+                return x.Position.Equals(y.Position);
+            }
+
+            public override int GetHashCode(DMDNode obj)
+            {
+                return obj.Position.GetHashCode();
+            }
+        }
     }
 }
