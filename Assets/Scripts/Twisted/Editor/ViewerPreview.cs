@@ -187,9 +187,8 @@ namespace Twisted.Editor
 
                     foreach (var polygons in lists)
                     {
-                        var value = polygons.Single();
                         var label = split
-                            ? $"Polygon {++index:D3}, Type = 0x{value.GetType().Name.Replace("Polygon", string.Empty)}, Position = {value.Position}"
+                            ? $"Polygon {++index:D3}, Type = 0x{polygons.Single().GetType().Name.Replace("Polygon", string.Empty)}, Position = {polygons.Single().Position}"
                             : parent.name;
 
                         var child = split ? new GameObject(label) { transform = { parent = parent.transform } } : parent;
