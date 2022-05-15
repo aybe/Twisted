@@ -13,12 +13,12 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
 {
-    [ExecuteAlways]
-    internal sealed class ViewerPreview : MonoBehaviour
+    internal sealed class ViewerPreview
         // TODO splitting
         // TODO texturing
         // TODO transform
@@ -79,7 +79,7 @@ namespace Twisted.Editor
 
             while (host.transform.childCount > 0)
             {
-                DestroyImmediate(host.transform.GetChild(0).gameObject);
+                Object.DestroyImmediate(host.transform.GetChild(0).gameObject);
             }
 
             // build hierarchy of selected nodes
