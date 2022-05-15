@@ -26,58 +26,6 @@ namespace Twisted.Editor
 
         private void OnDisable()
         {
-            rootVisualElement
-                .UnregisterCallback<KeyDownEvent>(
-                    OnRootVisualKeyDown
-                );
-
-            ToolbarOpenFile.clicked -= OnToolbarOpenFile;
-
-            ToolbarDistinctFiltering
-                .UnregisterValueChangedCallback(
-                    OnToolbarDistinctFilteringValueChanged
-                );
-
-            ToolbarSelectionFraming
-                .UnregisterValueChangedCallback(
-                    OnToolbarSelectionFramingValueChanged
-                );
-
-            ToolbarModelSplitting
-                .UnregisterValueChangedCallback(
-                    OnToolbarModelSplittingValueChanged
-                );
-
-            ToolbarTexturing
-                .UnregisterValueChangedCallback(
-                    OnToolbarTexturingValueChanged
-                );
-
-            ToolbarTextureAlpha
-                .UnregisterValueChangedCallback(
-                    OnToolbarTextureAlphaValueChanged
-                );
-
-            ToolbarVertexColors
-                .UnregisterValueChangedCallback(
-                    OnToolbarVertexColorsValueChanged
-                );
-
-            ToolbarPolygonColoring
-                .UnregisterValueChangedCallback(
-                    OnToolbarPolygonColoringValueChanged
-                );
-
-            ToolbarSearchField
-                .UnregisterValueChangedCallback(
-                    OnToolbarSearchFieldValueChanged
-                );
-
-            ToolbarSearchField
-                .UnregisterCallback<KeyDownEvent>(
-                    OnToolbarSearchFieldKeyDown
-                );
-
             TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
 
             TreeView.Dispose();
