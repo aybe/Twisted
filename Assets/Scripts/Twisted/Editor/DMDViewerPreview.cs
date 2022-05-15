@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Controls;
-using Twisted.Extensions;
 using Twisted.Formats.Binary;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
