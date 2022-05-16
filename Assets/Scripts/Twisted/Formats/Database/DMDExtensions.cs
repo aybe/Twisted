@@ -60,6 +60,7 @@ namespace Twisted.Formats.Database
         {
             var info = node.NodeType switch
             {
+                0x0107_0100 => "3D environment",
                 0x0107_0A00 => "Sweet Tooth",
                 0x0107_1400 => "Yellow Jacket",
                 0x0107_1E00 => "Darkside",
@@ -86,7 +87,6 @@ namespace Twisted.Formats.Database
 
             info ??= role switch
             {
-                0x0001 => "3D environment",
                 0x0002 => "Sky",
                 0x00C9 => "Bullet",
                 0x0138 => "Bullet",
