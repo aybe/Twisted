@@ -56,7 +56,7 @@ namespace Twisted.Formats.Database
         }
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        public static string? GetNodeInfo(this DMDNode node)
+        public static string? TryGetNodeInfo(this DMDNode node)
         {
             var info = node.NodeType switch
             {
