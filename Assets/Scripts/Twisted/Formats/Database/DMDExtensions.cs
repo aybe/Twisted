@@ -62,6 +62,7 @@ namespace Twisted.Formats.Database
             {
                 0x0107_0100 => "3D environment",
                 0x0107_0200 => "Sky",
+                0x0107_0300 => "Ground",
                 0x0107_0A00 => "Sweet Tooth",
                 0x0107_1400 => "Yellow Jacket",
                 0x0107_1E00 => "Darkside",
