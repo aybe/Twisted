@@ -243,18 +243,29 @@ namespace Twisted.Editor
 
             var currentInfos = nodes.SelectMany(GetTextures).Distinct().ToArray();
             var currentNodes = GetNodes(nodes, filter);
-            var progress1    = progress == null ? null : new Progress("Texturing", currentInfos.Length, progress);
-            var progress2    = progress == null ? null : new Progress("Debugging", currentInfos.Length, progress);
-            var progress3    = progress == null ? null : new Progress("Hierarchy", currentNodes,        progress);
+
+            var progress1 = progress == null || currentInfos.Length is 0
+                ? null
+                : new Progress("Texturing", currentInfos.Length, progress);
+
+            var progress2 = progress == null || currentInfos.Length is 0
+                ? null
+                : new Progress("Debugging", currentInfos.Length, progress);
+
+            var progress3 = progress == null
+                ? null
+                : new Progress("Hierarchy", currentNodes, progress);
 
             // initialize textures
 
-            var texturing = factory.GetTexturing(currentInfos, progress1);
+            var texturing = currentInfos.Length is 0 ? null : factory.GetTexturing(currentInfos, progress1);
 
-            if (texturing.AtlasTexture != null)
+            if (texturing != null)
+            {
                 texturing.AtlasTexture.filterMode = FilterMode.Point;
 
-            factory.Export(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
+                factory.Export(texturing, Path.Combine(Application.dataPath, "../.temp", DateTime.Now.ToString("u").Replace(":", "-")), progress2);
+            }
 
             // build scene hierarchy
 
@@ -294,19 +305,16 @@ namespace Twisted.Editor
                 }
             }
 
-            texturing.Dispose();
+            texturing?.Dispose();
         }
 
-        private static void SetupNode(GameObject host, DMDNode node, ViewerTexturing texturing, bool split)
+        private static void SetupNode(GameObject host, DMDNode node, ViewerTexturing? texturing, bool split)
         {
             if (host == null)
                 throw new ArgumentNullException(nameof(host));
 
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
-
-            if (texturing == null)
-                throw new ArgumentNullException(nameof(texturing));
 
             switch (node)
             {
@@ -351,7 +359,7 @@ namespace Twisted.Editor
                         mf.sharedMesh = mesh;
 
                         var mr = child.AddComponent<MeshRenderer>();
-                        mr.material = new Material(shader) { mainTexture = texturing.AtlasTexture };
+                        mr.material = new Material(shader) { mainTexture = texturing?.AtlasTexture };
                     }
 
                     break;
@@ -362,13 +370,10 @@ namespace Twisted.Editor
             SetupNodeTransform(node, host);
         }
 
-        private static Mesh SetupNodeMesh(DMDNode00FF node, ViewerTexturing texturing, IReadOnlyList<Polygon> polygons)
+        private static Mesh SetupNodeMesh(DMDNode00FF node, ViewerTexturing? texturing, IReadOnlyList<Polygon> polygons)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
-
-            if (texturing == null)
-                throw new ArgumentNullException(nameof(texturing));
 
             if (polygons == null)
                 throw new ArgumentNullException(nameof(polygons));
@@ -423,11 +428,14 @@ namespace Twisted.Editor
 
                             colors2.Add(polygonColor);
 
-                            var info = polygon.TextureInfo;
-
-                            if (info is not null && polygon.TextureUVs is not null)
+                            if (polygon.TextureInfo is not null && polygon.TextureUVs is not null)
                             {
-                                var key = info.Value;
+                                if (texturing is null)
+                                {
+                                    throw new ArgumentNullException(nameof(texturing));
+                                }
+                                
+                                var key = polygon.TextureInfo.Value;
 
                                 if (!texturing.AtlasIndices.TryGetValue(key, out var index))
                                 {
