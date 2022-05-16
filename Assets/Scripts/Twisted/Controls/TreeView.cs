@@ -191,7 +191,7 @@ namespace Twisted.Controls
         /// </summary>
         public void SetSelection(IEnumerable<T> nodes)
         {
-            var indices = nodes.Select(node => Builder.GetNodeIdentifier(node)).ToArray();
+            var indices = nodes.Select(s => viewController.GetIndexForId(Builder.GetNodeIdentifier(s))).ToArray();
 
             SetSelection(indices);
         }
