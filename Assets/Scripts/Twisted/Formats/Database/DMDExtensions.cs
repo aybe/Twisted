@@ -75,6 +75,8 @@ namespace Twisted.Formats.Database
                 0x0107_6400 => new DMDInfo(DMDInfoCategory.Character,   "Thumper"),
                 0x0107_6E00 => new DMDInfo(DMDInfoCategory.Character,   "Spectre"),
                 0x0107_7800 => new DMDInfo(DMDInfoCategory.Character,   "Road Kill"),
+                0x0107_8200 => new DMDInfo(DMDInfoCategory.Character,   "Minion"),
+                0x0107_F503 => new DMDInfo(DMDInfoCategory.Character,   "Talon"),
                 0x040B_9101 => new DMDInfo(DMDInfoCategory.Bonus,       "Power up"),
                 0x040B_9201 => new DMDInfo(DMDInfoCategory.Bonus,       "Power up"),
                 0x040B_9301 => new DMDInfo(DMDInfoCategory.Bonus,       "Power up"),
