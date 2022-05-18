@@ -186,39 +186,39 @@ This is a bug in Unity's tree view.
 
 **Maximizing a scene view while the viewer is open clears the hierarchy:**
 
-This is because windows are destroyed during this event, significant work required.
+Editor windows get destroyed during this event, currently this isn't handled.
 
 **Rendering a database in its entirety produces wrong textures:**
 
-This seems to be because there is colliding texture information in the game data.
+There is colliding texture information in the game data.
 
 **Scene hierarchy is not updated by viewer after switching to play mode:**
 
-This needs to be investigated, for now, close it and open it again to fix the issue.
+This has to be investigated, for now, close it and open it again to fix the issue.
 
 **Sprites are completely wrong:**
 
-These require a special type of node that isn't implemented at the moment.
+They require a special type of node that isn't implemented at the moment.
 
 **Wrong colors in some regions:**
 
-There is extra lighting involved in the game but it hasn't been figured out yet.
+Extra lighting is involved in the game but it hasn't been figured out yet.
 
 **Wrong textures in some regions:**
 
-This is because there is incorrect texture information in some of the polygons.
+There is incorrect texture information in some of the polygons.
 
 **Wrong transforms for some objects:**
 
-This is because the game performs extra transformations at runtime.
+The game performs extra transformations at runtime.
 
 **Wrong transparency for some objects:**
 
-This is because correct transparency among families of polygons has yet to be done.
+Correct transparency among families of polygons has yet to be implemented.
 
 **Z-fighting:**
 
-This is because some objects are at the same position or are missing ordering tables.
+Either some objects are at the same position or required ordering tables are missing.
 
 # Gallery
 
