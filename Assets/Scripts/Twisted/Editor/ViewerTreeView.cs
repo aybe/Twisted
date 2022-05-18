@@ -60,10 +60,19 @@ namespace Twisted.Editor
                 },
                 new TreeViewColumn<DMDNode>
                 {
+                    Title          = "Category",
+                    Name           = "Category",
+                    MinWidth       = 125.0f,
+                    ValueGetter    = s => s.TryGetInfo()?.Category.ToString(),
+                    ValueComparer  = s => Comparer<string>.Default,
+                    ValueFormatter = s => $"{s}"
+                },
+                new TreeViewColumn<DMDNode>
+                {
                     Title          = "Description",
                     Name           = "Description",
                     MinWidth       = 150.0f,
-                    ValueGetter    = s => s.TryGetNodeInfo(),
+                    ValueGetter    = s => s.TryGetInfo()?.Description,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}"
                 },

@@ -131,37 +131,10 @@ namespace Twisted.Editor
             return infos;
         }
 
-        [SuppressMessage("ReSharper", "CommentTypo")]
         private static bool IsExcluded(DMDNode node)
-            // TODO make an enum or whatever out of this
         {
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
-
-            switch (node.NodeType)
-            {
-                case 0x0107_0A00: // sweet tooth
-                case 0x0107_1400: // yellow jacket
-                case 0x0107_1E00: // darkside
-                case 0x0107_2800: // hammerhead
-                case 0x0107_3200: // outlaw
-                case 0x0107_3C00: // crimson fury
-                case 0x0107_4600: // warthog
-                case 0x0107_5000: // mr grimm
-                case 0x0107_5A00: // pit viper
-                case 0x0107_6400: // thump
-                case 0x0107_6E00: // spectre
-                case 0x0107_7800: // road kill
-                    return true;
-                case 0x040B_9101: // power up 
-                case 0x040B_9201: // power up 
-                case 0x040B_9301: // power up 
-                case 0x040B_9501: // power up 
-                case 0x040B_9A01: // power up 
-                case 0x040B_9C01: // power up 
-                case 0x040B_9E01: // power up 
-                    return true;
-            }
 
             // mesh with highest LOD when there are many
 
@@ -173,59 +146,9 @@ namespace Twisted.Editor
                 }
             }
 
-            // various stuff
+            // only show environment to simplify overall
 
-            var role = node.NodeRole.ReverseEndianness();
-
-            switch (role)
-            {
-                case 0x00D2: // weapon texture
-                case 0x00D4: // weapon texture
-                case 0x00D5: // weapon texture
-                case 0x00D6: // weapon texture
-                case 0x028A: // flame animation
-                case 0x028B: // smoke animation
-                case 0x028C: // contrail animation
-                case 0x028D: // spark animation
-                case 0x028E: // explosion animation
-                case 0x028F: // burst animation
-                case 0x0290: // burn animation
-                case 0x029E: // frag texture
-                case 0x029F: // frag texture
-                case 0x02A0: // frag texture
-                case 0x02A1: // frag texture
-                case 0x02EF: // pedestrian
-                case 0x02F4: // pedestrian
-                case 0x02F8: // pedestrian
-                case 0x0304: // pedestrian
-                case 0x0305: // pedestrian
-                case 0x0307: // pedestrian
-                case 0x0308: // pedestrian
-                case 0x0309: // pedestrian
-                case 0x030A: // pedestrian
-                case 0x030D: // pedestrian
-                case 0x030E: // pedestrian
-                case 0x02EE: // hover cop
-                case 0x02F0: // hover cop
-                case 0x02F1: // static cop
-                case 0x02F2: // static cop
-                case 0x02F3: // static cop
-                case 0x04D8: // dashboard
-                case 0x04DF: // rear view mirror
-                case 0x04EC: // dashboard icons
-                case 0x0500: // steering wheel
-                case 0x012D: // special bullet
-                case 0x012E: // special bullet
-                case 0x0134: // special bullet
-                case 0x0135: // special bullet
-                    return true;
-                case 0x0398: // health stand
-                case 0x0399: // health stand lightniing
-                case 0x0514: // car occupants
-                    break;
-            }
-
-            return false;
+            return node.TryGetInfo() is { Category: not DMDInfoCategory.Environment };
         }
 
         public static void SetupNodes(GameObject host, ViewerTexturingFactory factory, DMDNode[] nodes, bool split, bool filter, Progress? progress = null)
