@@ -17,7 +17,7 @@ namespace Twisted.Editor
                 {
                     Title          = "Name",
                     Name           = "Name",
-                    MinWidth       = 200.0f,
+                    MinWidth       = 150.0f,
                     ValueGetter    = s => s.GetType().Name,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}"
@@ -71,7 +71,7 @@ namespace Twisted.Editor
                 {
                     Title          = "Description",
                     Name           = "Description",
-                    MinWidth       = 150.0f,
+                    MinWidth       = 125.0f,
                     ValueGetter    = s => s.TryGetInfo()?.Description,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}"
@@ -80,7 +80,7 @@ namespace Twisted.Editor
                 {
                     Title          = "Polygons",
                     Name           = "Polygons",
-                    MinWidth       = 150.0f,
+                    MinWidth       = 125.0f,
                     ValueGetter    = s => s is DMDNode00FF ff ? ff.GetPolygonsString() : null,
                     ValueComparer  = s => Comparer<string>.Default,
                     ValueFormatter = s => $"{s}"
