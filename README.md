@@ -184,17 +184,17 @@ This is a bug in Unity's tree view.
 
 ## Project
 
-**Rendering a database in its entirety produces wrong textures:**
-
-There is colliding texture information in the game data.
-
-**Sprites are completely wrong:**
-
-They require a special type of node that isn't implemented at the moment.
-
 **Wrong colors in some regions:**
 
 Extra lighting is involved in the game but it hasn't been figured out yet.
+
+**Wrong sprites:**
+
+These require a special type of node that isn't implemented at the moment.
+
+**Wrong textures if rendering a database in its entirety:**
+
+There is colliding texture information in the game data.
 
 **Wrong textures in some regions:**
 
@@ -206,7 +206,7 @@ The game performs extra transformations at runtime.
 
 **Wrong transparency for some objects:**
 
-Correct transparency among families of polygons has yet to be implemented.
+Correct transparency among families of polygons isn't implemented at the moment.
 
 **Z-fighting:**
 
