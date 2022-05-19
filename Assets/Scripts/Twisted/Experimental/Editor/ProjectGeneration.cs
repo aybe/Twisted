@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Twisted.Editor
+namespace Twisted.Experimental.Editor
 {
     internal sealed class ProjectGeneration : AssetPostprocessor
     {
@@ -108,6 +108,7 @@ namespace Twisted.Editor
             }
 
             // ReSharper disable once ConvertToUsingDeclaration
+
             using (var writer = new Utf8StringWriter())
             {
                 document.Save(writer);

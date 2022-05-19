@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Twisted.Editor
+namespace Twisted.Experimental
 {
     /// <summary>
     ///     Hierarchical progress reporting.

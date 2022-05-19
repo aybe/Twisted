@@ -2,13 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace Twisted.Controls
 {
-    [PublicAPI]
     public static class TreeNodeExtensions
     {
+        public static bool HasParent<T>(this TreeNode node) where T : TreeNode
+        {
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
+
+            var parent = node.Parent;
+
+            while (parent is not null)
+            {
+                if (parent is T)
+                {
+                    return true;
+                }
+
+                parent = parent.Parent;
+            }
+
+            return false;
+        }
+
         public static string PrintHierarchyBackward(this TreeNode node)
         {
             if (node is null)

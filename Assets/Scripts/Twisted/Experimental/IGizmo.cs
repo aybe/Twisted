@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Twisted.Editor
+namespace Twisted.Experimental
 {
     /// <summary>
     ///     Z-sorted gizmos.

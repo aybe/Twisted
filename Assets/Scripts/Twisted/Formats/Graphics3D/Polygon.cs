@@ -17,11 +17,11 @@ namespace Twisted.Formats.Graphics3D
     {
         protected Polygon(
             BinaryReader reader,
-            int          polygonSize      = -1,
-            int          polygonFaces     = -1,
-            int          positionVertices = -1,
-            int          positionNormals  = -1,
-            int          offsetNormals    = -1)
+            int polygonSize = -1,
+            int polygonFaces = -1,
+            int positionVertices = -1,
+            int positionNormals = -1,
+            int offsetNormals = -1)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -197,7 +197,7 @@ namespace Twisted.Formats.Graphics3D
         protected virtual int? TextureElements { get; } = null;
 
         protected virtual int? TextureElementsPosition { get; } = null;
-        
+
         protected virtual int? TextureWindowPosition { get; } = null;
 
         public TextureInfo? TextureInfo => TryReadTextureInfo();
@@ -236,8 +236,8 @@ namespace Twisted.Formats.Graphics3D
             var pageDisable = (pageRaw & 0b_00001000_00000000) / 1024;
             var page        = new TexturePage(new TexturePosition(pageX, pageY), (TexturePageAlpha)pageAlpha, (TexturePageColors)pageColors, (TexturePageDisable)pageDisable);
 
-            var window = TextureWindowPosition.HasValue 
-                ? new TextureWindow(Data.ReadInt32(TextureWindowPosition.Value, Endianness.LE)) 
+            var window = TextureWindowPosition.HasValue
+                ? new TextureWindow(Data.ReadInt32(TextureWindowPosition.Value, Endianness.LE))
                 : default(TextureWindow?);
 
             return new TextureInfo(page, palette, window);

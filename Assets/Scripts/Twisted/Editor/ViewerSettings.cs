@@ -45,7 +45,7 @@ namespace Twisted.Editor
         public SerializedProperty LastDatabaseProperty { get; private set; } = null!;
 
         public SerializedProperty LastFilterProperty { get; private set; } = null!;
-        
+
         public SerializedProperty LastSelectionProperty { get; private set; } = null!;
 
         public SerializedProperty EnableFilteredSearchProperty { get; private set; } = null!;

@@ -75,12 +75,12 @@ namespace Twisted.Formats.Graphics2D
         }
 
         public static Texture2D GetTexture(
-            FrameBufferFormat    picFormat,
-            FrameBuffer          picBuffer,
-            RectInt              picRect,
-            FrameBuffer?         palBuffer = null,
-            RectInt?             palRect   = null,
-            TransparentColorMode mode      = TransparentColorMode.None)
+            FrameBufferFormat picFormat,
+            FrameBuffer picBuffer,
+            RectInt picRect,
+            FrameBuffer? palBuffer = null,
+            RectInt? palRect = null,
+            TransparentColorMode mode = TransparentColorMode.None)
         {
             if (picBuffer is null)
                 throw new ArgumentNullException(nameof(picBuffer));

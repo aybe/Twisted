@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
 
 namespace Twisted.Controls
 {
-    [PublicAPI]
     public abstract class TreeNode : IList<TreeNode>
     {
         private TreeNode? _parent;
@@ -34,7 +31,6 @@ namespace Twisted.Controls
             }
         }
 
-        [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
         public TreeNode? Parent => _parent;
 
         public TreeNode Root
@@ -152,42 +148,6 @@ namespace Twisted.Controls
             child._parent = null;
 
             Children.RemoveAt(index);
-        }
-
-        public List<T> GetParents<T>() where T : TreeNode
-        {
-            var parents = new List<T>();
-
-            var parent = this;
-
-            while (parent is not null)
-            {
-                if (parent is T value)
-                {
-                    parents.Add(value);
-                }
-
-                parent = parent.Parent;
-            }
-
-            return parents;
-        }
-
-        public bool HasParent<T>() where T : TreeNode
-        {
-            var parent = Parent;
-
-            while (parent is not null)
-            {
-                if (parent is T)
-                {
-                    return true;
-                }
-
-                parent = parent.Parent;
-            }
-
-            return false;
         }
     }
 }

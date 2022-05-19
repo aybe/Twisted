@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 
 namespace Twisted.Controls
 {
+    [PublicAPI]
     public class TreeViewColumn<T> where T : TreeNode
     {
         public const string ControlUssClassName = "generic-tree-view-cell-control";
@@ -102,146 +103,124 @@ namespace Twisted.Controls
 
         private Column Column { get; } = new();
 
-        [PublicAPI]
         public string Name
         {
             get => Column.name;
             set => Column.name = value;
         }
 
-        [PublicAPI]
         public string Title
         {
             get => Column.title;
             set => Column.title = value;
         }
 
-        [PublicAPI]
         public Background Icon
         {
             get => Column.icon;
             set => Column.icon = value;
         }
 
-        [PublicAPI]
         public bool Visible
         {
             get => Column.visible;
             set => Column.visible = value;
         }
 
-        [PublicAPI]
         public Length Width
         {
             get => Column.width;
             set => Column.width = value;
         }
 
-        [PublicAPI]
         public Length MinWidth
         {
             get => Column.minWidth;
             set => Column.minWidth = value;
         }
 
-        [PublicAPI]
         public Length MaxWidth
         {
             get => Column.maxWidth;
             set => Column.maxWidth = value;
         }
 
-        [PublicAPI]
         public bool Sortable
         {
             get => Column.sortable;
             set => Column.sortable = value;
         }
 
-        [PublicAPI]
         public bool Stretchable
         {
             get => Column.stretchable;
             set => Column.stretchable = value;
         }
 
-        [PublicAPI]
         public bool Optional
         {
             get => Column.optional;
             set => Column.optional = value;
         }
 
-        [PublicAPI]
         public bool Resizable
         {
             get => Column.resizable;
             set => Column.resizable = value;
         }
 
-        [PublicAPI]
         public Func<VisualElement> HeaderMake
         {
             get => Column.makeHeader;
             set => Column.makeHeader = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement> HeaderBind
         {
             get => Column.bindHeader;
             set => Column.bindHeader = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement> HeaderUnbind
         {
             get => Column.unbindHeader;
             set => Column.unbindHeader = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement> HeaderDestroy
         {
             get => Column.destroyHeader;
             set => Column.destroyHeader = value;
         }
 
-        [PublicAPI]
         public Func<VisualElement> CellMake
         {
             get => Column.makeCell;
             set => Column.makeCell = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement, int> CellBind
         {
             get => Column.bindCell;
             set => Column.bindCell = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement, int> CellUnbind
         {
             get => Column.unbindCell;
             set => Column.unbindCell = value;
         }
 
-        [PublicAPI]
         public Action<VisualElement> CellDestroy
         {
             get => Column.destroyCell;
             set => Column.destroyCell = value;
         }
 
-        [PublicAPI]
         public Func<T, object?>? ValueGetter { get; set; }
 
-        [PublicAPI]
         public Func<object?, string?>? ValueFormatter { get; set; }
 
-        [PublicAPI]
         public Func<object?, IComparer>? ValueComparer { get; set; }
 
         internal Column GetColumn()

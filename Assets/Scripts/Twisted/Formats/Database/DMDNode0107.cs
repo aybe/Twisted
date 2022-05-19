@@ -8,9 +8,8 @@ namespace Twisted.Formats.Database
 {
     public sealed class DMDNode0107 : DMDNode
     {
-        private readonly int Unknown1;
-
-        public readonly float3 BoundsCenter;
+        public readonly  float3 BoundsCenter;
+        private readonly int    Unknown1;
 
         public DMDNode0107(DMDNode? parent, BinaryReader reader)
             : base(parent, reader)

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Twisted.Controls;
-using Twisted.Formats.Binary;
 using Twisted.Formats.Database;
 using Twisted.Formats.Graphics2D;
 using Twisted.Formats.Graphics3D;
@@ -15,6 +13,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using Object = UnityEngine.Object;
+using Progress = Twisted.Experimental.Progress;
 using Random = UnityEngine.Random;
 
 namespace Twisted.Editor
@@ -354,7 +353,7 @@ namespace Twisted.Editor
                                 {
                                     throw new ArgumentNullException(nameof(texturing));
                                 }
-                                
+
                                 var key = polygon.TextureInfo.Value;
 
                                 if (!texturing.AtlasIndices.TryGetValue(key, out var index))

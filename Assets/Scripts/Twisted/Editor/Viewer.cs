@@ -10,6 +10,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
+using Progress = Twisted.Experimental.Progress;
 
 namespace Twisted.Editor
 {

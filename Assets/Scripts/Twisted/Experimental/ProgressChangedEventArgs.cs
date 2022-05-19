@@ -1,4 +1,4 @@
-﻿namespace Twisted.Editor
+﻿namespace Twisted.Experimental
 {
     public sealed class ProgressChangedEventArgs
     {

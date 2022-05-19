@@ -19,10 +19,11 @@ namespace Twisted.Controls
 
         public void OnSortChanged()
         {
-            // these code monkeys will raise this event N headers + 2 times in a row for NO FUCKING REASON
-            // this, unless you hold a FUCKING modifier such as Shift or Ctrl, obviously, not explained...
-            // now let's protect ourselves from their stupid shit by using a task with a rudimentary guard
-            // this, along our manual handling brings back SMOOTH performance like there was in IMGUI tree
+            // how fucking amazing? these guys raise this event as many times as there are columns + 2
+
+            // that is, unless you hold a fucking modifier and obviously that isn't explained anywhere
+
+            // to protect ourselves from this shit we use a task and it brings smooth performance back
 
             if (BackgroundTask?.IsCompleted == false)
                 return;
@@ -31,7 +32,7 @@ namespace Twisted.Controls
                 Sort,
                 CancellationToken.None,
                 TaskCreationOptions.None,
-                TaskScheduler.FromCurrentSynchronizationContext() // this is WPF-like, cross-thread stuff
+                TaskScheduler.FromCurrentSynchronizationContext()
             );
         }
 
@@ -47,7 +48,7 @@ namespace Twisted.Controls
 
             View.Rebuild();
 
-            // restore the collapsed/expanded state of the tree view items but in a FAST manner
+            // restore the collapsed/expanded state of the tree view items but in a fast manner
 
             SortLoadExpanded(collapsed, expanded);
 
@@ -59,19 +60,19 @@ namespace Twisted.Controls
 
                 View.SetSelectionByIdWithoutNotify(selection.Select(s => builder.GetNodeIdentifier(s)));
 
-                // scroll to something or it'll suck, not perfect because of their incompetence
+                // scroll to something or it'll suck, this isn't perfect because you know why!
 
                 View.ScrollToItemById(builder.GetNodeIdentifier(selection.First()));
             }
 
-            View.RefreshItems(); // now redraw the control or we'll get a nice broken interface
+            View.RefreshItems(); // try avoid partially redrawn tree! BUG doesn't always work!
 
             View.Focus();
         }
 
         private void SortSaveExpanded(out HashSet<T> collapsed, out HashSet<T> expanded)
         {
-            // by using their slow junk at bare minimum we can finally enjoy decent performance
+            // by carefully avoiding to use their incredibly slow junk, we get decent speed
 
             collapsed = new HashSet<T>();
             expanded  = new HashSet<T>();
@@ -95,9 +96,7 @@ namespace Twisted.Controls
 
         private void SortLoadExpanded(HashSet<T> collapsed, HashSet<T> expanded)
         {
-            // here we use a simple but effective approach that scale well for 10K+ tree nodes
-            // now really stupid: we'd do it in whichever way that will take the shortest time
-            // that's because this crap is exponentially longer as there are nodes in the tree
+            // same as when saving the expanded nodes, simple, works fast for 10K+ nodes
 
             var builder = View.Builder;
 

@@ -6,19 +6,12 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// these bugs are impossible to fix because these morons failed to do proper testing
-// let's see again in maybe six months or so, if they're not too lazy or 'by design'
-
-// BUG the mouse wheel can fully reveal last item but keyboard navigation cannot
-// BUG expand root item, scroll down, sort: enjoy an incompletely redrawn tree
-
 namespace Twisted.Controls
 {
     public class TreeView<T> : MultiColumnTreeView, IDisposable where T : TreeNode
-    // not only the code monkeys at Unity managed to do it in 3 FUCKING YEARS,
-    // it's also unbelievably buggy but from them this isn't a surprise at all
-    // worst being the column sorting stuff, that was literally freezing Unity
-    // to deep sort 10K+ nodes: theirs = ~30 second, mine = less than a second
+    // not only these morons managed to do it 3 FUCKING years, it's also incredibly buggy
+    // the worst being the column sorting that would literally freeze the whole interface
+    // sorting using their shit is like 30 seconds, using mine is literally instantaneous
     {
         protected TreeView()
         {
@@ -91,13 +84,16 @@ namespace Twisted.Controls
         /// <summary>
         ///     Gets or sets the root node for this instance.
         /// </summary>
+        /// <remarks>
+        ///     Call <see cref="Rebuild" /> to apply changes.
+        /// </remarks>
         public T? RootNode { get; set; }
 
         /// <summary>
         ///     Gets or sets the search filter for this instance.
         /// </summary>
         /// <remarks>
-        ///     Call <see cref="Rebuild" /> after to apply changes.
+        ///     Call <see cref="Rebuild" /> to apply changes.
         /// </remarks>
         public string? SearchFilter { get; set; }
 
@@ -105,7 +101,7 @@ namespace Twisted.Controls
         ///     Gets or sets the search filter comparer for this instance.
         /// </summary>
         /// <remarks>
-        ///     Call <see cref="Rebuild" /> after to apply changes.
+        ///     Call <see cref="Rebuild" /> to apply changes.
         /// </remarks>
         public IEqualityComparer<T>? SearchFilterComparer { get; set; }
 
@@ -114,8 +110,10 @@ namespace Twisted.Controls
         #region Public methods
 
         /// <inheritdoc cref="VisualElement.Focus" />
-        public new void Focus() // how the fuck they even managed to fail on that?
+        public new void Focus()
         {
+            // amazingly, they couldn't even get this thing right...
+
             this.Q<ScrollView>().contentContainer.Focus();
         }
 
@@ -129,7 +127,7 @@ namespace Twisted.Controls
         }
 
         /// <inheritdoc cref="BaseVerticalCollectionView.Rebuild" />
-        public new void Rebuild() // let's go pile up on their favorite 'new' keyword
+        public new void Rebuild()
         {
             // backup the actual selection so that we can restore it after rebuild
 
@@ -223,10 +221,12 @@ namespace Twisted.Controls
             if (node is null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (node is null)
-                throw new ArgumentNullException(nameof(node));
-
             var id = Builder.GetNodeIdentifier(node);
+
+            if (id is -1)
+            {
+                throw new InvalidOperationException($"Couldn't get identifier for '{node}'.");
+            }
 
             if (notify)
             {
@@ -272,15 +272,12 @@ namespace Twisted.Controls
 
         private void OnContextMenuPopulate(ContextualMenuPopulateEvent evt)
         {
-            // I've decided to use this approach which, I believe, is the least intrusive way to implement this
-            // and it follows what appears to be the newest crap in their junk API: ContextualMenuPopulateEvent
-            // this has many benefits, it works on the entire row and doesn't steal focus like in IMGUI version
-            // now the downside is that we have to rely on user data because TreeNode is by nature not bindable
+            // this is the least intrusive approach that doesn't steal focus like in IMGUI tree view
+
+            // but we do have to rely on user data for this to work because TreeNode is not bindable
 
             if (ContextMenuHandler is null)
-            {
-                return; // user may not choose to use context menu, in this case there's no point in doing work
-            }
+                return;
 
             // get the row container that holds the controls representing a cell
 
@@ -308,7 +305,7 @@ namespace Twisted.Controls
                 throw new InvalidOperationException("Cell control could not be found.");
             }
 
-            // invoke user callback to populate context menu, it will be displayed immediately after that
+            // invoke callback to populate menu, get displayed immediately after
 
             var node = element.userData as T ?? throw new InvalidOperationException("Cell has no user data.");
 
