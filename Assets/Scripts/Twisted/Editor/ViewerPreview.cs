@@ -76,9 +76,6 @@ namespace Twisted.Editor
             if (nodes == null)
                 throw new ArgumentNullException(nameof(nodes));
 
-            if (nodes.Length == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(nodes));
-
             var count = 0;
 
             if (filter)
