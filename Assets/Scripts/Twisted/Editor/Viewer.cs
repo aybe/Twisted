@@ -41,9 +41,14 @@ namespace Twisted.Editor
 
         private void OnDisable()
         {
-            TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
-            TreeView.Dispose();
+            if (TreeView != null) // when the window gets maximized in editor, this becomes true
+            {
+                TreeView.SelectionChanged -= OnTreeViewSelectionChanged;
+
+                TreeView.Dispose();
+            }
 
             Settings.Save();
         }
