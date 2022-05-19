@@ -184,17 +184,9 @@ This is a bug in Unity's tree view.
 
 ## Project
 
-**Maximizing a scene view while the viewer is open clears the hierarchy:**
-
-Editor windows get destroyed during this event, currently this isn't handled.
-
 **Rendering a database in its entirety produces wrong textures:**
 
 There is colliding texture information in the game data.
-
-**Scene hierarchy is not updated by viewer after switching to play mode:**
-
-This has to be investigated, for now, close it and open it again to fix the issue.
 
 **Sprites are completely wrong:**
 
