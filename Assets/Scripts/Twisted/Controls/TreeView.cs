@@ -189,11 +189,30 @@ namespace Twisted.Controls
         /// <summary>
         ///     Sets the selected nodes for this instance.
         /// </summary>
-        public void SetSelection(IEnumerable<T> nodes)
+        public void SetSelection(IEnumerable<T> nodes, bool notify)
         {
-            var indices = nodes.Select(s => viewController.GetIndexForId(Builder.GetNodeIdentifier(s))).ToArray();
+            var indices = new List<int>();
 
-            SetSelection(indices);
+            foreach (var node in nodes)
+            {
+                var id = Builder.GetNodeIdentifier(node);
+
+                if (id is -1)
+                {
+                    throw new InvalidOperationException($"Couldn't get identifier for '{node}'.");
+                }
+
+                indices.Add(id);
+            }
+
+            if (notify)
+            {
+                SetSelectionById(indices);
+            }
+            else
+            {
+                SetSelectionByIdWithoutNotify(indices);
+            }
         }
 
         /// <summary>

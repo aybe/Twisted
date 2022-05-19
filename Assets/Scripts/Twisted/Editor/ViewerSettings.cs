@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Twisted.Editor
@@ -11,6 +12,9 @@ namespace Twisted.Editor
 
         [SerializeField]
         private string? LastFilter;
+
+        [SerializeField]
+        private List<int> LastSelection = new();
 
         [SerializeField]
         private bool EnableFraming = true;
@@ -41,6 +45,8 @@ namespace Twisted.Editor
         public SerializedProperty LastDatabaseProperty { get; private set; } = null!;
 
         public SerializedProperty LastFilterProperty { get; private set; } = null!;
+        
+        public SerializedProperty LastSelectionProperty { get; private set; } = null!;
 
         public SerializedProperty EnableFilteredSearchProperty { get; private set; } = null!;
 
@@ -71,6 +77,7 @@ namespace Twisted.Editor
 
             LastDatabaseProperty            = SerializedObject.FindProperty(nameof(LastDatabase));
             LastFilterProperty              = SerializedObject.FindProperty(nameof(LastFilter));
+            LastSelectionProperty           = SerializedObject.FindProperty(nameof(LastSelection));
             EnableFramingProperty           = SerializedObject.FindProperty(nameof(EnableFraming));
             EnablePolygonGenerationProperty = SerializedObject.FindProperty(nameof(EnablePolygonGeneration));
             EnableTextureProperty           = SerializedObject.FindProperty(nameof(EnableTexture));

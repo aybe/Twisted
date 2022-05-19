@@ -62,6 +62,8 @@ namespace Twisted.Editor
             UpdateFactory();
             UpdateInterface();
             UpdateTitle();
+
+            UpdateSelectionLoad();
         }
 
         #region Initialization/cleanup
@@ -230,8 +232,65 @@ namespace Twisted.Editor
             var selection = TreeView.GetSelection();
             if (selection.Any())
             {
-                TreeView.SetSelection(selection);
+                TreeView.SetSelection(selection, true);
             }
+        }
+
+        /// <summary>
+        ///     Loads selection from settings.
+        /// </summary>
+        private void UpdateSelectionLoad()
+        {
+            if (Database == null)
+                return;
+
+            var nodes      = new List<DMDNode>();
+            var selection  = Settings.LastSelectionProperty;
+            var dictionary = Database.TraverseDfs().Cast<DMDNode>().ToDictionary(s => s.PrintHierarchyBackward().GetHashCode(StringComparison.Ordinal), s => s);
+            var enumerator = selection.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                var item = enumerator.Current as SerializedProperty ?? throw new InvalidOperationException();
+                var hash = item.intValue;
+
+                if (dictionary.TryGetValue(hash, out var node))
+                {
+                    nodes.Add(node);
+                }
+            }
+
+            if (nodes.Any())
+            {
+                TreeView.SetSelection(nodes, true);
+            }
+        }
+
+        /// <summary>
+        ///     Saves selection to settings.
+        /// </summary>
+        private static void UpdateSelectionSave(DMDNode[] nodes)
+        {
+            if (nodes == null)
+                throw new ArgumentNullException(nameof(nodes));
+
+            var selection = Settings.LastSelectionProperty;
+
+            selection.ClearArray();
+
+            foreach (var node in nodes)
+            {
+                var text = node.PrintHierarchyBackward();
+                var hash = text.GetHashCode(StringComparison.Ordinal);
+
+                selection.InsertArrayElementAtIndex(selection.arraySize);
+
+                var item = selection.GetArrayElementAtIndex(selection.arraySize - 1);
+
+                item.intValue = hash;
+            }
+
+            selection.serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         #endregion
@@ -406,7 +465,13 @@ namespace Twisted.Editor
             if (Factory is null)
                 return;
 
-            // no task here is overall better: progress bar modal behavior is kept, no context switch to call onto Unity API
+            var nodes = e.Items;
+
+            // save selected nodes to settings
+
+            UpdateSelectionSave(nodes);
+
+            // generate scene, a sync call ensures for a modal progress bar and simplifies calling Unity API
 
             var progress = new Progress();
 
@@ -420,7 +485,7 @@ namespace Twisted.Editor
             ViewerPreview.SetupNodes(
                 Container,
                 Factory,
-                e.Items,
+                nodes,
                 Settings.EnablePolygonGenerationProperty.boolValue,
                 Settings.EnableFilteredNodesProperty.boolValue,
                 progress
