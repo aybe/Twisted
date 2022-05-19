@@ -18,21 +18,6 @@ namespace Twisted.Editor
         [SerializeField]
         private VisualTreeAsset VisualTreeAsset = null!;
 
-        private static GameObject Container
-        {
-            get
-            {
-                var gameObject = GameObject.Find("DMD Viewer");
-
-                if (gameObject == null)
-                {
-                    gameObject = new GameObject("DMD Viewer") { hideFlags = HideFlags.DontSave };
-                }
-
-                return gameObject;
-            }
-        }
-
         private DMD? Database { get; set; }
 
         private ViewerTexturingFactory? Factory { get; set; }
@@ -51,11 +36,6 @@ namespace Twisted.Editor
             }
 
             Settings.Save();
-        }
-
-        private void OnDestroy()
-        {
-            DestroyImmediate(Container);
         }
 
         public void CreateGUI()
@@ -338,10 +318,17 @@ namespace Twisted.Editor
 
         private void OnToolbarFramingValueChanged(ChangeEvent<bool> evt)
         {
-            if (Settings.EnableFramingProperty.boolValue && TreeView.GetSelection().OfType<DMDNode00FF>().Any())
+            if (!Settings.EnableFramingProperty.boolValue || !TreeView.GetSelection().OfType<DMDNode00FF>().Any())
+                return;
+
+            var gameObject = GameObject.Find("DMD Viewer");
+            if (gameObject == null)
+                return;
+
+            EditorApplication.delayCall += () =>
             {
-                EditorApplication.delayCall += () => ViewerPreview.Frame(Container);
-            }
+                ViewerPreview.Frame(gameObject);
+            };
         }
 
         private void OnToolbarFilteredSearchValueChanged(ChangeEvent<bool> evt)
@@ -487,8 +474,12 @@ namespace Twisted.Editor
                 EditorUtility.DisplayProgressBar("Generating scene, please be patient...", $"{args.Leaf.Header}: {percent1:P0}", percent2);
             };
 
+            var container = GameObject.Find("DMD Viewer");
+            if (container == null)
+                container = new GameObject("DMD Viewer");
+
             ViewerPreview.SetupNodes(
-                Container,
+                container,
                 Factory,
                 nodes,
                 Settings.EnablePolygonGenerationProperty.boolValue,
@@ -500,7 +491,7 @@ namespace Twisted.Editor
 
             if (Settings.EnableFramingProperty.boolValue)
             {
-                ViewerPreview.Frame(Container);
+                ViewerPreview.Frame(container);
             }
         }
 
